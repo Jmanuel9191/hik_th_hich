@@ -1,0 +1,427 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+@media (min-width: 768px) {
+.skin-red .main-header .logo {
+  
+     border-right: 1px solid #DBDBDB; 
+             border-bottom: 1px solid #0072c3;
+}
+.main-sidebar {
+  
+     border-right: 1px solid #DBDBDB; 
+}
+
+  .sidebar-toggle   { 
+  border-radius: 50%!important;
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    top: 20px;
+    left: -16px;
+
+     } 
+
+            .main-header .navbar {
+   
+    margin-left: 215px;
+
+    min-height: 70px;
+ 
+}
+}
+
+
+@media (max-width: 767px) {
+
+
+    .breadcrum{display: none!important;}
+
+    .main-sidebar {
+        -webkit-transform: translate(-250px, 0);
+        -ms-transform: translate(-250px, 0);
+        -o-transform: translate(-250px, 0);
+        transform: translate(-250px, 0);
+    }
+
+    .content-wrapper, .main-footer {
+        margin-left: 0!important;
+    }
+}
+.main-sidebar {
+        width: 215px!important;
+        padding-top: 70px;
+    }
+
+       .skin-red .main-header .navbar,
+    .skin-red .main-header .logo{
+        background-color: white!important;
+    }
+
+    .skin-red .sidebar-menu>li:hover>a, .skin-red .sidebar-menu>li.active>a {
+        color: #fff!important;
+        background: #0072c3;
+        border-left-color: #000000;
+    }
+
+    .skin-red .sidebar-menu>li.header {
+        color: #4b646f;
+        background: #8dccff;
+    }
+
+    .skin-red .wrapper, .skin-red .main-sidebar, .skin-red .left-side {
+        background-color: #ffffff;
+    }
+
+
+    .navbar-nav>.user-menu>.dropdown-menu>.user-footer {
+        background-color: white;
+        padding:7px;
+    }
+    .navbar-nav>.user-menu>.dropdown-menu>.user-footer .btn-default {
+        color: #ffffff;
+        background: transparent;
+        border: none;
+        font-size: 14px;
+        font-weight: 600;
+            text-align: left;
+    border-bottom: 1px solid;
+    padding-left: 15px;
+    width: 100%;
+    }
+
+  .wrapper .content-wrapper, .main-footer{
+    margin-left: 215px;    
+    }
+
+ 
+
+.main-header .logo img {
+    padding: 10px;
+    /* margin: 0 auto; */
+    max-width: 100%;
+}
+
+.main-header .logo {
+    width: 215px;
+    height: 70px;
+  }   
+.sidebar-toggle   { 
+   background-color: #f8f8f8!important;
+    color: #7f7f7f!important;
+    border: 2px solid #f0f0f0;
+  
+
+     } 
+
+     .main-header .sidebar-toggle {
+    padding: 12px 12px!important;
+}
+
+
+
+     .main-header .sidebar-toggle:before {
+    content: "\f104";
+    position: absolute;
+ top: -7px;
+    left: 7px;
+    font-size: 26px;
+}
+
+.main-sidebar,
+.left-side {
+    transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+}
+
+.content-wrapper,
+.main-footer,
+.main-header .navbar,
+.main-header .logo {
+    transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+}
+
+.foents p{
+      font-family: "Inter", sans-serif;
+      font-weight: 400;
+      color: #787486;
+      font-size: 14px;
+ }   
+    .foents {
+        position: absolute;
+    padding: 13px;
+    bottom: 0;
+
+    }
+
+a {
+
+color: #0072c3!important }
+
+.breadcrum {
+    font-family: "Inter", sans-serif;
+    font-weight: bold;
+    font-size: 18px;
+    position: absolute;
+    left: 27px;
+    top: 21px;
+}
+
+.btn-success {
+    background-color: #0072c3!important;
+    border-color: #3186cc !important;
+    color:white!important;
+    border: 1px solid;
+}
+
+.dropdown.user.user-menu {
+
+position: relative;
+    background: #0072c3;
+}
+
+.dropdown.user.user-menu .dropdown-toggle{
+     color: white !important;
+    padding: 25px 32px;
+ }    
+
+
+ .dropdown.user.user-menu > a > ul{
+ 
+width: auto!important;
+}    
+
+
+.navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
+ 
+width: auto!important;
+}    
+
+
+.btn-group.btn-group-justified .svg-inline--fa {
+    color: white!important;
+    font-weight: 600!important;
+ }
+
+
+ .sidebar-menu>li>a {
+    padding: 18px 5px 18px 8px;
+    display: block;
+    border-bottom: 1px solid #adc4d4;
+}
+ 
+.btform { padding: 10px 15px;
+    font-weight: 600;
+    margin-bottom: 20px;    }
+
+    .form-horizontal{
+    padding-top: 50px;
+    padding-bottom: 50px;
+
+        }
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper .form-control {
+    padding-right: 40px; /* deja espacio para que el ojo no tape el texto */
+}
+
+
+        #toggle-password {
+    outline: none; /* Elimina el contorno por defecto */
+}
+
+#toggle-password:focus {
+    box-shadow: 0 0 5px #0056b3; /* Agrega un contorno sombreado para indicar foco */
+    border-color: #0056b3; /* Cambia el color del borde si lo prefieres */
+}
+
+#toggle-password {
+    position: relative;
+    margin-left: -40px;
+    outline: none;
+    background: #0072c3;
+    color: white !important;
+
+    height: 35px;
+    z-index: 9999;
+}
+
+.col-sm-3.laelsle{
+padding-top: 0;
+}
+
+
+.toggle-password-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.toggle-password-btn:hover {
+    color: #333;
+}
+
+.input-group.desl{
+        display: block!important;
+   } 
+
+   .app-page-title{ font-weight: 600;} 
+
+
+   .pagination>.active>a, .pagination>.active>a:focus, .pagination>.active>a:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover {
+    color: #fff !important;
+}
+
+.btn-danger {     color: #fff !important;}
+
+
+.skin-red .sidebar-menu>li>.treeview-menu {
+    margin: 0 1px;
+    background: #f5f5f5!IMPORTANT;
+}
+
+.treeview-menu>li>a {
+    padding: 15px 5px 7px 11px;
+    display: block;
+    font-size: 13px;
+    border-bottom: 1px solid;
+}
+
+
+
+.sidebar-menu>li.active>a {
+    font-weight: 600;
+    }
+
+
+.treeview-menu>li.active>a {
+    font-weight: 600;
+    }
+
+    .treeview-menu>li:hover>a,
+    .treeview-menu>li:focus>a,
+    .treeview-menu>li:active>a {
+    font-weight: 600;
+    } 
+
+
+    .sidebar-menu>li>a>.fa{
+            width: 16px;
+    font-size: 13px;
+} 
+
+.btn-info.btnls{
+    background-color: #0071c1;
+    border-color: #00acd6;
+    color: white !important;
+    }
+.btnls{
+    FONT-SIZE: 15PX;
+    font-weight: 600;
+}
+
+.mf-20{
+    padding-bottom: 15px;
+}
+
+.cjafera .info-box{
+        min-height: 60px;
+    }
+
+
+.cjafera .info-box-icon {
+line-height: 60px;
+    height: 60px;
+    width: 80px; 
+            font-size: 25px;}
+
+ .info-box-number {
+    font-size: 17px;
+}
+
+.cbrar  {
+        margin-top: 0px;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 1px 5px;
+    background: #0072c3;
+}
+
+.btn.btn-secondary.toggle-pass{
+
+    position: relative;
+    margin-left: -40px;
+    outline: none;
+    background: #0072c3;
+    color: white !important;
+    height: 35px;
+    z-index: 9999;
+}
+
+.btn-info i{ color: white!important;}
+
+
+
+
+    .cjafera.sce2 .info-box-icon {
+    line-height: 50px;
+    height: 50px;
+    width: 50px;
+    font-size: 20px;
+}
+
+.cjafera.sce2 .info-box-content{
+        margin-left: 45px;}
+
+
+  .cjafera.sce2 .info-box-number {
+    font-size: 14px;
+}
+
+.cjafera.sce2  .info-box {
+    min-height: 50px;
+}
+
+.cjafera.sce2 .info-box-text{
+font-size: 12px;
+    font-weight: 600;
+}
+
+.btn-warning { color: white!important;}
+
+.btn-group.reds .btn {    padding: 4px 7px; }
+
+.ldseq12{ background-color: #00a65a!important;}
+
+.skin-red .sidebar-menu>li>a {font-weight: 600; font-size: 13px;}
+
+.btn-info {
+    background-color: #00c0ef;
+    border-color: #00acd6;
+    COLOR: white !important;
+}
+
+.btn-sm.whasw {
+        border-color: #00d054 !important;
+    border: 1px solid;
+    background-color: #00d054;
+    color: white!important;
+}
+
+
+.btn-default.lesiq{
+        background: red!important;
+    color: white !important;
+}
+
+#yii-debug-toolbar{
+    
+display: none!important;}

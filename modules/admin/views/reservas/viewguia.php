@@ -1,0 +1,323 @@
+<?php
+
+use yii\helpers\Html;
+use yii\widgets\DetailView;
+
+/* @var $this yii\web\View */
+/* @var $model app\models\Usuarios */
+
+$this->title = $model->nombre;
+$this->params['breadcrumbs'][] = ['label' => 'Reservas', 'url' => ['index']];
+$this->params['breadcrumbs'][] = $this->title;
+
+$tipoEvento = $model->tipoevento;
+if ($tipoEvento == 'matrimonio') {
+    $tipoEvento = 'boda'; // unificamos nombre interno
+}
+$cronograma = \app\models\CronogramaBoda::findOne(['idreserva' => $model->idreservas]);
+
+$urlmans = ($model->tipoevento == 'matrimonio')
+    ? ['form-campos-extra', 'idreserva' => $model->idreservas]
+    : ['form-campos-extra-quince', 'idreserva' => $model->idreservas];
+$url = $cronograma ? ['updatecronograma', 'id' => $model->idreservas] : ['createcronograma', 'id' => $model->idreservas];
+$meses2 = array('', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+$meses = array('', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic');
+$dia = date("d", strtotime($model['fecha_boda']));
+$mes = date("m", strtotime($model['fecha_boda']));
+$ano = date("Y", strtotime($model['fecha_boda']));
+$texto = $cronograma ? 'Editar Cronograma' : 'Crear Cronograma';
+?>
+<section class="content-header">
+
+    <h1><?= Html::encode($this->title) ?></h1>
+    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+
+
+</section>
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+
+                <div class="box-header">
+                    <?= Html::a('Cambiar Contraseña', ['update2' , 'id' => $model->idreservas], ['class' => 'btn btn-primary']) ?>
+                    <?= Html::a('Editar datos generales', ['update', 'id' => $model->idreservas], ['class' => 'btn btn-secondary']) ?>
+                    <?= Html::a($texto, $url, ['class' => 'btn btn-secondary']) ?>
+                    <?= Html::a('Lista de invitados', ['invitados', 'idreservas' => $model->idreservas], ['class' => 'btn btn-primary']) ?>
+                    <?= Html::a('VER GUIA(anterior)', ['viewguia', 'id' => $model->idreservas], ['class' => 'btn btn-primary']) ?>
+
+                    <?= Html::a('➕ Añadir u Ordenar Campos', $urlmans, [
+                        'class' => 'btn btn-secondary'
+                    ]) ?>
+                </div>
+
+                <div class="box-body btnslinks">
+
+                    <h3>Datos generales</h3>
+
+
+                    <?= DetailView::widget([
+                        'model' => $model,
+                        'attributes' => [
+                                'tipoevento',
+                            //'idusuario',
+
+                            [  'label' => 'Fecha de Boda',
+                                'value' =>   $dia. ' de '.  $meses2[$mes * 1]. ' , '.$ano ],
+                            'nombrenovios',
+                            'salondeeventos',
+                            'paqueteeventos',
+                            'horainvitacionevento',
+                            'iglesia',
+                            'direccioniglesia',
+                            'horaiglesia',
+                            'musica',
+                            'horasmusicas',
+                            'maestradeceremonia',
+                            'recomendacionsalon',
+                            'recomendacioniglesia',
+                            'recomendaciondj',
+                            'coordinadorar',
+                            'aproxcoordinadora',
+                            'degustacionbarra',
+                            'aproxbarra',
+                            'desgustaciontorta',
+                            'aproxtorta',
+                            'degustacioncomida',
+                            'aproxcomida',
+                            'decoradorar',
+                            'aproxdecoradora',
+                            'celebranter',
+                            'aproxcelebrante',
+
+                        ],
+                    ]) ?>
+
+                    <h3>Ceremonia Religiosa</h3>
+
+                    <?= DetailView::widget([
+                        'model' => $model,
+                        'attributes' => [
+                            //'idusuario',
+                            'horaceremonia',
+                            'ccordinacions',
+                            'cdecoracion',
+                            'censamblajemusical',
+                            'cbouquet',
+                            'ctransporte',
+                            'caccesorios',
+                            'csalidasesposos',
+                            'cessionfotos',
+                            'crecmcoodinacion',
+                            'crecmdecoracion',
+                            'crecmensamblaje',
+                            'csugsaludasesposo'
+
+
+                        ],
+                    ]) ?>
+
+
+                    <h3>Ceremonia Civil</h3>
+
+                    <?= DetailView::widget([
+                        'model' => $model,
+                        'attributes' => [
+
+                            'horacivil',
+                            'oficialregistrocivil',
+                            'tipodeceremoniaciv',
+                            'testigoscv',
+                            'cvensabmlemusical',
+                            'cvefectosespec',
+                            'ccprecoctel',
+                            'recmregistrocv',
+                            'recmensambcivil',
+                            'recmefectos',
+                            'detallesimpcv',
+
+
+                        ],
+                    ]) ?>
+
+
+                    <h3>Bebidas </h3>
+
+
+
+                    <?= DetailView::widget([
+                        'model' => $model,
+                        'attributes' => [
+
+                            'cerveza',
+                            'sodas',
+                            'agua',
+                            'otrosbebidas',
+                            'barracocteles',
+                            'horadeapertura',
+                            'recmbebidas',
+                            'recmbarradecocteles',
+
+
+
+                        ],
+                    ]) ?>
+
+
+
+                    <h3>Campos faltantes de Bebidas </h3>
+                    <?= DetailView::widget([
+                        'model' => $model,
+                        'attributes' => [
+
+                            'dulcebienvenida',
+                            'mesadulces',
+                            'mesabocaditos',
+                            'maquetatortafalsa',
+                            'detallesimportantesbebidas',
+
+
+
+                        ],
+                    ]) ?>
+
+
+
+
+
+
+
+
+                    <h3>Ingreso de novios, vals y brindis (Ingreso Quinceañera)</h3>
+
+                    <?= DetailView::widget([
+                        'model' => $model,
+                        'attributes' => [
+                            //'idusuario',
+                            'coreografo',
+                            'maestoceremoniadet',
+                            'bailedeingreso',
+                            'baileprincip',
+                            'brindis',
+                            'baileespecial',
+                            'efectosespeciales',
+                            'recmcoreografo',
+                            'recmmaestrocemonia',
+                            'recmefectosd',
+                            'horaingresonovios',
+                            'detallesimpingresonovis'
+
+
+
+
+                        ],
+                    ]) ?>
+                    <h3> Campos faltantes de ingreso para 15 años</h3>
+
+
+
+                    <?= DetailView::widget([
+                        'model' => $model,
+                        'attributes' => [
+                            //'idusuario',
+                            'ingresoin',
+                            'experienciasin',
+
+
+
+
+                        ],
+                    ]) ?>
+
+
+
+
+                    <h3>Cena, fiesta y torta</h3>
+
+
+
+                    <?= DetailView::widget([
+                        'model' => $model,
+                        'attributes' => [
+                            'horacena',
+                            'cenac',
+                            'tortac',
+                            'bocaditosc',
+                            'dulcesc',
+                            'horalocac',
+                            'recmcena',
+                            'recmtorta',
+                            'recmbocaditos',
+                            'recmdul',
+                            'recmhoraloca',
+                            'mariachis',
+                            'otrosdetallesfiestas',
+
+
+
+
+
+                        ],
+                    ]) ?>
+
+
+
+                    <h3>Otros proveedores o (Antes de la fiesta) </h3>
+
+                    <?= DetailView::widget([
+                        'model' => $model,
+                        'attributes' => [
+                            'invitaciones',
+                            'fotografia',
+                            'video',
+                            'vestidodenovia',
+                            'salondebelleza',
+                            'trajenovio',
+                            'glitterbar',
+                            'espejomagico',
+                            'video360',
+                            'memoriphone',
+                            'recmfotoyvideo',
+                            'recmvestidonovia',
+                            'recmsalonbelleza',
+                            'recmtrajenovio',
+                            'recmgiiterbar',
+                            'recmemori',
+                            'detallesimpoprov',
+
+
+
+
+                        ],
+                    ]) ?>
+
+
+                    <h3> Campos faltantes para Antes de la fiesta de quinceaños</h3>
+
+
+
+                    <?= DetailView::widget([
+                        'model' => $model,
+                        'attributes' => [
+                            //'idusuario',
+                            'limosna',
+                            'horantesfiesta',
+
+
+
+
+                        ],
+                    ]) ?>
+
+
+
+
+                </div>
+            </div>
+        </div>
+</section>
+
+
+<?php
+

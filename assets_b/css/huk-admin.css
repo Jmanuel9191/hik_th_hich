@@ -1,0 +1,330 @@
+/* ==========================================================================
+   HUK-THE-ICHI · huk-admin.css   (reemplaza a portaladmin.css)
+   Tema del panel admin (AdminLTE 2 + Bootstrap 3) con los colores de HUK.
+   Mantiene la estructura de portaladmin.css: sidebar 215px, header 70px,
+   botón redondo para plegar, .breadcrum, .foents y tus clases propias.
+   Se carga con app\assets_b\AdminHukAsset (después de AdminLTE).
+
+   1. Fuentes y colores   4. Contenido (cajas, botones, tablas, formularios)
+   2. Header              5. Tus clases propias (portaladmin.css)
+   3. Sidebar             6. Login
+   ========================================================================== */
+
+/* 1. FUENTES Y COLORES ----------------------------------------------------- */
+@font-face{font-family:"Arimo";src:url("../fonts/arimo-latin-700-normal.woff2") format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"Figtree";src:url("../fonts/figtree-latin-400-normal.woff2") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Figtree";src:url("../fonts/figtree-latin-500-normal.woff2") format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"Figtree";src:url("../fonts/figtree-latin-600-normal.woff2") format("woff2");font-weight:600;font-display:swap}
+@font-face{font-family:"Figtree";src:url("../fonts/figtree-latin-700-normal.woff2") format("woff2");font-weight:700;font-display:swap}
+
+:root{
+  --adm-gold:#bd944f;        /* mismo dorado del menú de la web */
+  --adm-gold-light:#e6c27a;
+  --adm-gold-dark:#8a6a2e;
+  --adm-gold-rgb:189,148,79;
+  --adm-ink:#0b0b0b;         /* header y sidebar */
+  --adm-ink-2:#161616;
+  --adm-ink-3:#262626;
+  --adm-sand:#a9a290;
+  --adm-bg:#f4f1ea;          /* fondo del contenido */
+  --adm-card:#ffffff;
+  --adm-text:#1d1b17;
+  --adm-muted:#6b665c;
+  --adm-line:#e2dccf;
+  --adm-ok:#2f7d4f;
+  --adm-warn:#b07a12;
+  --adm-danger:#a33a2c;
+  --adm-info:#34557a;
+  --adm-side:250px;
+  --adm-head:70px;
+  --adm-font:"Figtree","Segoe UI",Helvetica,Arial,sans-serif;
+  --adm-font-head:"Arimo",Arial,Helvetica,sans-serif;
+}
+
+body,.main-header .logo,.main-sidebar,.content-wrapper,.main-footer,.form-control,.btn{font-family:var(--adm-font)}
+h1,h2,h3,h4,h5,.content-header>h1,.box-title,.app-page-title{font-family:var(--adm-font-head)}
+body{color:var(--adm-text);-webkit-font-smoothing:antialiased}
+.content-wrapper,.right-side,body[class*="skin-"] .wrapper{background:var(--adm-bg)}
+a{color:var(--adm-gold-dark)}
+a:hover,a:focus{color:var(--adm-gold)}
+::selection{background:var(--adm-gold);color:#0b0b0b}
+
+/* 2. HEADER ---------------------------------------------------------------- */
+.main-header{max-height:none}
+.main-header .logo{width:var(--adm-side);height:var(--adm-head);line-height:var(--adm-head);padding:0 12px;display:flex;align-items:center;justify-content:center}
+.main-header .logo img{max-width:100%;max-height:35px;padding:0}
+body[class*="skin-"] .main-header .logo,
+body[class*="skin-"] .main-header .logo:hover{background:var(--adm-ink)!important;border-right:1px solid var(--adm-ink-3);border-bottom:2px solid var(--adm-gold)}
+body[class*="skin-"] .main-header .navbar{background:var(--adm-card)!important;min-height:var(--adm-head);border-bottom:1px solid var(--adm-line);box-shadow:0 2px 10px rgba(0,0,0,.04)}
+
+/* Botón redondo para plegar el menú (igual que portaladmin.css) */
+.main-header .sidebar-toggle{background:#0b0b0b !important;color:var(--adm-gold-dark)!important;border:2px solid var(--adm-line);padding:5px 10px!important;transition:all .25s}
+.main-header .sidebar-toggle:hover{background:var(--adm-gold)!important;color:#0b0b0b!important;border-color:var(--adm-gold)}
+.main-header .sidebar-toggle:before{content:"\f104";position:absolute;top:-6px;left:6px;font-size:26px}
+.sidebar-collapse .main-header .sidebar-toggle:before{content:"\f105";left:9px}
+
+/* Menú del usuario (arriba a la derecha) */
+.dropdown.user.user-menu{position:relative;background:var(--adm-ink)}
+.dropdown.user.user-menu .dropdown-toggle{color:var(--adm-gold-light)!important;padding:25px 32px;font-weight:600}
+.dropdown.user.user-menu .dropdown-toggle:hover,.dropdown.user.user-menu.open .dropdown-toggle{background:var(--adm-ink-2)!important}
+.dropdown.user.user-menu .dropdown-toggle:before{content:"\f2bd";font-family:FontAwesome;margin-right:8px;font-size:16px}
+.navbar-custom-menu>.navbar-nav>li>.dropdown-menu{width:auto!important;min-width:190px;border:0;border-top:2px solid var(--adm-gold);border-radius:0 0 6px 6px;box-shadow:0 12px 30px rgba(0,0,0,.18);padding:0}
+.navbar-nav>.user-menu>.dropdown-menu>.user-footer{background:var(--adm-card);padding:6px 0}
+.navbar-nav>.user-menu>.dropdown-menu>.user-footer .btn-default{color:var(--adm-text)!important;background:transparent;border:0;border-bottom:1px solid var(--adm-line);font-size:14px;font-weight:600;text-align:left;padding:10px 16px;width:100%}
+.navbar-nav>.user-menu>.dropdown-menu>.user-footer .btn-default:hover{background:var(--adm-bg);color:var(--adm-gold-dark)!important}
+.navbar-nav>.user-menu>.dropdown-menu>.user-footer br{display:none}
+
+/* Título de la página en el header */
+.breadcrum{font-family:var(--adm-font-head);font-weight:700;font-size:18px;position:absolute;left:27px;top:23px;color:var(--adm-text)}
+
+/* 3. SIDEBAR --------------------------------------------------------------- */
+.main-sidebar{width:var(--adm-side)!important;padding-top:var(--adm-head)}
+body[class*="skin-"] .main-sidebar,body[class*="skin-"] .left-side{background:var(--adm-ink)!important;border-right:0}
+.sidebar-menu>li>a{padding:15px 10px 15px 14px;display:block;border-bottom:1px solid var(--adm-ink-3);border-left:3px solid transparent}
+body[class*="skin-"] .sidebar-menu>li>a{color:#d9d3c5;font-weight:600;font-size:13px;letter-spacing:.02em}
+body[class*="skin-"] .sidebar-menu>li>a>.fa{width:18px;font-size:14px;color:var(--adm-gold);margin-right:6px;text-align:center}
+body[class*="skin-"] .sidebar-menu>li:hover>a{background:var(--adm-ink-2)!important;color:var(--adm-gold-light)!important;border-left-color:rgba(var(--adm-gold-rgb),.5)}
+body[class*="skin-"] .sidebar-menu>li.active>a,body[class*="skin-"] .sidebar-menu>li.menu-open>a{background:rgba(var(--adm-gold-rgb),.14)!important;color:var(--adm-gold-light)!important;border-left-color:var(--adm-gold)}
+body[class*="skin-"] .sidebar-menu>li.header{background:var(--adm-ink);color:var(--adm-sand);letter-spacing:.12em;font-size:11px}
+body[class*="skin-"] .sidebar-menu>li>.treeview-menu{margin:0;background:#121212!important;padding:4px 0}
+.treeview-menu>li>a{padding:11px 5px 11px 22px!important;display:block;font-size:12.5px;border-bottom:1px solid var(--adm-ink-3)}
+body[class*="skin-"] .sidebar-menu .treeview-menu>li>a{color:#bdb6a6}
+body[class*="skin-"] .sidebar-menu .treeview-menu>li.active>a,body[class*="skin-"] .sidebar-menu .treeview-menu>li>a:hover{color:var(--adm-gold-light);font-weight:600}
+.sidebar-menu>li.active>a,.treeview-menu>li.active>a{font-weight:700}
+.sidebar-menu .pull-right-container .fa{color:var(--adm-sand)}
+
+/* Pie del sidebar ("Derechos Reservados") */
+.foents{position:absolute;bottom:0;left:0;right:0;padding:13px 16px;border-top:1px solid var(--adm-ink-3)}
+.foents p{font-family:var(--adm-font);font-weight:400;color:var(--adm-sand);font-size:12px;margin:0}
+
+/* Escritorio: medidas fijas como en portaladmin.css */
+@media (min-width:768px){
+  .main-header .navbar{margin-left:var(--adm-side)}
+  .wrapper .content-wrapper,.main-footer{margin-left:var(--adm-side)}
+  .main-header .sidebar-toggle{border-radius:50%!important;width:27px;height:27px;position:absolute;top:22px;left:-12px;z-index:5}
+  /* Menú plegado: queda solo la columna de íconos */
+  .sidebar-mini.sidebar-collapse .main-header .logo{width:50px}
+  .sidebar-mini.sidebar-collapse .main-header .logo img{max-height:36px}
+  .sidebar-mini.sidebar-collapse .main-header .navbar{margin-left:50px}
+  .sidebar-mini.sidebar-collapse .main-sidebar{width:50px!important}
+  .sidebar-mini.sidebar-collapse .content-wrapper,.sidebar-mini.sidebar-collapse .main-footer{margin-left:50px!important}
+  .sidebar-mini.sidebar-collapse .foents,.sidebar-mini.sidebar-collapse .breadcrum{display:none}
+}
+.main-sidebar,.left-side{transition:transform .3s ease-in-out,width .3s ease-in-out}
+.content-wrapper,.main-footer,.main-header .navbar,.main-header .logo{transition:margin-left .3s ease-in-out,width .3s ease-in-out}
+
+/* Celular */
+@media (max-width:767px){
+  nav a.sidebar-toggle {background: transparent!important;}
+  .main-header nav.navbar.navbar-static-top{background: #0b0b0b!important;}
+  .breadcrum{display:none!important}
+  .main-header .logo{width:100%}
+  .main-sidebar{transform:translate(-250px,0);padding-top:140px}
+  .sidebar-open .main-sidebar{transform:translate(0,0)}
+  .content-wrapper,.main-footer{margin-left:0!important}
+  .main-header .navbar{margin:0}
+  .main-header .sidebar-toggle{position:static;border-radius:6px!important;margin:13px;width:auto;height:auto}
+  .main-header .sidebar-toggle:before{content:"\f0c9";position:static;font-size:18px}
+  .dropdown.user.user-menu .dropdown-toggle{padding:25px 18px}
+}
+
+/* 4. CONTENIDO ------------------------------------------------------------- */
+.content{padding:24px}
+.content-header{padding:20px 24px 0}
+.content-header>h1,.app-page-title{font-weight:700;color:var(--adm-text)}
+
+/* Cajas */
+.box{background:var(--adm-card);border:0;border-top:3px solid var(--adm-line);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.05)}
+.box.box-primary,.box.box-info,.box.box-solid.box-primary>.box-header{border-top-color:var(--adm-gold)}
+.box.box-solid.box-primary>.box-header{background:var(--adm-ink);color:var(--adm-gold-light)}
+.box-header.with-border{border-bottom:1px solid var(--adm-line)}
+.box-header .box-title{font-size:17px;font-weight:700}
+
+/* Botones */
+.btn{border-radius:6px;font-weight:600;transition:all .2s}
+.btn-primary,.btn-success,.btn-info.btnls{background:var(--adm-gold)!important;border-color:var(--adm-gold-dark)!important;color:white!important}
+.btn-primary:hover,.btn-success:hover,.btn-primary:focus,.btn-success:focus,.btn-info.btnls:hover{background:var(--adm-gold-dark)!important;border-color:var(--adm-gold-dark)!important;color:#fff!important}
+.btn-default{background:var(--adm-card);border-color:var(--adm-line);color:var(--adm-text)}
+.btn-default:hover{background:var(--adm-bg);border-color:var(--adm-gold);color:var(--adm-gold-dark)}
+.btn-info{background:var(--adm-ink)!important;border-color:var(--adm-ink)!important;color:var(--adm-gold-light)!important}
+.btn-info:hover{background:var(--adm-ink-3)!important;color:#fff!important}
+.btn-info i,.btn-info .fa{color:inherit!important}
+.btn-warning{background:var(--adm-warn)!important;border-color:var(--adm-warn)!important;color:#fff!important}
+.btn-danger{background:var(--adm-danger)!important;border-color:var(--adm-danger)!important;color:#fff!important}
+.btn-warning:hover,.btn-danger:hover{filter:brightness(1.1)}
+.btn-group.btn-group-justified .svg-inline--fa{color:#fff!important;font-weight:600!important}
+
+/* Formularios */
+.form-control{border-radius:6px;border-color:var(--adm-line);box-shadow:none;height:38px}
+textarea.form-control{height:auto}
+.form-control:focus{border-color:var(--adm-gold);box-shadow:0 0 0 3px rgba(var(--adm-gold-rgb),.2)}
+.control-label{font-weight:600;color:var(--adm-text)}
+.has-error .form-control{border-color:var(--adm-danger)}
+.has-error .help-block,.has-error .control-label{color:var(--adm-danger)}
+.has-success .form-control{border-color:var(--adm-ok)}
+.form-horizontal{padding-top:50px;padding-bottom:50px}
+
+/* Tablas (GridView) */
+.table>thead>tr>th{background:#faf8f3;border-bottom:2px solid var(--adm-gold)!important;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--adm-text)}
+.table>thead>tr>th a{color:var(--adm-text)!important}
+.table-striped>tbody>tr:nth-of-type(odd){background:#fcfbf8}
+.table-hover>tbody>tr:hover{background:#f7f3ea}
+.table>tbody>tr>td{vertical-align:middle}
+.grid-view{overflow-x:auto}
+.grid-view .btn-group{white-space:nowrap;display:inline-flex}
+.grid-view .summary{color:var(--adm-muted);font-size:13px;margin-bottom:8px}
+
+/* Paginación y pestañas */
+.pagination>li>a,.pagination>li>span{color:var(--adm-text)!important;border-color:var(--adm-line)}
+.pagination>.active>a,.pagination>.active>a:focus,.pagination>.active>a:hover,.pagination>.active>span{background:var(--adm-gold)!important;border-color:var(--adm-gold)!important;color:#0b0b0b!important}
+.nav-tabs-custom>.nav-tabs>li.active{border-top-color:var(--adm-gold)}
+.nav-pills>li.active>a,.nav-pills>li.active>a:hover{background:var(--adm-gold);color:#0b0b0b}
+
+/* Etiquetas, cajas de números, alertas */
+.label-primary,.bg-light-blue,.bg-primary{background-color:var(--adm-gold)!important;color:#0b0b0b!important}
+.label-success,.bg-green{background-color:var(--adm-ok)!important}
+.small-box.bg-aqua,.small-box.bg-light-blue,.info-box-icon.bg-aqua,.info-box-icon.bg-light-blue{background:var(--adm-ink)!important;color:var(--adm-gold-light)!important}
+.small-box.bg-yellow,.info-box-icon.bg-yellow{background:var(--adm-gold)!important;color:#0b0b0b!important}
+.info-box{border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.05)}
+.info-box-icon{border-radius:8px 0 0 8px}
+.info-box-number{font-size:17px;font-family:var(--adm-font-head)}
+.alert{border-radius:8px;border:0}
+.callout.callout-info{background:var(--adm-ink)!important;border-left-color:var(--adm-gold)!important;color:#f3efe6!important}
+
+/* 5. TUS CLASES PROPIAS (vienen de portaladmin.css) ------------------------ */
+.btform{padding:10px 15px;font-weight:600;margin-bottom:20px}
+.password-wrapper{position:relative}
+.password-wrapper .form-control{padding-right:40px}
+.toggle-password-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:transparent;border:0;color:var(--adm-muted);cursor:pointer;padding:4px 8px}
+.toggle-password-btn:hover{color:var(--adm-gold-dark)}
+#toggle-password,.btn.btn-secondary.toggle-pass{position:relative;margin-left:-40px;outline:none;background:var(--adm-ink);color:var(--adm-gold-light)!important;height:38px;z-index:3;border:0}
+#toggle-password:focus{box-shadow:0 0 0 3px rgba(var(--adm-gold-rgb),.35)}
+.col-sm-3.laelsle{padding-top:0}
+.input-group.desl{display:block!important}
+.app-page-title{font-weight:700}
+.btnls{font-size:15px;font-weight:600}
+.mf-20{padding-bottom:15px}
+.cbrar{margin-top:0;color:#0b0b0b!important;font-weight:600!important;padding:1px 6px;background:var(--adm-gold);border-radius:4px}
+.btn-group.reds .btn{padding:4px 7px}
+.ldseq12{background-color:var(--adm-ok)!important}
+.btn-sm.whasw{background:#25d366;border:1px solid #25d366!important;color:#fff!important}
+.btn-default.lesiq{background:var(--adm-danger)!important;border-color:var(--adm-danger)!important;color:#fff!important}
+.cjafera .info-box{min-height:60px}
+.cjafera .info-box-icon{line-height:60px;height:60px;width:80px;font-size:25px}
+.cjafera.sce2 .info-box{min-height:50px}
+.cjafera.sce2 .info-box-icon{line-height:50px;height:50px;width:50px;font-size:20px}
+.cjafera.sce2 .info-box-content{margin-left:45px}
+.cjafera.sce2 .info-box-number{font-size:14px}
+.cjafera.sce2 .info-box-text{font-size:12px;font-weight:600}
+#yii-debug-toolbar{display:none!important}
+
+/* 6. LOGIN ------------------------------------------------------------------
+   Pantalla partida: panel oscuro con el logo + formulario a la derecha.     */
+body.login-page{background:var(--adm-bg);min-height:100vh;margin:0}
+.huk-adm-login{display:grid;grid-template-columns:1.1fr 1fr;min-height:100vh}
+.huk-adm-login-side{position:relative;overflow:hidden;background:radial-gradient(circle at 75% 35%,#3a2d14 0,#0b0b0b 65%);color:#f3efe6;padding:56px;display:flex;flex-direction:column;justify-content:space-between}
+.huk-adm-login-side:before{content:"";position:absolute;left:-60px;top:46%;width:220px;height:30px;background:var(--adm-gold);transform:rotate(28deg);opacity:.9}
+.huk-adm-login-side:after{content:"";position:absolute;right:-80px;bottom:-80px;width:320px;height:320px;border:1px solid rgba(var(--adm-gold-rgb),.25);border-radius:50%}
+.huk-adm-login-logo{position:relative;z-index:1}
+.huk-adm-login-logo img{max-width:300px;max-height:90px}
+.huk-adm-login-logo span{font-family:var(--adm-font-head);font-size:26px;color:var(--adm-gold)}
+.huk-adm-login-claim{position:relative;z-index:1;max-width:440px}
+.huk-adm-login-claim small{display:block;color:var(--adm-gold);font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;margin-bottom:10px}
+.huk-adm-login-claim h2{font-family:var(--adm-font-head);font-size:34px;line-height:1.15;margin:0 0 12px;color:#fff}
+.huk-adm-login-claim p{color:var(--adm-sand);font-size:15px;margin:0}
+.huk-adm-login-main{display:flex;align-items:center;justify-content:center;padding:40px 24px}
+.huk-adm-login-card{width:100%;max-width:400px}
+.huk-adm-login-card .huk-adm-mobile-logo{display:none;text-align:center;margin-bottom:24px;background:var(--adm-ink);padding:18px;border-radius:10px}
+.huk-adm-login-card .huk-adm-mobile-logo img{max-height:56px}
+.huk-adm-login-card h1{font-family:var(--adm-font-head);font-size:28px;margin:0 0 6px;color:var(--adm-text)}
+.huk-adm-login-card .huk-adm-sub{color:var(--adm-muted);margin:0 0 28px;font-size:14px}
+.huk-adm-login-card .form-group{margin-bottom:18px}
+.huk-adm-login-card .control-label{font-size:13px;margin-bottom:6px}
+.huk-adm-field{position:relative}
+.huk-adm-field>.fa{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--adm-muted);font-size:15px;pointer-events:none;z-index:2}
+.huk-adm-login-card .form-control{height:48px;padding-left:42px;font-size:15px;background:#fff}
+.huk-adm-login-card .help-block{font-size:13px;margin-top:6px}
+.huk-adm-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:transparent;border:0;color:var(--adm-muted);padding:8px 10px;z-index:2}
+.huk-adm-eye:hover{color:var(--adm-gold-dark)}
+.huk-adm-btn{display:block;width:100%;height:50px;border:0;border-radius:8px;background:var(--adm-gold);color:#0b0b0b;font-weight:700;font-size:15px;letter-spacing:.03em;transition:all .2s}
+.huk-adm-btn:hover,.huk-adm-btn:focus{background:var(--adm-gold-dark);color:#fff;box-shadow:0 10px 24px rgba(var(--adm-gold-rgb),.35)}
+a.huk-adm-btn{display:flex;align-items:center;justify-content:center;text-decoration:none!important} /* mismo botón usado como enlace */
+.huk-adm-forgot{display:block;text-align:center;margin-top:18px;font-size:14px;color:var(--adm-gold-dark)!important}
+.huk-adm-forgot:hover{color:var(--adm-gold)!important}
+.huk-adm-login-foot{text-align:center;color:var(--adm-muted);font-size:12px;margin-top:36px}
+@media (max-width:900px){
+  .huk-adm-login{grid-template-columns:1fr}
+  .huk-adm-login-side{display:none}
+  .huk-adm-login-card .huk-adm-mobile-logo{display:block}
+}
+
+/* 7. AVISOS EN LOGIN Y RECUPERAR CONTRASEÑA -------------------------------- */
+.huk-adm-alert{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:8px;margin:0 0 20px;font-size:14px;line-height:1.45;border-left:4px solid}
+.huk-adm-alert .fa{font-size:17px;margin-top:1px}
+.huk-adm-alert.is-ok{background:#e5f2ea;border-color:var(--adm-ok);color:#1f5a37}
+.huk-adm-alert.is-error{background:#f8e4e0;border-color:var(--adm-danger);color:#7d2a1f}
+.huk-adm-forgot .fa{margin-right:6px;font-size:12px}
+.btn-group-justified > .btn, .btn-group-justified > .btn-group {
+    
+    width: auto !important;
+}
+
+/* 8. ECOSISTEMAS ----------------------------------------------------------- */
+.huk-filtros{display:inline-flex;gap:8px;flex-wrap:wrap;margin-left:12px;vertical-align:middle}
+.huk-eco-num{font-family:var(--adm-font-head);font-weight:700;color:var(--adm-gold-dark)}
+.huk-eco-icono{width:34px;height:34px;object-fit:contain}
+.huk-eco-resumen{color:var(--adm-muted);font-size:12.5px;max-width:520px;margin-top:2px}
+.huk-img-campo{padding-bottom:14px;border-bottom:1px solid var(--adm-line)}
+.huk-img-prev img{display:block;max-width:100%;max-height:150px;border-radius:6px;margin:4px 0 8px;border:1px solid var(--adm-line);background:#faf8f3;transition:opacity .2s}
+.huk-img-prev.is-icono img{width:64px;height:64px;object-fit:contain;padding:6px}
+.huk-img-prev img.is-quitar{opacity:.3}
+.huk-img-quitar{display:block;font-weight:500;color:var(--adm-danger);margin-top:6px}
+.huk-form-acciones{margin:0 0 30px}
+.huk-eco-imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:12px}
+.huk-eco-imgs figure{margin:0;text-align:center}
+.huk-eco-imgs img{width:100%;height:90px;object-fit:cover;border-radius:6px;border:1px solid var(--adm-line)}
+.huk-eco-imgs figure.is-icono img{object-fit:contain;padding:10px;background:#faf8f3}
+.huk-eco-imgs figcaption{font-size:12px;color:var(--adm-muted);margin-top:4px}
+.huk-eco-vacio{display:flex;align-items:center;justify-content:center;height:90px;border:1px dashed var(--adm-line);border-radius:6px;color:var(--adm-muted);font-size:12px}
+.huk-rich table{border-collapse:collapse;max-width:100%}
+.huk-rich td,.huk-rich th{border:1px solid var(--adm-line);padding:4px 8px}
+/* Galería (Kartik FileInput) con colores HUK */
+.huk-galeria .file-drop-zone{border:2px dashed rgba(var(--adm-gold-rgb),.55);border-radius:10px;background:#fcfbf8}
+.huk-galeria .file-drop-zone.highlighted,.huk-galeria .file-highlighted{border-color:var(--adm-gold)!important;background:#f7f1e4!important}
+.huk-galeria .file-drop-zone-title{color:var(--adm-muted);font-family:var(--adm-font)}
+.huk-galeria .file-preview{border-radius:10px;border-color:var(--adm-line)}
+.huk-galeria .krajee-default.file-preview-frame{border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.huk-galeria .krajee-default.file-preview-frame:hover{box-shadow:0 4px 14px rgba(var(--adm-gold-rgb),.35)}
+.huk-galeria .file-caption .form-control{border-radius:6px 0 0 6px}
+
+/* 9. FORMULARIO DE USUARIO --------------------------------------------------- */
+.huk-form-usuario{padding:28px 32px 8px}
+.huk-form-usuario .control-label{padding-right:18px}
+/* Ojo de la contraseña: misma altura que el campo */
+.huk-form-usuario .huk-adm-field.input-group{display:flex;align-items:stretch}
+.huk-form-usuario .huk-adm-field .form-control{flex:1 1 auto;float:none}
+.huk-form-usuario .huk-adm-field .input-group-btn{display:flex;width:auto}
+.huk-form-usuario .huk-adm-field .input-group-btn .btn{height:auto;padding:0 16px}
+/* Select2 múltiple: que el texto "Elegí uno o varios…" se lea completo */
+.huk-form-usuario .select2-selection__rendered>li.select2-search--inline:first-child,
+.huk-form-usuario .select2-selection__rendered>li.select2-search--inline:first-child .select2-search__field{width:100%!important}
+.huk-form-usuario .select2-search__field::placeholder{color:var(--adm-muted);opacity:1}
+/* Cambiar contraseña */
+#usuario-clave-form{padding:24px 28px 8px}
+.huk-clave-usuario{display:block;margin-top:4px;color:var(--adm-muted);font-size:13px}
+.huk-clave-aviso{color:var(--adm-muted);font-size:13px;margin:4px 0 18px;padding:10px 12px;background:#faf8f3;border-left:3px solid var(--adm-gold);border-radius:4px}
+
+/* 10. ROLES Y PERMISOS ------------------------------------------------------ */
+.huk-permisos{margin-bottom:16px}
+.huk-permisos thead th{position:sticky;top:0;z-index:1}
+.huk-permisos td code{display:block;margin-top:2px;padding:0;background:none;color:var(--adm-muted);font-size:11.5px}
+.huk-permisos input[type=checkbox]{width:18px;height:18px;accent-color:var(--adm-gold);cursor:pointer}
+.huk-permisos input[type=checkbox]:disabled{cursor:not-allowed;opacity:.55}
+.huk-permisos .huk-permisos-grupo td{background:var(--adm-ink);color:var(--adm-gold-light);font-family:var(--adm-font-head);font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:12.5px}
+.huk-permisos .huk-permisos-grupo small{color:var(--adm-sand);text-transform:none;font-family:var(--adm-font);font-weight:500;letter-spacing:0}
+
+/* 11. BARRA DE ACCIONES DE LOS LISTADOS (Nuevo + Exportar) ------------------ */
+.huk-barra-acciones{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.huk-barra-acciones .dropdown-menu{border-top:2px solid var(--adm-gold);border-radius:0 0 6px 6px}
+.huk-barra-acciones .dropdown-menu>li>a{padding:8px 16px;color:var(--adm-text);font-weight:500}
+.huk-barra-acciones .dropdown-menu>li>a .fa{width:18px;color:var(--adm-gold-dark)}

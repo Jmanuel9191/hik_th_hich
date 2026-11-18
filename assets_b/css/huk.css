@@ -1,0 +1,623 @@
+/* ==========================================================================
+   HUK-THE-ICHI · huk.css
+   Capa de marca sobre Bootstrap 5 (sirve con el 5.0 de Electra y con 5.3).
+   Cargar DESPUÉS de bootstrap.min.css y style.css.
+
+   1. Fuentes          5. Componentes del sitio
+   2. Tokens de marca  6. Efectos (reveal, hover, header)
+   3. Base             7. Panel del inversor (/mi-cuenta)
+   4. Bootstrap        8. Accesibilidad y movimiento reducido
+   ========================================================================== */
+
+/* 1. FUENTES ---------------------------------------------------------------
+   PDF: títulos en Arial Bold, texto en Aptos.
+   Arimo  = mismas medidas que Arial (títulos).
+   Figtree = alternativa libre y cercana a Aptos (texto).                     */
+@font-face{font-family:"Arimo";src:url("../fonts/arimo-latin-400-normal.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Arimo";src:url("../fonts/arimo-latin-700-normal.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:"Figtree";src:url("../fonts/figtree-latin-400-normal.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Figtree";src:url("../fonts/figtree-latin-500-normal.woff2") format("woff2");font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:"Figtree";src:url("../fonts/figtree-latin-600-normal.woff2") format("woff2");font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:"Figtree";src:url("../fonts/figtree-latin-700-normal.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
+
+/* 2. TOKENS DE MARCA (tomados de tu maqueta de referencia) ----------------- */
+:root{
+  /* Dorado */
+  --huk-gold:        #b8954f;   /* acento principal */
+  --huk-gold-light:  #e6c27a;
+  --huk-gold-dark:   #8a6a2e;
+  --huk-gold-rgb:    184,149,79;
+  --huk-gold-grad:   linear-gradient(135deg,#e6c27a 0%,#b8954f 50%,#8a6a2e 100%);
+
+  /* Oscuros */
+  --huk-ink:         #040404;   /* header, footer, secciones oscuras */
+  --huk-ink-2:       #161616;
+  --huk-ink-3:       #2a2a2a;   /* líneas sobre oscuro */
+  --huk-brown:       #2b2418;   /* degradados cálidos */
+  --huk-sand:        #a9a290;   /* texto suave sobre oscuro */
+  --huk-dark-grad:   radial-gradient(circle at 78% 40%,#3a2d14 0,#0b0b0b 62%);
+
+  /* Claros */
+  --huk-bg:          #f4f1ea;   /* fondo de página */
+  --huk-card:        #ffffff;
+  --huk-text:        #111111;
+  --huk-muted:       #6b665c;
+  --huk-line:        #d9d3c5;
+
+  /* Estados (para badges del panel) */
+  --huk-ok:          #2f7d4f;
+  --huk-ok-bg:       #e5f2ea;
+  --huk-warn:        #9a6b00;
+  --huk-warn-bg:     #fbf1d9;
+  --huk-danger:      #a33a2c;
+  --huk-danger-bg:   #f8e4e0;
+  --huk-info:        #34557a;
+  --huk-info-bg:     #e4ebf3;
+
+  /* Tipografía */
+  --huk-font-head:   "Arimo",Arial,Helvetica,sans-serif;
+  --huk-font-body:   "Figtree","Aptos","Segoe UI",Helvetica,Arial,sans-serif;
+
+  /* Forma y movimiento */
+  --huk-radius:      4px;
+  --huk-radius-lg:   10px;
+  --huk-shadow:      0 6px 18px rgba(0,0,0,.08);
+  --huk-shadow-lg:   0 14px 34px rgba(0,0,0,.14);
+  --huk-ease:        cubic-bezier(.22,.61,.36,1);
+  --huk-speed:       .35s;
+
+  /* Puente con Bootstrap */
+  --bs-primary:      var(--huk-gold);
+  --bs-primary-rgb:  var(--huk-gold-rgb);
+  --bs-dark:         var(--huk-ink);
+  --bs-dark-rgb:     11,11,11;
+  --bs-light:        var(--huk-bg);
+  --bs-body-font-family: var(--huk-font-body);
+  --bs-body-color:   var(--huk-text);
+  --bs-body-bg:      var(--huk-bg);
+  --bs-link-color:   var(--huk-gold-dark);
+  --bs-link-hover-color: var(--huk-gold);
+  --bs-border-color: var(--huk-line);
+}
+
+/* 3. BASE ------------------------------------------------------------------ */
+body{font-family:var(--huk-font-body);color:var(--huk-text);background:var(--huk-bg);line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6,.display-1,.display-2,.display-3,.display-4,.display-5,.display-6{font-family:var(--huk-font-head);font-weight:700;color:inherit;letter-spacing:-.01em;line-height:1.15}
+a{color:var(--huk-gold-dark);text-decoration:none;transition:color var(--huk-speed) var(--huk-ease)}
+/* Compatibilidad Bootstrap 5.0 → 5.3 (Electra usa .sr-only, que en 5.3 se llama .visually-hidden) */
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+a:hover{color:var(--huk-gold)}
+::selection{background:var(--huk-gold);color:#0b0b0b}
+img{max-width:100%;height:auto}
+
+/* 4. BOOTSTRAP: lo que Electra trae compilado en naranja ------------------- */
+.text-primary{color:var(--huk-gold)!important}
+.bg-primary{background-color:var(--huk-gold)!important}
+.bg-dark{background-color:var(--huk-ink)!important}
+.bg-light{background-color:var(--huk-bg)!important}
+.border-primary{border-color:var(--huk-gold)!important}
+.text-muted{color:var(--huk-muted)!important}
+
+.btn{font-family:var(--huk-font-body);font-weight:600;letter-spacing:.02em;border-radius:var(--huk-radius);transition:all var(--huk-speed) var(--huk-ease)}
+.btn-primary,.btn.btn-primary{background:var(--huk-gold-grad);background-size:160% 160%;background-position:0 0;border:0;color:#0b0b0b}
+.btn-primary:hover,.btn.btn-primary:hover,.btn-primary:focus{background-position:100% 100%;color:#0b0b0b;box-shadow:0 8px 20px rgba(var(--huk-gold-rgb),.35)}
+.btn-outline-primary{color:var(--huk-gold-dark);border-color:var(--huk-gold)}
+.btn-outline-primary:hover{background:var(--huk-gold);border-color:var(--huk-gold);color:#0b0b0b}
+.btn-dark,.btn.btn-dark{background:var(--huk-ink);border-color:var(--huk-ink);color:var(--huk-gold-light)}
+.btn-dark:hover{background:var(--huk-ink-2);color:var(--huk-gold-light)}
+
+.form-control,.form-select{border-color:var(--huk-line);border-radius:var(--huk-radius);background-color:var(--huk-card)}
+.form-control:focus,.form-select:focus{border-color:var(--huk-gold);box-shadow:0 0 0 .2rem rgba(var(--huk-gold-rgb),.25)}
+.form-check-input:checked{background-color:var(--huk-gold);border-color:var(--huk-gold)}
+.form-check-input:focus{box-shadow:0 0 0 .2rem rgba(var(--huk-gold-rgb),.25);border-color:var(--huk-gold)}
+.form-label{font-weight:600;font-size:.9rem}
+.invalid-feedback,.help-block-error{color:var(--huk-danger)}
+.has-error .form-control,.form-control.is-invalid{border-color:var(--huk-danger)}
+
+.pagination .page-link{color:var(--huk-text);border-color:var(--huk-line)}
+.pagination .page-item.active .page-link{background:var(--huk-gold);border-color:var(--huk-gold);color:#0b0b0b}
+.nav-pills .nav-link.active{background:var(--huk-gold);color:#0b0b0b}
+.nav-tabs .nav-link.active{border-bottom:2px solid var(--huk-gold);color:var(--huk-text)}
+.spinner-border.text-primary{color:var(--huk-gold)!important}
+
+/* 5. COMPONENTES DEL SITIO -------------------------------------------------- */
+/* Etiqueta pequeña sobre títulos: "SOBRE LA COMPAÑÍA" */
+.huk-eyebrow{display:inline-block;font-family:var(--huk-font-body);font-size:.8rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--huk-gold)}
+
+/* Título de sección con línea dorada */
+.huk-title{position:relative;margin-bottom:2.5rem}
+.huk-title h2{font-size:clamp(1.7rem,3.6vw,2.75rem);margin:.25rem 0 0;max-width:46rem}
+.huk-title h2::after{content:"";display:block;width:44px;height:3px;background:var(--huk-gold-grad);margin-top:.75rem}
+.huk-title.text-center h2{margin-inline:auto}
+.huk-title.text-center h2::after{margin-inline:auto}
+/* Palabra gigante de fondo ("Ecosistemas") */
+.huk-title .huk-ghost{position:absolute;inset:-1.4rem 0 auto 0;font-family:var(--huk-font-head);font-weight:700;font-size:clamp(3rem,9vw,7rem);line-height:1;color:transparent;-webkit-text-stroke:1px rgba(0,0,0,.07);pointer-events:none;user-select:none;z-index:0}
+.huk-section-dark .huk-title .huk-ghost,.huk-section-warm .huk-title .huk-ghost{-webkit-text-stroke-color:rgba(255,255,255,.08)}
+.huk-title > *:not(.huk-ghost){position:relative;z-index:1}
+
+/* Texto con degradado dorado */
+.huk-text-gold{background:var(--huk-gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* Número contorneado ("01") */
+.huk-num-outline{font-family:var(--huk-font-head);font-weight:700;font-size:3.25rem;line-height:1;color:transparent;-webkit-text-stroke:1.5px var(--huk-gold)}
+
+/* Secciones */
+.huk-section{padding:5rem 0;position:relative;overflow:hidden}
+.huk-section-dark{background:var(--huk-ink);color:#f3efe6}
+.huk-section-dark .text-muted,.huk-section-dark p{color:var(--huk-sand)!important}
+.huk-section-warm{background:linear-gradient(120deg,var(--huk-brown),var(--huk-ink));color:#f3efe6}
+.huk-section-card{background:var(--huk-card)}
+
+/* Topbar y header */
+.huk-topbar{background:#000;color:var(--huk-sand);font-size:.75rem;padding:.5rem 0}
+.huk-topbar b,.huk-topbar a:hover{color:var(--huk-gold)}
+.huk-header{background:var(--huk-ink);color:#f3efe6;border-bottom:1px solid var(--huk-ink-3)}
+.huk-navbar{background:var(--huk-gold-grad);transition:box-shadow var(--huk-speed) var(--huk-ease),padding var(--huk-speed) var(--huk-ease)}
+.huk-navbar .nav-link{color:#0b0b0b!important;font-weight:500;padding:1rem 1rem!important;position:relative}
+.huk-navbar .nav-link::after{content:"";position:absolute;left:1rem;right:1rem;bottom:.7rem;height:2px;background:#0b0b0b;transform:scaleX(0);transform-origin:left;transition:transform var(--huk-speed) var(--huk-ease)}
+.huk-navbar .nav-link:hover::after,.huk-navbar .nav-link.active::after{transform:scaleX(1)}
+.huk-navbar .dropdown-menu{background:var(--huk-ink);border:0;border-top:2px solid var(--huk-gold);border-radius:0;padding:0;min-width:240px}
+.huk-navbar .dropdown-item{color:#f3efe6;padding:.75rem 1.1rem;border-bottom:1px solid var(--huk-ink-3);font-size:.85rem}
+.huk-navbar .dropdown-item:hover{background:var(--huk-ink-2);color:var(--huk-gold-light);padding-left:1.4rem}
+/* Navbar pegada al hacer scroll (la activa huk.js) */
+.huk-navbar.is-stuck{position:sticky;top:0;z-index:1030;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.huk-cta-pill{background:var(--huk-ink);color:var(--huk-gold-light);border-radius:30px;padding:.6rem 1.25rem;font-weight:600;font-size:.82rem}
+.huk-cta-pill:hover{background:var(--huk-ink-2);color:#fff}
+
+/* Hero */
+.huk-hero{background:var(--huk-dark-grad);color:#fff;padding:7rem 0 7.5rem;position:relative;overflow:hidden}
+.huk-hero h1{font-size:clamp(2rem,5vw,3.9rem);max-width:52rem;margin-bottom:1.1rem}
+.huk-hero h1 em{font-style:normal;color:var(--huk-gold)}
+.huk-hero p{max-width:35rem;color:#cfc7b5}
+.huk-hero::before{content:"";position:absolute;left:-40px;top:70px;width:140px;height:26px;background:var(--huk-gold-grad);transform:rotate(28deg);opacity:.9}
+/* Hero con foto de fondo (banner del admin) */
+.huk-hero-img{background-size:cover;background-position:center}
+.huk-hero-img::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,11,11,.92) 0%,rgba(11,11,11,.6) 55%,rgba(11,11,11,.2) 100%);z-index:0}
+.huk-hero-img > .container{position:relative;z-index:1}
+
+/* Tarjeta genérica con elevación */
+.huk-card{background:var(--huk-card);border:1px solid transparent;border-radius:var(--huk-radius);box-shadow:var(--huk-shadow);overflow:hidden;transition:transform var(--huk-speed) var(--huk-ease),box-shadow var(--huk-speed) var(--huk-ease),border-color var(--huk-speed) var(--huk-ease)}
+.huk-card:hover{transform:translateY(-6px);box-shadow:var(--huk-shadow-lg);border-color:rgba(var(--huk-gold-rgb),.35)}
+
+/* Imagen con zoom suave al pasar el mouse */
+.huk-zoom{overflow:hidden;display:block}
+.huk-zoom img{transition:transform .8s var(--huk-ease);width:100%;object-fit:cover}
+.huk-card:hover .huk-zoom img,.huk-zoom:hover img{transform:scale(1.06)}
+
+/* Tarjeta de ecosistema (foto + número + nombre) */
+.huk-eco{position:relative;min-height:340px;border-radius:var(--huk-radius);overflow:hidden;box-shadow:var(--huk-shadow);color:#111}
+.huk-eco > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .8s var(--huk-ease)}
+.huk-eco:hover > img{transform:scale(1.06)}
+.huk-eco .huk-eco-label{position:absolute;left:0;right:2.5rem;bottom:0;display:flex}
+.huk-eco .huk-eco-num{width:70px;background:var(--huk-ink);color:var(--huk-gold-light);display:flex;align-items:center;justify-content:center;font-family:var(--huk-font-head);font-weight:700;font-size:1.25rem}
+.huk-eco .huk-eco-text{background:#fff;padding:.9rem 1rem;flex:1}
+.huk-eco .huk-eco-text b{font-family:var(--huk-font-head);font-size:1.1rem;display:block}
+.huk-eco .huk-eco-text small{color:var(--huk-muted)}
+
+/* Miembro del equipo */
+.huk-team .huk-team-photo{position:relative;height:300px;border-radius:var(--huk-radius);overflow:hidden;background:linear-gradient(180deg,#6e675a 35%,#0b0b0b)}
+.huk-team .huk-team-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(.35);transition:filter .6s,transform .8s var(--huk-ease)}
+.huk-team:hover .huk-team-photo img{filter:grayscale(0);transform:scale(1.04)}
+.huk-team .huk-social{position:absolute;left:.75rem;top:1rem;display:flex;flex-direction:column;gap:.4rem;transform:translateX(-140%);transition:transform var(--huk-speed) var(--huk-ease)}
+.huk-team:hover .huk-social{transform:none}
+.huk-team .huk-social a{width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--huk-gold-grad);color:#0b0b0b;font-size:.8rem}
+.huk-team h4{margin:1rem 0 .1rem;text-align:center;font-size:1.2rem}
+.huk-team .huk-role{text-align:center;color:var(--huk-gold);font-size:.82rem}
+
+/* Cifras */
+.huk-stat b{display:block;font-family:var(--huk-font-head);font-size:2.25rem;line-height:1.1;color:var(--huk-gold)}
+.huk-stat span{font-size:.85rem;color:var(--huk-muted)}
+
+/* Pasos del modelo de valor */
+.huk-steps{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center}
+.huk-steps span{background:var(--huk-card);border:1px solid var(--huk-line);padding:.45rem .9rem;border-radius:30px;font-size:.75rem;font-weight:600;text-transform:uppercase;transition:all var(--huk-speed) var(--huk-ease)}
+.huk-steps span b{color:var(--huk-gold)}
+.huk-steps span:hover{border-color:var(--huk-gold);transform:translateY(-2px)}
+
+/* Footer */
+.huk-footer{background:var(--huk-ink);color:var(--huk-sand);padding:4.5rem 0 0}
+.huk-footer h4{color:#fff;font-size:1.2rem;margin-bottom:1.2rem}
+.huk-footer h4::after{content:"";display:block;width:34px;height:2px;background:var(--huk-gold);margin-top:.5rem}
+.huk-footer a{color:var(--huk-sand)}
+.huk-footer a:hover{color:var(--huk-gold-light)}
+.huk-footer .huk-copy{border-top:1px solid var(--huk-ink-3);margin-top:3rem;padding:1.25rem 0;text-align:center;font-size:.8rem}
+
+/* Selector de idioma (GTranslate) */
+.huk-lang select,.huk-lang .gt_selector{background:var(--huk-ink-2);color:#f3efe6;border:1px solid var(--huk-ink-3);border-radius:var(--huk-radius);padding:.3rem .5rem;font-size:.8rem}
+
+/* Volver arriba */
+.huk-back-top{position:fixed;right:1.5rem;bottom:1.5rem;width:46px;height:46px;border-radius:50%;background:var(--huk-gold-grad);color:#0b0b0b;display:flex;align-items:center;justify-content:center;box-shadow:var(--huk-shadow-lg);opacity:0;visibility:hidden;transform:translateY(12px);transition:all var(--huk-speed) var(--huk-ease);z-index:1040}
+.huk-back-top.is-visible{opacity:1;visibility:visible;transform:none}
+.huk-back-top:hover{color:#0b0b0b;transform:translateY(-3px)}
+
+/* 6. EFECTOS (reemplazan WOW.js + animate.css) ------------------------------
+   Uso: <div data-reveal>…</div>   variantes: data-reveal="left|right|zoom"
+   Retraso: data-reveal-delay="200" (ms). Lo activa huk.js.                  */
+[data-reveal]{opacity:0;transform:translateY(28px);transition:opacity .8s var(--huk-ease),transform .8s var(--huk-ease);will-change:opacity,transform}
+[data-reveal="left"]{transform:translateX(-36px)}
+[data-reveal="right"]{transform:translateX(36px)}
+[data-reveal="zoom"]{transform:scale(.94)}
+[data-reveal].is-in{opacity:1;transform:none}
+/* Sin JS, todo visible */
+.no-js [data-reveal]{opacity:1;transform:none}
+
+/* Línea dorada que se dibuja bajo un enlace */
+.huk-link{position:relative;color:inherit;font-weight:600}
+.huk-link::after{content:"";position:absolute;left:0;bottom:-3px;width:100%;height:2px;background:var(--huk-gold-grad);transform:scaleX(0);transform-origin:right;transition:transform var(--huk-speed) var(--huk-ease)}
+.huk-link:hover::after{transform:scaleX(1);transform-origin:left}
+
+/* Brillo que cruza un botón o tarjeta */
+.huk-shine{position:relative;overflow:hidden}
+.huk-shine::before{content:"";position:absolute;top:0;left:-75%;width:50%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);transition:left .8s var(--huk-ease)}
+.huk-shine:hover::before{left:125%}
+
+/* Carga (skeleton) */
+.huk-skeleton{background:linear-gradient(90deg,#ebe6da 25%,#f6f3ec 37%,#ebe6da 63%);background-size:400% 100%;animation:huk-sk 1.4s ease infinite;border-radius:var(--huk-radius);min-height:1em}
+@keyframes huk-sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
+
+/* 7. PANEL DEL INVERSOR (/mi-cuenta, con el diseño de la web) --------------- */
+.huk-dash{display:grid;grid-template-columns:260px 1fr;gap:2rem;padding:2.5rem 0 4rem;align-items:start}
+@media (max-width:991.98px){.huk-dash{grid-template-columns:1fr}}
+
+/* Menú lateral del inversor */
+.huk-side{background:var(--huk-ink);color:#f3efe6;border-radius:var(--huk-radius-lg);padding:1.5rem 1rem;position:sticky;top:5rem}
+.huk-side .huk-user{display:flex;align-items:center;gap:.75rem;padding:0 .5rem 1.25rem;border-bottom:1px solid var(--huk-ink-3);margin-bottom:1rem}
+.huk-avatar{width:44px;height:44px;border-radius:50%;background:var(--huk-gold-grad);color:#0b0b0b;display:flex;align-items:center;justify-content:center;font-family:var(--huk-font-head);font-weight:700;flex-shrink:0}
+.huk-side .huk-user small{display:block;color:var(--huk-sand);font-size:.75rem}
+.huk-side a.huk-side-link{display:flex;align-items:center;gap:.7rem;padding:.65rem .75rem;border-radius:var(--huk-radius);color:#f3efe6;font-size:.92rem;transition:all var(--huk-speed) var(--huk-ease)}
+.huk-side a.huk-side-link:hover{background:var(--huk-ink-2);color:var(--huk-gold-light)}
+.huk-side a.huk-side-link.active{background:rgba(var(--huk-gold-rgb),.15);color:var(--huk-gold-light);box-shadow:inset 3px 0 0 var(--huk-gold)}
+.huk-side .huk-side-count{margin-left:auto;background:var(--huk-gold);color:#0b0b0b;font-size:.7rem;font-weight:700;border-radius:20px;padding:.05rem .5rem}
+
+/* Encabezado de página del panel */
+.huk-page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;flex-wrap:wrap;margin-bottom:1.75rem}
+.huk-page-head h1{font-size:1.75rem;margin:0}
+.huk-breadcrumb{font-size:.8rem;color:var(--huk-muted)}
+.huk-breadcrumb a{color:var(--huk-muted)}
+.huk-breadcrumb a:hover{color:var(--huk-gold-dark)}
+
+/* KPIs (total invertido en Bs y USD, proyectos, documentos) */
+.huk-kpi{background:var(--huk-card);border-radius:var(--huk-radius-lg);padding:1.25rem 1.4rem;box-shadow:var(--huk-shadow);border-top:3px solid var(--huk-gold);height:100%}
+.huk-kpi small{color:var(--huk-muted);text-transform:uppercase;letter-spacing:.08em;font-size:.72rem;font-weight:600}
+.huk-kpi .huk-kpi-value{font-family:var(--huk-font-head);font-size:1.75rem;font-weight:700;line-height:1.2;margin-top:.25rem;font-variant-numeric:tabular-nums}
+.huk-kpi .huk-kpi-cur{font-size:.85rem;color:var(--huk-muted);font-weight:600;margin-left:.25rem}
+
+/* Tarjeta de proyecto */
+.huk-proj{display:flex;flex-direction:column;height:100%}
+.huk-proj .huk-proj-cover{position:relative;aspect-ratio:16/9;background:linear-gradient(160deg,var(--huk-brown),var(--huk-ink))}
+.huk-proj .huk-proj-cover img{width:100%;height:100%;object-fit:cover}
+.huk-proj .huk-proj-cover .huk-chip{position:absolute;left:.75rem;top:.75rem}
+.huk-proj .huk-proj-body{padding:1.1rem 1.25rem;flex:1;display:flex;flex-direction:column}
+.huk-proj h3{font-size:1.15rem;margin:.35rem 0 .5rem}
+.huk-proj p{color:var(--huk-muted);font-size:.9rem;margin-bottom:1rem}
+.huk-proj .huk-proj-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;border-top:1px solid var(--huk-line);padding-top:.9rem;margin-top:auto}
+.huk-proj .huk-proj-meta small{display:block;color:var(--huk-muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em}
+.huk-proj .huk-proj-meta b{font-size:.95rem;font-variant-numeric:tabular-nums}
+
+/* Chips y badges de estado */
+.huk-chip{display:inline-flex;align-items:center;gap:.35rem;font-size:.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:.3rem .65rem;border-radius:30px;background:var(--huk-ink);color:var(--huk-gold-light)}
+.huk-chip-gold{background:var(--huk-gold-grad);color:#0b0b0b}
+.huk-chip-light{background:rgba(var(--huk-gold-rgb),.14);color:var(--huk-gold-dark)}
+.huk-badge{display:inline-block;font-size:.72rem;font-weight:700;padding:.25rem .6rem;border-radius:var(--huk-radius)}
+.huk-badge-ok{background:var(--huk-ok-bg);color:var(--huk-ok)}
+.huk-badge-warn{background:var(--huk-warn-bg);color:var(--huk-warn)}
+.huk-badge-danger{background:var(--huk-danger-bg);color:var(--huk-danger)}
+.huk-badge-info{background:var(--huk-info-bg);color:var(--huk-info)}
+
+/* Etapas del proyecto (Fase I → II → III) */
+.huk-stages{display:flex;list-style:none;padding:0;margin:0 0 1.5rem;counter-reset:st}
+.huk-stages li{flex:1;position:relative;text-align:center;font-size:.78rem;color:var(--huk-muted);padding-top:2.2rem;counter-increment:st}
+.huk-stages li::before{content:counter(st);position:absolute;top:0;left:50%;transform:translateX(-50%);width:1.8rem;height:1.8rem;border-radius:50%;background:var(--huk-card);border:2px solid var(--huk-line);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;z-index:1}
+.huk-stages li::after{content:"";position:absolute;top:.85rem;left:-50%;width:100%;height:2px;background:var(--huk-line)}
+.huk-stages li:first-child::after{display:none}
+.huk-stages li.done{color:var(--huk-text)}
+.huk-stages li.done::before{content:"✓";background:var(--huk-gold);border-color:var(--huk-gold);color:#0b0b0b}
+.huk-stages li.done::after,.huk-stages li.current::after{background:var(--huk-gold)}
+.huk-stages li.current{color:var(--huk-text);font-weight:700}
+.huk-stages li.current::before{border-color:var(--huk-gold);color:var(--huk-gold-dark);box-shadow:0 0 0 4px rgba(var(--huk-gold-rgb),.2)}
+
+/* Ficha de datos (ROI, plazo, monto, ubicación) */
+.huk-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--huk-line);border:1px solid var(--huk-line);border-radius:var(--huk-radius-lg);overflow:hidden;margin-bottom:1.5rem}
+.huk-facts > div{background:var(--huk-card);padding:1rem 1.1rem}
+.huk-facts small{display:block;color:var(--huk-muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.huk-facts b{font-family:var(--huk-font-head);font-size:1.15rem;font-variant-numeric:tabular-nums}
+
+/* Lista de documentos (data room) */
+.huk-docs{list-style:none;padding:0;margin:0;background:var(--huk-card);border-radius:var(--huk-radius-lg);box-shadow:var(--huk-shadow);overflow:hidden}
+.huk-docs li{display:flex;align-items:center;gap:1rem;padding:.9rem 1.1rem;border-bottom:1px solid var(--huk-line);transition:background var(--huk-speed)}
+.huk-docs li:last-child{border-bottom:0}
+.huk-docs li:hover{background:#faf8f3}
+.huk-docs .huk-doc-ico{width:42px;height:42px;border-radius:var(--huk-radius);background:rgba(var(--huk-gold-rgb),.14);color:var(--huk-gold-dark);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.huk-docs .huk-doc-name{flex:1;min-width:0}
+.huk-docs .huk-doc-name b{display:block;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.huk-docs .huk-doc-name small{color:var(--huk-muted);font-size:.76rem}
+.huk-docs li.is-locked{opacity:.55}
+.huk-docs li.is-locked .huk-doc-ico{background:var(--huk-line);color:var(--huk-muted)}
+
+/* Video 16:9 (YouTube o archivo privado) */
+.huk-video{position:relative;aspect-ratio:16/9;border-radius:var(--huk-radius-lg);overflow:hidden;background:#000;box-shadow:var(--huk-shadow)}
+.huk-video iframe,.huk-video video{position:absolute;inset:0;width:100%;height:100%;border:0}
+
+/* Caja del NDA */
+.huk-nda{background:var(--huk-card);border-radius:var(--huk-radius-lg);box-shadow:var(--huk-shadow-lg);max-width:820px;margin:3rem auto;overflow:hidden}
+.huk-nda header{background:var(--huk-ink);color:#f3efe6;padding:1.4rem 1.75rem;border-bottom:3px solid var(--huk-gold)}
+.huk-nda header h2{font-size:1.35rem;margin:0}
+.huk-nda .huk-nda-text{max-height:52vh;overflow-y:auto;padding:1.5rem 1.75rem;font-size:.92rem;line-height:1.7;border-bottom:1px solid var(--huk-line)}
+.huk-nda .huk-nda-text::-webkit-scrollbar{width:8px}
+.huk-nda .huk-nda-text::-webkit-scrollbar-thumb{background:var(--huk-line);border-radius:8px}
+.huk-nda footer{padding:1.25rem 1.75rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;background:#faf8f3}
+.huk-nda .huk-nda-hint{font-size:.78rem;color:var(--huk-muted)}
+
+/* Hilo de comentarios inversor ↔ HUK */
+.huk-thread{display:flex;flex-direction:column;gap:1rem;max-height:520px;overflow-y:auto;padding:1.25rem;background:#faf8f3;border-radius:var(--huk-radius-lg);border:1px solid var(--huk-line)}
+.huk-msg{max-width:78%;display:flex;gap:.6rem;align-items:flex-end}
+.huk-msg .huk-avatar{width:32px;height:32px;font-size:.75rem}
+.huk-msg .huk-bubble{background:var(--huk-card);border:1px solid var(--huk-line);border-radius:12px 12px 12px 2px;padding:.7rem .95rem;font-size:.9rem}
+.huk-msg .huk-bubble small{display:block;color:var(--huk-muted);font-size:.7rem;margin-top:.35rem}
+.huk-msg.is-mine{align-self:flex-end;flex-direction:row-reverse}
+.huk-msg.is-mine .huk-bubble{background:var(--huk-ink);color:#f3efe6;border-color:var(--huk-ink);border-radius:12px 12px 2px 12px}
+.huk-msg.is-mine .huk-bubble small{color:var(--huk-sand)}
+.huk-msg .huk-attach{display:inline-flex;align-items:center;gap:.4rem;margin-top:.5rem;font-size:.8rem;padding:.35rem .6rem;border-radius:var(--huk-radius);background:rgba(var(--huk-gold-rgb),.14);color:var(--huk-gold-dark)}
+.huk-msg.is-mine .huk-attach{color:var(--huk-gold-light)}
+.huk-composer{display:flex;gap:.6rem;margin-top:.75rem}
+.huk-composer textarea{flex:1;resize:none;min-height:46px}
+
+/* Subida de archivos (arrastrar y soltar) */
+.huk-drop{border:2px dashed var(--huk-line);border-radius:var(--huk-radius-lg);padding:1.75rem;text-align:center;color:var(--huk-muted);background:var(--huk-card);transition:all var(--huk-speed) var(--huk-ease);cursor:pointer}
+.huk-drop > i{display:block;margin:0 auto .6rem}
+.huk-drop:hover,.huk-drop.is-over{border-color:var(--huk-gold);background:rgba(var(--huk-gold-rgb),.06);color:var(--huk-text)}
+
+/* Tabla (mis inversiones) */
+.huk-table{width:100%;background:var(--huk-card);border-radius:var(--huk-radius-lg);overflow:hidden;box-shadow:var(--huk-shadow);border-collapse:separate;border-spacing:0}
+.huk-table th{background:var(--huk-ink);color:var(--huk-gold-light);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600;padding:.8rem 1rem;text-align:left}
+.huk-table td{padding:.85rem 1rem;border-bottom:1px solid var(--huk-line);font-size:.9rem}
+.huk-table tr:last-child td{border-bottom:0}
+.huk-table tbody tr:hover td{background:#faf8f3}
+.huk-table .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* Estado vacío */
+.huk-empty{text-align:center;padding:3.5rem 1.5rem;background:var(--huk-card);border-radius:var(--huk-radius-lg);border:1px dashed var(--huk-line)}
+.huk-empty .huk-empty-ico{width:64px;height:64px;margin:0 auto 1rem;border-radius:50%;background:rgba(var(--huk-gold-rgb),.14);color:var(--huk-gold-dark);display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+.huk-empty h3{font-size:1.15rem}
+.huk-empty p{color:var(--huk-muted);max-width:28rem;margin:0 auto 1rem}
+
+/* Aviso de cuenta (pendiente de aprobación, etc.) */
+.huk-notice{display:flex;gap:1rem;align-items:flex-start;padding:1rem 1.2rem;border-radius:var(--huk-radius-lg);border-left:4px solid var(--huk-gold);background:var(--huk-card);box-shadow:var(--huk-shadow);margin-bottom:1.5rem}
+.huk-notice.is-warn{border-color:var(--huk-warn);background:var(--huk-warn-bg)}
+.huk-notice.is-danger{border-color:var(--huk-danger);background:var(--huk-danger-bg)}
+.huk-notice.is-ok{border-color:var(--huk-ok);background:var(--huk-ok-bg)}
+
+/* Login / registro (pantalla partida: imagen + formulario) */
+.huk-auth{display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
+.huk-auth .huk-auth-side{background:var(--huk-dark-grad);color:#f3efe6;padding:3rem;display:flex;flex-direction:column;justify-content:flex-end}
+.huk-auth .huk-auth-form{display:flex;align-items:center;justify-content:center;padding:3rem 1.5rem;background:var(--huk-bg)}
+.huk-auth .huk-auth-form > div{width:100%;max-width:420px}
+@media (max-width:767.98px){.huk-auth{grid-template-columns:1fr}.huk-auth .huk-auth-side{display:none}}
+
+/* 8. ACCESIBILIDAD Y MOVIMIENTO REDUCIDO ---------------------------------- */
+:focus-visible{outline:2px solid var(--huk-gold);outline-offset:3px}
+.btn:focus-visible{box-shadow:0 0 0 .25rem rgba(var(--huk-gold-rgb),.4)}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  [data-reveal]{opacity:1;transform:none}
+}
+
+/* 9. HEADER (estructura tipo Industo, colores HUK) -------------------------
+   Piezas: .huk-hd-top · .huk-hd-main (logo + datos + menú dorado) · .huk-sticky
+   --huk-nav-h: alto de la franja del menú. La mitad cae sobre el contenido. */
+:root{--huk-nav-h:64px;--huk-nav-overlap:32px;--huk-nav-bg:#bd944f}
+
+/* 9.1 Barra superior */
+.huk-hd-top{background:#0b0b0b;color:var(--huk-sand);font-size:.85rem}
+.huk-hd-top .container{display:flex;justify-content:space-between;align-items:center;gap:1rem;min-height:46px}
+.huk-hd-top b{color:var(--huk-gold);font-weight:600}
+.huk-hd-top-right{display:flex;align-items:center;gap:1.25rem}
+.huk-hd-hours i{color:var(--huk-gold)}
+.huk-hd-slash{width:1px;height:46px;background:rgba(var(--huk-gold-rgb),.45);transform:skewX(-24deg)}
+.huk-hd-social{display:flex;gap:1rem}
+.huk-hd-social-link{color:#f3efe6;font-size:1rem;transition:color var(--huk-speed),transform var(--huk-speed)}
+.huk-hd-social-link:hover{color:var(--huk-gold-light);transform:translateY(-2px)}
+
+/* 9.2 Franja principal: logo + datos de contacto */
+.huk-hd-main{background:var(--huk-ink);position:relative;z-index:20;overflow-x:clip}
+.huk-hd-main>.container{position:relative}
+.huk-hd-brandrow{display:flex;align-items:flex-start;justify-content:space-between;gap:2rem;padding:1.25rem 0 calc(var(--huk-nav-overlap) + 1.1rem);  padding-bottom: 25px;
+    padding-top: 25px;}
+.huk-hd-brandrow>.huk-brand{align-self:center;margin-top:calc(var(--huk-nav-overlap) * .5)}
+.huk-brand{display:inline-flex;align-items:center;flex-shrink:0}
+.huk-logo{    max-height: 72px;
+    width: auto;
+    margin-top: -20px}
+.huk-logo-sm{max-height:46px;width:auto}
+.huk-logo-text{font-family:var(--huk-font-head);font-weight:700;font-size:1.4rem;color:var(--huk-gold);letter-spacing:.03em}
+.huk-hd-info{display:flex;gap:2.25rem}
+.huk-hd-info-item{display:flex;align-items:center;gap:.85rem;color:var(--huk-sand);font-size:.9rem;line-height:1.35}
+a.huk-hd-info-item:hover{color:var(--huk-gold-light)}
+.huk-hd-info-item i{font-size:1.9rem;color:var(--huk-gold);width:2.2rem;text-align:center;transition:transform var(--huk-speed) var(--huk-ease)}
+.huk-hd-info-item:hover i{transform:scale(1.1) rotate(-6deg)}
+.huk-hd-info-item b{display:block;color:#fff;font-size:1rem;font-weight:600}
+
+/* 9.3 Menú dorado con borde izquierdo inclinado, se extiende hasta el borde derecho de la pantalla */
+.huk-hd-navwrap{position:absolute;right:calc(var(--bs-gutter-x,1.5rem) * .5);bottom:0;transform:translateY(50%);display:flex;justify-content:flex-end;z-index:30}
+.huk-hd-nav{position:relative;z-index:0;display:flex;align-items:center;gap:.25rem;min-height:var(--huk-nav-h);padding:0 0 0 4rem}
+/* El fondo dorado inclinado va en un pseudo-elemento: así el recorte no corta los submenús */
+.huk-hd-nav::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--huk-nav-bg);clip-path:polygon(2.75rem 0,100% 0,100% 100%,0 100%)}
+.huk-hd-nav::after{content:"";position:absolute;left:100%;top:0;bottom:0;width:50vw;z-index:-1;background:var(--huk-nav-bg)}
+
+.huk-nav{list-style:none;margin:0;padding:0;display:flex;align-items:center}
+.huk-nav-item{position:relative}
+.huk-nav-link{display:flex;align-items:center;gap:.35rem;font-weight:600;font-size:1rem;white-space:nowrap}
+.huk-caret{font-size:.6rem;transition:transform var(--huk-speed) var(--huk-ease)}
+.huk-nav-item:hover .huk-caret,.huk-nav-item:focus-within .huk-caret{transform:rotate(180deg)}
+
+/* Variante principal (sobre dorado) */
+.huk-nav-main .huk-nav-link{color:#0b0b0b;padding:0 1.1rem;height:var(--huk-nav-h);position:relative;z-index:1}
+.huk-nav-main .huk-nav-link::after{content:"";position:absolute;left:1.1rem;right:1.1rem;bottom:14px;height:2px;background:#0b0b0b;transform:scaleX(0);transform-origin:left;transition:transform var(--huk-speed) var(--huk-ease)}
+.huk-nav-main .huk-nav-link:hover::after,.huk-nav-main .huk-nav-link.active::after{transform:scaleX(1)}
+.huk-nav-main .huk-nav-link:hover{color:#0b0b0b}
+
+/* Submenú (principal y compacto) */
+.huk-submenu{list-style:none;margin:0;padding:.35rem 0;position:absolute;left:0;top:100%;min-width:230px;background:var(--huk-ink);border-top:2px solid var(--huk-gold);box-shadow:0 14px 34px rgba(0,0,0,.35);opacity:0;visibility:hidden;transform:translateY(10px);transition:all var(--huk-speed) var(--huk-ease);z-index:50}
+.huk-nav-item:hover>.huk-submenu,.huk-nav-item:focus-within>.huk-submenu{opacity:1;visibility:visible;transform:none}
+.huk-submenu a{display:block;padding:.7rem 1.15rem;color:#f3efe6;font-size:.9rem;border-bottom:1px solid var(--huk-ink-3);transition:all var(--huk-speed) var(--huk-ease)}
+.huk-submenu li:last-child a{border-bottom:0}
+.huk-submenu a:hover{color:var(--huk-gold-light);padding-left:1.45rem;background:var(--huk-ink-2)}
+
+/* Botón "Acceso inversores": píldora negra dentro de la barra dorada */
+.huk-hd-cta{display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.25rem;margin:0 0 0 .75rem;border-radius:30px;background:var(--huk-ink);color:var(--huk-gold-light);font-weight:600;font-size:.88rem;white-space:nowrap;position:relative;z-index:1;transition:background var(--huk-speed),color var(--huk-speed),transform var(--huk-speed)}
+.huk-hd-cta:hover{background:var(--huk-ink-2);color:#fff;transform:translateY(-1px)}
+.huk-sticky .huk-hd-cta{border:1px solid rgba(var(--huk-gold-rgb),.6);margin-left:1rem}
+.huk-sticky .huk-hd-cta:hover{background:var(--huk-gold);color:#0b0b0b}
+
+/* El primer bloque de la página se mete debajo del menú (como el hero de Industo) */
+#contenido{padding-top:var(--huk-nav-overlap)}
+#contenido>.huk-hero:first-child,#contenido>.huk-under-nav:first-child{margin-top:calc(-1 * var(--huk-nav-overlap));padding-top:calc(7rem + var(--huk-nav-overlap))}
+
+/* 9.4 Header compacto que baja al hacer scroll */
+.huk-sticky{position:fixed;top:0;left:0;right:0;z-index:1030;background:rgba(11,11,11,.97);border-bottom:2px solid var(--huk-gold);box-shadow:0 8px 24px rgba(0,0,0,.3);transform:translateY(-110%);visibility:hidden;transition:transform .4s var(--huk-ease),visibility 0s linear .4s}
+.huk-sticky.is-visible{transform:none;visibility:visible;transition:transform .4s var(--huk-ease),visibility 0s}
+.huk-sticky .container{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;min-height:74px}
+.huk-nav-sticky .huk-nav-link{color:#f3efe6;padding:0 1rem;height:74px;position:relative}
+.huk-nav-sticky .huk-nav-link::after{content:"";position:absolute;left:1rem;right:1rem;bottom:20px;height:2px;background:var(--huk-gold-grad);transform:scaleX(0);transform-origin:left;transition:transform var(--huk-speed) var(--huk-ease)}
+.huk-nav-sticky .huk-nav-link:hover,.huk-nav-sticky .huk-nav-link.active{color:var(--huk-gold-light)}
+.huk-nav-sticky .huk-nav-link:hover::after,.huk-nav-sticky .huk-nav-link.active::after{transform:scaleX(1)}
+
+/* 9.5 Botón ☰ y menú del celular */
+.huk-hd-toggler{display:none;width:46px;height:46px;border:1px solid rgba(var(--huk-gold-rgb),.5);border-radius:var(--huk-radius);background:transparent;color:var(--huk-gold-light);font-size:1.2rem}
+.huk-hd-toggler:hover{background:rgba(var(--huk-gold-rgb),.15)}
+.huk-offcanvas{background:var(--huk-ink);color:#f3efe6;border-left:2px solid var(--huk-gold)!important;max-width:320px}
+.huk-offcanvas .offcanvas-header{border-bottom:1px solid var(--huk-ink-3)}
+.huk-offcanvas-close{background:transparent;border:0;color:var(--huk-gold-light);font-size:1.4rem}
+.huk-nav-mobile{flex-direction:column;align-items:stretch}
+.huk-nav-mobile .huk-nav-link{color:#f3efe6;padding:.85rem .25rem;border-bottom:1px solid var(--huk-ink-3)}
+.huk-nav-mobile .huk-nav-link.active,.huk-nav-mobile .huk-nav-link:hover{color:var(--huk-gold-light)}
+.huk-nav-mobile .huk-caret{display:none}
+.huk-nav-mobile .huk-submenu{position:static;opacity:1;visibility:visible;transform:none;background:transparent;border:0;box-shadow:none;padding:0 0 .25rem .9rem}
+.huk-nav-mobile .huk-submenu a{border:0;padding:.5rem .25rem;color:var(--huk-sand)}
+.huk-offcanvas .huk-hd-cta{margin:0;border:1px solid var(--huk-gold)}
+.huk-offcanvas-contact{margin-top:2rem;display:flex;flex-direction:column;gap:.6rem;font-size:.88rem}
+.huk-offcanvas-contact a{color:var(--huk-sand)}
+
+/* 9.6 Responsive */
+@media (max-width:1199.98px){
+  .huk-hd-info-item:nth-child(2){display:none}         /* oculta la dirección en laptops chicas */
+  .huk-nav-main .huk-nav-link{padding:0 .8rem}
+}
+@media (max-width:991.98px){
+  .huk-hd-info,.huk-hd-navwrap,.huk-sticky-nav,.huk-sticky .huk-hd-cta{display:none}
+  .huk-hd-toggler{display:inline-flex;align-items:center;justify-content:center}
+  .huk-hd-brandrow{padding:1rem 0;align-items:center;    }
+  .huk-hd-brandrow>.huk-brand{margin-top:0;         max-height: initial;
+        max-width: 70% !important;}
+  .huk-logo{max-height:54px}
+  #contenido{padding-top:0}
+  #contenido>.huk-hero:first-child,#contenido>.huk-under-nav:first-child{margin-top:0;padding-top:5rem}
+  .huk-sticky .container{min-height:64px}
+}
+@media (max-width:575.98px){
+  .huk-hd-welcome{display:none}
+  .huk-hd-top .container{justify-content:center}
+}
+
+.huk-hd-welcome{font-size: 13px;}
+
+
+@media (min-width:992px) and (max-width:1200px){
+
+  .huk-logo {
+    max-height: 55px!important;
+}
+    .huk-hd-welcome {
+    font-size: 11px!important;
+}
+
+  .container {
+        max-width: 960px!important;
+    }
+
+  }
+
+
+@media (min-width:768px) and (max-width:991px){
+
+  .huk-nav.huk-nav-sticky {display: none!important;}
+  .huk-logo {
+    margin-top: 0px!important;
+}
+    .container {
+        max-width: 850px!important;
+    }
+
+    .huk-hd-welcome {
+         display: none;
+}
+}
+
+@media (max-width:767px) {
+
+    .huk-nav.huk-nav-sticky {display: none!important;}
+    .huk-hd-top .container{justify-content:center}
+  .huk-hd-welcome{display:none}
+
+  .huk-logo {
+    margin-top: 0px!important;
+}
+}
+
+@media (max-width:767px) {
+
+  .huk-hd-toggler{
+        width: 35px!important;
+    height: 35px!important;
+}
+  .huk-hd-toggler i {    font-size: 16px!important;}
+.footer .footer-item a{
+  font-size: 12px!important;
+}}
+
+
+@media (min-width: 576px) and (max-width:767px) {
+    .container{
+        max-width: 640px!important;
+    }
+}
+
+/* 10. Selector de idioma (GTranslate con banderas) */
+.huk-lang .gt_switcher{font-family:var(--huk-font-body)!important;font-size:.85rem!important;width:170px!important}
+.huk-lang .gt_switcher .gt_selected{background:var(--huk-ink-2)!important;border:1px solid rgba(var(--huk-gold-rgb),.5)!important;border-radius:var(--huk-radius)!important}
+.huk-lang .gt_switcher .gt_selected a{color:#f3efe6!important;border:0!important}
+.huk-lang .gt_switcher .gt_selected a:hover{background:transparent!important;color:var(--huk-gold-light)!important}
+.huk-lang .gt_switcher .gt_option{background:var(--huk-ink)!important;border:1px solid rgba(var(--huk-gold-rgb),.5)!important;border-top:0!important;z-index:1050!important}
+.huk-lang .gt_switcher .gt_option a{color:#f3efe6!important}
+.huk-lang .gt_switcher .gt_option a:hover{background:var(--huk-ink-2)!important;color:var(--huk-gold-light)!important}
+.huk-lang .gt_switcher img{border-radius:2px;margin-right:.4rem}
+
+/* 11. SELECTOR DE IDIOMA CON BANDERAS (agregado) ------------------------------
+   Selector propio con bandera al lado de cada idioma.
+   El <select> de GTranslate queda oculto y traduce por detrás.              */
+.huk-lang.gtranslate_wrapper{display:none!important}
+.huk-lang-switch{position:relative;font-size:.92rem}
+.huk-lang-btn{display:flex;align-items:center;gap:.55rem;min-width:180px;padding:.42rem .8rem;background:var(--huk-ink-2);color:#f3efe6;border:1px solid rgba(var(--huk-gold-rgb),.6);border-radius:var(--huk-radius-lg);font:inherit;cursor:pointer;transition:border-color var(--huk-speed),background var(--huk-speed)}
+.huk-lang-btn:hover,.huk-lang-btn[aria-expanded="true"]{border-color:var(--huk-gold);background:#1c1c1c}
+.huk-lang-btn img,.huk-lang-list img{width:20px;height:15px;object-fit:cover;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.12);flex-shrink:0}
+.huk-lang-btn span{flex:1;text-align:left}
+.huk-lang-caret{font-size:.7rem;transition:transform var(--huk-speed) var(--huk-ease)}
+.huk-lang-btn[aria-expanded="true"] .huk-lang-caret{transform:rotate(180deg)}
+.huk-lang-list{position:absolute;right:0;top:calc(100% + 4px);min-width:100%;margin:0;padding:.3rem 0;list-style:none;background:var(--huk-ink);border:1px solid rgba(var(--huk-gold-rgb),.45);border-radius:var(--huk-radius);box-shadow:0 14px 34px rgba(0,0,0,.45);z-index:1060;max-height:80vh;overflow-y:auto}
+.huk-lang-list[hidden]{display:none}
+.huk-lang-list li{display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .4rem .85rem;
+    color: #f3efe6;
+    cursor: pointer;
+    white-space: nowrap;
+    outline: 0;
+    font-size: 13px;}
+.huk-lang-list li:hover,.huk-lang-list li:focus{background:var(--huk-ink-2);color:var(--huk-gold-light)}
+.huk-lang-list li[aria-selected="true"]{background:var(--huk-gold);color:#0b0b0b;font-weight:600}
+.skiptranslate,#goog-gt-tt,.goog-te-banner-frame{display:none!important}
+body{top:0!important}
+@media (max-width:575.98px){.huk-lang-btn{min-width:0}.huk-lang-btn span{display:none}}
+
+
+.huk-lang-btn span{    FONT-SIZE: 14PX;}
