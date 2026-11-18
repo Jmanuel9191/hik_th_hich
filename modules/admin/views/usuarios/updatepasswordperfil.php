@@ -1,142 +1,67 @@
 <?php
 
+/**
+ * Cambiar mi contraseña. Pide la actual. Ojo en cada campo (huk-admin.js, data-ver-clave).
+ *
+ * @var yii\web\View $this
+ * @var app\models\ChangePasswordForm $model
+ */
+
 use kartik\form\ActiveForm;
 use yii\helpers\Html;
-$this->title = 'ACTUALIZAR PASSWORD';
+
+\app\assets_b\UsuariosAdminAsset::register($this);
+
+$this->title = 'Cambiar mi contraseña';
+
+$conOjo = [
+    'addon' => [
+        'groupOptions' => ['class' => 'huk-adm-field'],
+        'append' => [
+            'content' => '<button type="button" class="btn btn-default" data-ver-clave aria-label="Mostrar contraseña">'
+                . '<i class="fa fa-eye" aria-hidden="true"></i></button>',
+            'asButton' => true,
+        ],
+    ],
+];
 ?>
-<!-- Main content -->
+
+<section class="content-header">
+    <h1><i class="fa fa-key"></i> Cambiar mi contraseña</h1>
+</section>
+
 <section class="content">
-            <div class="box">
-
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-lg-7 col-md-9">
+            <div class="box box-primary">
+                <?php $form = ActiveForm::begin([
+                    'id' => 'usuario-clave-form',
+                    'type' => ActiveForm::TYPE_HORIZONTAL,
+                    'formConfig' => ['labelSpan' => 4, 'deviceSize' => ActiveForm::SIZE_SMALL],
+                    'options' => ['class' => 'huk-form-usuario', 'autocomplete' => 'off'],
+                ]); ?>
 
+                <?= $form->field($model, 'currentPassword', $conOjo)
+                    ->passwordInput(['autocomplete' => 'current-password', 'value' => '', 'autofocus' => true]) ?>
 
-        <div class="col-xs-12">
-            <h1 class="app-page-title">Mi cuenta</h1>
+                <?= $form->field($model, 'newPassword', $conOjo)
+                    ->passwordInput(['autocomplete' => 'new-password', 'value' => ''])
+                    ->hint('Mínimo 8 caracteres, con mayúscula, minúscula, número y símbolo.') ?>
+
+                <?= $form->field($model, 'confirmPassword', $conOjo)
+                    ->passwordInput(['autocomplete' => 'new-password', 'value' => '']) ?>
+
+                <p class="huk-clave-aviso">
+                    <i class="fa fa-info-circle"></i> Esta sesión sigue abierta; si tenías el panel abierto en otro equipo, ahí se cierra.
+                </p>
+
+                <div class="huk-form-acciones text-center">
+                    <?= Html::submitButton('<i class="fa fa-save"></i> Guardar contraseña', ['class' => 'btn btn-success btform']) ?>
+                    <?= Html::a('Cancelar', ['cuenta'], ['class' => 'btn btn-default btform']) ?>
+                </div>
+
+                <?php ActiveForm::end(); ?>
+            </div>
         </div>
-        
-        
-            <div class="col-12">
-                <div class="app-card app-card-settings shadow-sm p-4">
-
-                    <div class="app-card-body">
-
-
-
-                            <?php $form = ActiveForm::begin([
-                                'id' => 'frmContact',
-                                'class' => 'settings-form',
-                                'action' => ['usuarios/updatepasswordperfil'],
-                                'method' => 'post'
-                            ]); ?>
-                        <div class="col-12 col-lg-12">
-
-
-                       
-
-
-    <div class="mb-3 laelsle">
-        <?= $form->field($model, 'currentPassword', [
-            'template' => '
-            {label}
-            <div class="input-group desl">
-                {input}
-                <div class="input-group-append">
-                    <button type="button" class="btn btn-secondary toggle-pass">
-                        <i class="fa fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-            {error}',
-        ])->passwordInput(['class' => 'form-control', 'placeholder' => '']) ?>
     </div>
-</div>
-
-<div class="col-12 col-lg-12">
-    <div class="mb-3 laelsle">
-        <?= $form->field($model, 'newPassword', [
-            'template' => '
-            {label}
-            <div class="input-group desl">
-                {input}
-                <div class="input-group-append">
-                    <button type="button" class="btn btn-secondary toggle-pass">
-                        <i class="fa fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-            {error}',
-        ])->passwordInput(['class' => 'form-control', 'placeholder' => '']) ?>
-    </div>
-</div>
-
-<div class="col-12 col-lg-12">
-    <div class="mb-3 laelsle">
-        <?= $form->field($model, 'confirmPassword', [
-            'template' => '
-            {label}
-            <div class="input-group desl">
-                {input}
-                <div class="input-group-append">
-                    <button type="button" class="btn btn-secondary toggle-pass">
-                        <i class="fa fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-            {error}',
-        ])->passwordInput(['class' => 'form-control', 'placeholder' => '']) ?>
-    </div>
-</div>
-
-                    <div class="col-12 col-lg-12  " >
-                            <div class="mb-3">
-
-                        <?= Html::submitButton('Actualizar', ['class' => 'btn btn-success btform', 'name' => 'contact-button']) ?>
-
-                     </div>
-                        </div>
-
-
-                        <?php ActiveForm::end(); ?>
-
-
-                  
-
-
-                    </div><!--//app-card-body-->
-
-                </div><!--//app-card-->
-            </div>
-
-
-            
-        </div><!--//row-->
-
-
-    </div><!--//container-fluid-->
-</section><!--//app-content-->
-
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.toggle-pass').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var input = this.closest('.input-group').querySelector('input');
-            var icon  = this.querySelector('i');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        });
-    });
-});
-</script>
-
-
+</section>

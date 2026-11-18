@@ -29,77 +29,39 @@ if (is_array($flash) && !empty($flash['message'])) {
 }
 
 /* ---------- Menú lateral ---------- */
-$itemsBase = [
-    [
-        'label' => 'INICIO',
-        'url'   => ['/admin/default/index'],
-        'icon'  => 'home',
-    ],
-    [
-        'label' => 'ORDENES / RESULTADOS',
-        'url'   => ['/admin/ordenes/index'],
-        'icon'  => 'file-text',
-    ],
-    [
-        'label' => 'PRUEBAS GENERALES',
-        'url'   => ['/admin/servicios/index'],
-        'icon'  => 'stethoscope',
-    ],
-    [
-        'label' => 'DOCTORES',
-        'url'   => ['/admin/doctores/index'],
-        'icon'  => 'user-md',
-    ],
-    [
-        'label' => 'ANÁLISIS',
-        'url'   => ['/admin/categorias-servicio/index'],
-        'icon'  => 'tags',
-    ],
-];
-
-$itemsAdmin = [
-    [
-        'label' => 'REPORTES',
-        'url'   => ['/admin/reportes/index'],
-        'icon'  => 'bar-chart',
-    ],
-    [
-        'label'   => 'CONFIGURACIÓN',
-        'icon'    => 'cogs',
-        'url'     => '#',
-        'options' => ['class' => 'treeview'],
-        'items'   => [
-            [
-                'label' => 'USUARIOS',
-                'url'   => ['/admin/usuarios/index'],
-                'icon'  => 'users',
-            ],
-            [
-                'label' => 'ROLES Y PERMISOS',
-                'url'   => ['/admin/roles/index'],
-                'icon'  => 'key',
-            ],
-            [
-                'label' => 'INVENTARIO',
-                'url'   => ['/admin/productos/index'],
-                'icon'  => 'archive',
-            ],
-        ],
-    ],
-];
-
-// Admin (idrol=1) ve todo; el resto solo el menú base.
-$items = $idrol == 1 ? array_merge($itemsBase, $itemsAdmin) : $itemsBase;
-
-// Ecosistemas: Superadmin, Editor y Gerente (según permisos), justo después de INICIO.
+// Solo los módulos en uso. Los demás están apagados en Module::CONTROLADORES_ACTIVOS.
 $permisos = Yii::$container->get(\app\components\InterfacePermisosService::class);
+$esSuperadmin = (int) $idrol === \app\components\Rol::SUPERADMIN;
+$ctrl = Yii::$app->controller->id;
+
+$items = [
+    ['label' => 'INICIO', 'url' => ['/admin/default/index'], 'icon' => 'home'],
+];
+
+// Ecosistemas: Superadmin, Editor y Gerente (según permisos).
 if ($usuario && $permisos->tienePermiso('ecosistemas_listar')) {
-    array_splice($items, 1, 0, [[
-        'label' => 'ECOSISTEMAS',
-        'url'   => ['/admin/ecosistemas/index'],
-        'icon'  => 'th-large',
-        'active' => Yii::$app->controller->id === 'ecosistemas',
-    ]]);
+    $items[] = ['label' => 'ECOSISTEMAS', 'url' => ['/admin/ecosistemas/index'], 'icon' => 'th-large', 'active' => $ctrl === 'ecosistemas'];
+}
+
+if ($usuario && $permisos->tienePermiso('banners_listar')) {
+    $items[] = ['label' => 'BANNERS', 'url' => ['/admin/banners/index'], 'icon' => 'picture-o', 'active' => $ctrl === 'banners'];
+}
+if ($usuario && $permisos->tienePermiso('equipo_listar')) {
+    $items[] = ['label' => 'EQUIPO', 'url' => ['/admin/equipo/index'], 'icon' => 'id-badge', 'active' => $ctrl === 'equipo'];
+}
+if ($esSuperadmin) {
+    $items[] = ['label' => 'USUARIOS', 'url' => ['/admin/usuarios/index'], 'icon' => 'users', 'active' => $ctrl === 'usuarios' && Yii::$app->controller->action->id !== 'cuenta'];
+}
+
+$configuracion = [];
+if ($esSuperadmin) {
+    $configuracion[] = ['label' => 'ROLES Y PERMISOS', 'url' => ['/admin/roles/index'], 'icon' => 'key', 'active' => $ctrl === 'roles'];
+}
+if ($usuario && $permisos->tienePermiso('configuracion_editar')) {
+    $configuracion[] = ['label' => 'DATOS GENERALES', 'url' => ['/admin/datos-generales/index'], 'icon' => 'globe', 'active' => $ctrl === 'datos-generales'];
+}
+if ($configuracion) {
+    $items[] = ['label' => 'CONFIGURACIÓN', 'icon' => 'cogs', 'url' => '#', 'options' => ['class' => 'treeview'], 'items' => $configuracion];
 }
 ?>
 <?php $this->beginPage() ?>

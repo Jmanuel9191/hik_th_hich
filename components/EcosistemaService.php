@@ -7,7 +7,6 @@ use app\models\EcosistemaHistorial;
 use app\models\EcosistemaImagen;
 use Yii;
 use yii\data\ActiveDataProvider;
-use yii\helpers\HtmlPurifier;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
@@ -87,24 +86,10 @@ class EcosistemaService implements InterfaceEcosistemas
     /* ---------------- Crear / Editar ---------------- */
 
     /** HTML del editor: deja formato y tablas (Excel), saca scripts y todo lo peligroso. */
+    /** HTML del editor, limpio (ver HtmlEditor::limpiar). */
     public static function limpiarHtml($html)
     {
-        return HtmlPurifier::process((string) $html, function ($config) {
-            $config->set('HTML.Allowed',
-                'p[style],br,strong,b,em,i,u,s,sub,sup,span[style],div[style],h2[style],h3[style],h4[style],'
-                . 'ul[style],ol[style],li[style],blockquote,hr,a[href|title|target],'
-                . 'table[style|border|cellpadding|cellspacing|width],caption,thead,tbody,tfoot,tr[style],'
-                . 'th[style|colspan|rowspan|width],td[style|colspan|rowspan|width],colgroup,col[style|span|width]');
-            $config->set('CSS.AllowedProperties', [
-                'font-size', 'font-weight', 'font-style', 'font-family', 'text-decoration', 'color', 'background-color',
-                'text-align', 'vertical-align', 'white-space', 'width', 'height', 'padding', 'padding-left',
-                'padding-right', 'padding-top', 'padding-bottom', 'margin-left', 'border', 'border-collapse',
-                'border-top', 'border-bottom', 'border-left', 'border-right', 'border-color', 'border-width', 'border-style',
-            ]);
-            $config->set('Attr.AllowedFrameTargets', ['_blank']);
-            $config->set('URI.AllowedSchemes', ['http' => true, 'https' => true, 'mailto' => true]);
-            $config->set('AutoFormat.RemoveEmpty', false);
-        });
+        return HtmlEditor::limpiar($html);
     }
 
     /**
@@ -237,6 +222,38 @@ class EcosistemaService implements InterfaceEcosistemas
         $img->save(false);
         EcosistemaHistorial::registrar($model->idecosistema, 'Galería', 'Imagen agregada: ' . $img->nombre_original);
         return [];
+    }
+
+    /* ---------------- Eliminar ---------------- */
+
+    /**
+     * Proyectos asignados al ecosistema. Hoy siempre 0: el módulo Proyectos todavía no existe.
+     * Cuando se cree la tabla de proyectos (con su columna idecosistema), se cuenta acá y
+     * eliminar() deja de permitir borrar ecosistemas con proyectos.
+     */
+    public function proyectosAsignados($id)
+    {
+        return 0;
+    }
+
+    public function eliminar($id)
+    {
+        $model = $this->buscar($id, 'ecosistemas_eliminar');
+        $n = $this->proyectosAsignados($model->idecosistema);
+        if ($n > 0) {
+            return ['exito' => false, 'mensaje' => "No se puede eliminar: tiene {$n} proyecto(s) asignado(s). Desactivalo para ocultarlo de la web."];
+        }
+        $gerentes = (new \yii\db\Query())->from('usuario_ecosistema')->where(['idecosistema' => $model->idecosistema])->count();
+        $tx = Yii::$app->db->beginTransaction();
+        EcosistemaImagen::deleteAll(['idecosistema' => $model->idecosistema]);
+        Yii::$app->db->createCommand()->delete('usuario_ecosistema', ['idecosistema' => $model->idecosistema])->execute();
+        EcosistemaHistorial::registrar($model->idecosistema, 'Eliminación', 'Ecosistema eliminado: ' . $model->nombre
+            . ($gerentes ? "\nSe quitó de {$gerentes} gerente(s) que lo tenían asignado." : ''));
+        $carpeta = $model->carpeta();
+        $model->delete();
+        $tx->commit();
+        \yii\helpers\FileHelper::removeDirectory($carpeta); // imágenes y galería
+        return ['exito' => true, 'mensaje' => 'Ecosistema eliminado.'];
     }
 
     public function borrarImagenGaleria($idimagen)

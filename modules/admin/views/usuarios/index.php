@@ -8,6 +8,7 @@
  * @var app\models\UsuariosSearch $searchModel
  * @var yii\data\ActiveDataProvider $dataProvider
  * @var bool $puedeExportar
+ * @var array $conteo ['activos' => n, 'bloqueados' => n]
  */
 
 use app\components\Rol;
@@ -25,6 +26,8 @@ $this->title = 'Usuarios';
 $this->params['breadcrumbs'][] = $this->title;
 
 $miId = (int) Yii::$app->user->id;
+$enBloqueados = $searchModel->estado === '0';
+$fechaHora = fn($v) => $v ? date('d/m/Y H:i', strtotime($v)) : null;
 $roles = ArrayHelper::map(Roles::find()->where(['idrol' => Rol::PANEL])->orderBy('idrol')->all(), 'idrol', 'nombre');
 ?>
 
@@ -56,6 +59,14 @@ $roles = ArrayHelper::map(Roles::find()->where(['idrol' => Rol::PANEL])->orderBy
                             <small class="text-muted">Exporta con los filtros aplicados · sin filtros = todos</small>
                         <?php endif; ?>
                     </div>
+                    <ul class="nav nav-tabs huk-tabs">
+                        <li class="<?= $enBloqueados ? '' : 'active' ?>">
+                            <?= Html::a('<i class="fa fa-check-circle"></i> Activos <span class="badge">' . $conteo['activos'] . '</span>', ['index']) ?>
+                        </li>
+                        <li class="<?= $enBloqueados ? 'active' : '' ?>">
+                            <?= Html::a('<i class="fa fa-ban"></i> Bloqueados <span class="badge">' . $conteo['bloqueados'] . '</span>', ['index', 'UsuariosSearch' => ['estado' => '0']]) ?>
+                        </li>
+                    </ul>
                     <?= GridView::widget([
                         'dataProvider' => $dataProvider,
                         'filterModel' => $searchModel,
@@ -92,11 +103,20 @@ $roles = ArrayHelper::map(Roles::find()->where(['idrol' => Rol::PANEL])->orderBy
                                 },
                             ],
                             [
+                                'attribute' => 'ultimo_acceso',
+                                'label' => 'Último acceso',
+                                'format' => 'raw',
+                                'filter' => false,
+                                'contentOptions' => ['class' => 'text-nowrap'],
+                                'value' => fn($m) => $fechaHora($m->ultimo_acceso)
+                                    ? Html::tag('span', $fechaHora($m->ultimo_acceso), ['title' => 'IP: ' . ($m->ultimo_acceso_ip ?: '—')])
+                                    : Html::tag('span', 'Nunca', ['class' => 'text-muted']),
+                            ],
+                            [
                                 'attribute' => 'estado',
                                 'label' => 'Estado',
                                 'format' => 'raw',
-                                'filter' => ['1' => 'Activo', '0' => 'Bloqueado'],
-                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
+                                'filter' => false, // lo dan las pestañas
                                 'value' => function ($m) {
                                     if ($m->estado !== '1') {
                                         return Html::tag('span', 'Bloqueado', ['class' => 'label label-danger']);
@@ -143,8 +163,9 @@ $roles = ArrayHelper::map(Roles::find()->where(['idrol' => Rol::PANEL])->orderBy
                                             'data-nombre' => $m->nombrecompleto,
                                         ]);
                                     },
+                                    // Solo se elimina quien nunca entró (p. ej. creado por error); al resto se lo bloquea.
                                     'delete' => function ($url, $m) use ($miId) {
-                                        if ((int) $m->idusuario === $miId) {
+                                        if ((int) $m->idusuario === $miId || $m->ultimo_acceso !== null) {
                                             return '';
                                         }
                                         return Html::a('<i class="fa fa-trash"></i>', $url, [
@@ -152,7 +173,7 @@ $roles = ArrayHelper::map(Roles::find()->where(['idrol' => Rol::PANEL])->orderBy
                                             'title' => 'Eliminar',
                                             'data-pjax' => '0',
                                             'data-method' => 'post',
-                                            'data-confirm' => '¿Eliminar a ' . $m->nombrecompleto . '? Mejor bloquealo si querés conservar su historial.',
+                                            'data-confirm' => '¿Eliminar a ' . $m->nombrecompleto . '? Nunca ingresó al panel, así que se borra por completo.',
                                         ]);
                                     },
                                 ],

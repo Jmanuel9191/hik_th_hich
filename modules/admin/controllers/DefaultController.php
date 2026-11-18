@@ -3,9 +3,6 @@
 namespace app\modules\admin\controllers;
 use app\controllers\BaseController;
 use app\models\LoginForm;
-use app\models\Ordenes;
-use app\models\OrdenDetalle;
-use app\models\OrdenPagos;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -74,112 +71,23 @@ class DefaultController extends BaseController
      *
      * @return string
      */
-  public function actionIndex()
+    /** Inicio: bienvenida y accesos a los módulos que el usuario puede usar. */
+    public function actionIndex()
     {
-        date_default_timezone_set('America/La_Paz');
-        $hoy      = date('Y-m-d');
-        $mesDesde = date('Y-m-01');
-        $meses = [
-    1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo',
-    4 => 'Abril', 5 => 'Mayo', 6 => 'Junio',
-    7 => 'Julio', 8 => 'Agosto', 9 => 'Septiembre',
-    10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
-];
-        $mesActual = $meses[(int)date('n')] . ' ' . date('Y');
-
-        $queryBase = Ordenes::find()->where(['tipo_orden' => 'orden']);
-        $alertasInventario = \app\models\InventarioLote::alertasGlobales(10);
-$materialesStockBajo = \app\models\InventarioLote::stockBajo(10);
-        // Generales
-        $totalOrdenesGeneral   = (clone $queryBase)->count();
-        $totalAnalisisGeneral  = OrdenDetalle::find()
-            ->joinWith('orden')
-            ->where(['ordenes.tipo_orden' => 'orden'])
-            ->count();
-
-        // NUEVO: "Recaudado" se cuenta el día en que el dinero ENTRÓ
-        // (orden_pagos.fecha_pago), no el día en que se creó la orden.
-        // Si hoy pagan Bs. 30 de una orden de Bs. 100 y mañana pagan
-        // los Bs. 70 restantes, esos 70 tienen que sumar al recaudado
-        // de mañana, no al de hoy — antes, al sumar monto_pagado
-        // filtrando por fecha_registro de la orden, los 70 se contaban
-        // como si hubieran entrado el día en que se creó la orden.
-        $queryPagosBase = OrdenPagos::find()
-            ->joinWith('orden')
-            ->where(['ordenes.tipo_orden' => 'orden']);
-
-        $totalRecaudadoGeneral = (clone $queryPagosBase)->sum('orden_pagos.monto') ?? 0;
-
-        // Hoy
-        $queryHoy = (clone $queryBase)->andWhere(['DATE(fecha_registro)' => $hoy]);
-
-        $totalOrdenesHoy   = (clone $queryHoy)->count();
-        $totalRecaudadoHoy = (clone $queryPagosBase)
-            ->andWhere(['DATE(orden_pagos.fecha_pago)' => $hoy])
-            ->sum('orden_pagos.monto') ?? 0;
-        $totalAnalisisHoy  = OrdenDetalle::find()
-            ->joinWith('orden')
-            ->where(['ordenes.tipo_orden' => 'orden'])
-            ->andWhere(['DATE(ordenes.fecha_registro)' => $hoy])
-            ->count();
-
-        // Mes
-        $queryMes = (clone $queryBase)->andWhere(['>=', 'DATE(fecha_registro)', $mesDesde]);
-
-        $totalOrdenesMes   = (clone $queryMes)->count();
-        $totalRecaudadoMes = (clone $queryPagosBase)
-            ->andWhere(['>=', 'DATE(orden_pagos.fecha_pago)', $mesDesde])
-            ->sum('orden_pagos.monto') ?? 0;
-        $totalAnalisisMes  = OrdenDetalle::find()
-            ->joinWith('orden')
-            ->where(['ordenes.tipo_orden' => 'orden'])
-            ->andWhere(['>=', 'DATE(ordenes.fecha_registro)', $mesDesde])
-            ->count();
-
-        // Pendientes
-        $pendientes = Ordenes::find()
-            ->where(['tipo_orden' => 'orden', 'estado_pago' => 'pendiente'])
-            ->orderBy(['fecha_registro' => SORT_DESC])
-            ->limit(5)
-            ->all();
-
-        $totalSaldoPendiente = Ordenes::find()
-            ->where(['tipo_orden' => 'orden', 'estado_pago' => 'pendiente'])
-            ->sum('saldo') ?? 0;
-
-        // Últimas órdenes
-        $ultimasOrdenes = Ordenes::find()
-            ->with(['doctor'])
-            ->where(['tipo_orden' => 'orden'])
-            ->orderBy(['fecha_registro' => SORT_DESC])
-            ->limit(8)
-            ->all();
-
-        return $this->render('index', [
-    'hoy'                  => $hoy,
-    'mesActual' => $mesActual,  
-    'totalOrdenesGeneral'  => $totalOrdenesGeneral,
-    'totalRecaudadoGeneral'=> $totalRecaudadoGeneral,
-    'totalAnalisisGeneral' => $totalAnalisisGeneral,
-    'totalOrdenesHoy'      => $totalOrdenesHoy,
-    'totalRecaudadoHoy'    => $totalRecaudadoHoy,
-    'totalAnalisisHoy'     => $totalAnalisisHoy,
-    'totalOrdenesMes'      => $totalOrdenesMes,
-    'totalRecaudadoMes'    => $totalRecaudadoMes,
-    'totalAnalisisMes'     => $totalAnalisisMes,
-    'pendientes'           => $pendientes,
-    'totalSaldoPendiente'  => $totalSaldoPendiente,
-    'ultimasOrdenes'       => $ultimasOrdenes,
-    'alertasInventario' => $alertasInventario,
-    'materialesStockBajo' => $materialesStockBajo,
-]);
+        $permisos = Yii::$container->get(\app\components\InterfacePermisosService::class);
+        $superadmin = (int) (Yii::$app->user->identity->idrol ?? 0) === \app\components\Rol::SUPERADMIN;
+        $accesos = array_values(array_filter([
+            $permisos->tienePermiso('ecosistemas_listar') ? ['Ecosistemas', 'th-large', ['/admin/ecosistemas/index'], 'Contenido, imágenes y galería de cada ecosistema.'] : null,
+            $permisos->tienePermiso('banners_listar') ? ['Banners', 'picture-o', ['/admin/banners/index'], 'Las imágenes grandes de la portada, con su texto y botón.'] : null,
+            $permisos->tienePermiso('equipo_listar') ? ['Equipo', 'id-badge', ['/admin/equipo/index'], 'Las personas que se muestran en la página, con foto y biografía.'] : null,
+            $permisos->tienePermiso('configuracion_editar') ? ['Datos generales', 'globe', ['/admin/datos-generales/index'], 'Título, contacto, redes sociales y mapa de la página.'] : null,
+            $superadmin ? ['Usuarios', 'users', ['/admin/usuarios/index'], 'Altas, bloqueos e historial del personal del panel.'] : null,
+            $superadmin ? ['Roles y permisos', 'key', ['/admin/roles/index'], 'Qué puede hacer cada tipo de usuario.'] : null,
+            ['Mi perfil', 'user-circle', ['/admin/usuarios/cuenta'], 'Tus datos y tu contraseña.'],
+        ]));
+        return $this->render('index', ['accesos' => $accesos, 'usuario' => Yii::$app->user->identity]);
     }
 
-    /**
-     * Login action.
-     *
-     * @return string
-     */
     public function actionLogin()
     {
         $this->layout = "login";

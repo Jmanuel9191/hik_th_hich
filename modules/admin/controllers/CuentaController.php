@@ -141,39 +141,4 @@ class CuentaController extends Controller
         ]);
     }
 
-
-    public function actionCambiarClaveObligatoria()
-    {
-
-        $usuario = Yii::$app->user->identity;
-        $this->cuentaService->verificarUsuarioLogueado();
-
-        if ($usuario->requiere_cambio_contrasena == 0) {
-            return $this->redirect(['admin/default/index']); // o redirigir según el rol del usuario
-        }
-
-        $formModel = new CambioPasswordObligatorioForm();
-
-        if (Yii::$app->request->isAjax && $formModel->load(Yii::$app->request->post()) && $formModel->validate()) {
-            $resultado = $this->cuentaService->cambioPasswordObligatorio($usuario, $formModel->nueva_contrasena);
-
-            if ($resultado['exito']) {
-                $ruta = $this->authService->getRedirectRoute($usuario);
-
-                Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                return [
-                    'success' => true,
-                    'message' => 'Tu contraseña fue actualizada correctamente.',
-                    'redirect' => Url::to($ruta), // Convertí la ruta a URL
-                ];
-            }
-        }
-        return $this->render('cambiar-clave-obligatoria', [
-            'model' => $formModel,
-        ]);
-    }
-
-
-
-
 }

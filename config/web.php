@@ -159,22 +159,29 @@ if (YII_ENV_DEV) {
 }
 
 
-
+// --- Panel HUK (en uso) ---
 Yii::$container->set('app\components\InterfaceAuth', 'app\components\AuthService');
 Yii::$container->set('app\components\InterfaceCuenta', 'app\components\CuentaService');
-Yii::$container->set('app\components\InterfaceTarea', 'app\components\TareasService');
 Yii::$container->set('app\components\InterfaceAdmin', 'app\components\AdminService');
-Yii::$container->set('app\components\InterfaceConsultor', 'app\components\ConsultorService');
 Yii::$container->set('app\components\InterfaceNoti', 'app\components\NotiService');
 Yii::$container->set('app\components\InterfaceCorreos', 'app\components\CorreoService');
+Yii::$container->set('app\components\InterfaceAlert', 'app\components\AlertService');
+Yii::$container->set('app\components\InterfacePermisosService', 'app\components\PermisosService');
+Yii::$container->set(\app\components\InterfaceEcosistemas::class, \app\components\EcosistemaService::class);
+Yii::$container->set(\app\components\InterfaceConfiguracion::class, \app\components\ConfiguracionService::class);
+Yii::$container->set(\app\components\InterfaceBanners::class, \app\components\BannerService::class);
+Yii::$container->set(\app\components\InterfaceEquipo::class, \app\components\EquipoService::class);
+
+
+
+// --- Sistema anterior: los usa la web pública vieja (controllers/). Se sacan al limpiar la web. ---
+Yii::$container->set('app\components\InterfaceTarea', 'app\components\TareasService');
+Yii::$container->set('app\components\InterfaceConsultor', 'app\components\ConsultorService');
 Yii::$container->set('app\components\InterfaceGestor', 'app\components\GestorService');
 Yii::$container->set('app\components\InterfaceProyectos', 'app\components\ProyectosService');
-Yii::$container->set('app\components\InterfaceCorreos', 'app\components\CorreoService');
 Yii::$container->set('app\components\InterfaceAsignacion', 'app\components\AsignacionService');
 Yii::$container->set('app\components\InterfaceGestionProyecto', 'app\components\GestionProyectoAService');
 Yii::$container->set('app\components\InterfaceLib', 'app\components\LibService');
-Yii::$container->set('app\components\InterfaceAlert', 'app\components\AlertService');
-Yii::$container->set('app\components\Interface', 'app\components\AlertService');
 Yii::$container->set('app\components\InterfaceCliente', 'app\components\ClienteService');
 Yii::$container->set('app\components\InterfaceRecursos', 'app\components\RecursosService');
 Yii::$container->set('app\components\InterfaceMaterial', 'app\components\MaterialService');
@@ -182,14 +189,5 @@ Yii::$container->set('app\components\InterfaceGoogle', 'app\components\GoogleCal
 Yii::$container->set('app\components\InterfaceCampanias', 'app\components\CampaniasService');
 Yii::$container->set('app\components\InterfaceGestionCampania', 'app\components\GestionCampaniaAService');
 Yii::$container->set('app\components\InterfaceCalendario', 'app\components\CalendarioService');
-Yii::$container->set('app\components\InterfacePermisosService', 'app\components\PermisosService');
 Yii::$container->set('app\components\InterfaceCatalogoService', 'app\components\CatalogoService');
-
-Yii::$container->set(\app\components\InterfaceParametros::class, \app\components\ParametrosService::class);
-Yii::$container->set(\app\components\InterfaceOrdenes::class, \app\components\OrdenesService::class);
-Yii::$container->set(\app\components\InterfaceResultados::class, \app\components\ResultadosService::class);
-Yii::$container->set(\app\components\InterfaceCategoriasServicio::class, \app\components\CategoriasServicioService::class);
-Yii::$container->set(\app\components\InterfaceEcosistemas::class, \app\components\EcosistemaService::class);
-
-
-return $config;
+return $config; 

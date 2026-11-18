@@ -72,6 +72,12 @@ $fecha = fn($v) => $v ? date('d/m/Y H:i', strtotime($v)) : '—';
                             'ciudad',
                             'direccion',
                             ['label' => 'Fecha de registro', 'value' => $fecha($model->fecha_registro)],
+                            [
+                                'label' => 'Último acceso',
+                                'value' => $model->ultimo_acceso
+                                    ? $fecha($model->ultimo_acceso) . ($model->ultimo_acceso_ip ? ' · IP ' . $model->ultimo_acceso_ip : '')
+                                    : 'Nunca ingresó',
+                            ],
                         ],
                     ]) ?>
                 </div>

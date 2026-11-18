@@ -12,113 +12,72 @@ use yii\helpers\Url;
 
 class CorreoService implements InterfaceCorreos
 {
-/*MENSAJES DE BIENVENIDOS*/
+/* ===================== CORREOS DE CUENTA (estilo HUK) ===================== */
 
-    public function enviarCorreodeBienvenida($model)
+    /** Enlace al ingreso del panel. */
+    private function urlPanel(): string
+    {
+        return Url::to(['/admin/default/login'], true);
+    }
+
+    /**
+     * Cuerpo del correo: título dorado, párrafos y botón opcional.
+     * Los párrafos llegan YA escapados (lo que viene de la BD pasa por Html::encode antes).
+     */
+    private function cuerpoHuk(string $titulo, array $parrafos, ?array $boton = null): string
+    {
+        $html = Html::tag('h2', Html::encode($titulo), [
+            'style' => 'color: #e6c27a; font-family: Arimo, Arial, sans-serif; font-size: 22px; margin: 0 0 18px;',
+        ]);
+        foreach ($parrafos as $p) {
+            $html .= Html::tag('p', $p, ['style' => 'color: #ffffff; margin: 0 0 14px;']);
+        }
+        if ($boton !== null) {
+            [$texto, $url] = $boton;
+            $html .= Html::tag('p', Html::a(Html::encode($texto), $url, [
+                'target' => '_blank',
+                'style' => 'display: inline-block; background-color: #bd944f; color: #ffffff; padding: 12px 26px; border-radius: 6px; text-decoration: none; font-weight: bold;',
+            ]), ['style' => 'text-align: center; margin: 26px 0 18px;']);
+        }
+        return $html;
+    }
+
+    /** Recuadro con borde dorado (motivo, datos de acceso). $html ya escapado. */
+    private function recuadroHuk(string $html): string
+    {
+        return '<span style="display: block; background-color: #1a1610; border-left: 3px solid #bd944f; border-radius: 4px; padding: 10px 14px; color: #ffffff;">'
+            . $html . '</span>';
+    }
+
+    private function enviarHuk(string $email, string $asunto, string $cuerpo): bool
     {
         $conf = Configuracion::find()->one();
-        $rol = strtolower($model->rol->nombre); // Asegúrate que $model->rol esté definido como relación
-
-        // Obtener el contenido personalizado
-        switch ($rol) {
-            case 'cliente':
-                $mensaje = $this->mensajeCliente($model);
-                break;
-            case 'consultor':
-                $mensaje = $this->mensajeConsultor($model);
-                break;
-            case 'gestor':
-                $mensaje = $this->mensajeGestor($model);
-                break;
-            case 'administrador':
-                $mensaje = $this->mensajeAdministrador($model);
-                break;
-            default:
-                $mensaje = $this->mensajeGenerico($model);
-                break;
-        }
-
-
-        $result = Yii::$app->mailer->compose('layouts/template2', [
-            'content' => $mensaje,
-            'config' => $conf,
-        ])
-            ->setTo($model->email)
+        $ok = Yii::$app->mailer->compose('layouts/template2', ['content' => $cuerpo, 'config' => $conf])
+            ->setTo($email)
             ->setFrom([$conf->email => $conf->titulo_pagina])
-            ->setSubject($conf->titulo_pagina . ' - Registro completo')
+            ->setSubject($conf->titulo_pagina . ' - ' . $asunto)
             ->send();
-
-        if ($result) {
-            return true; // Retorna true si el envío fue exitoso.
-        } else {
-            Yii::error("El correo no pudo ser enviado por razones desconocidas.", __METHOD__);
-            return false;
+        if (!$ok) {
+            Yii::error("No se pudo enviar el correo \"$asunto\" a $email.", __METHOD__);
         }
-
-
+        return (bool) $ok;
     }
 
-    private function mensajeCliente($model)
+    /** Al crear un usuario del panel. No lleva la contraseña: si no la sabe, usa "¿Olvidaste tu contraseña?". */
+    public function enviarCorreodeBienvenida($model)
     {
         $nombre = Html::encode($model->nombrecompleto);
-        $loginUrl = Url::to(['site/login'], true);
-        return Html::tag('h2', "¡Bienvenido, $nombre!", ['style' => 'color: #ffffff;']) .
-            Html::tag('p', 'Gracias por ser parte de Laboratorios Bajio Santa Cruz.', ['style' => 'color: #ffffff;']) .
-            Html::tag('p', 'Desde ahora podrás hacer seguimiento a tus proyectos, revisar avances, aprobar recursos y comunicarte directamente con nuestro equipo de trabajo.', ['style' => 'color: #ffffff;']) .
-            Html::tag('p', 'Puedes acceder al sistema dando <a href="' . $loginUrl . '" target="_blank" style="color: #ffffff; text-decoration: underline;">clic aquí</a>.', ['style' => 'color: #ffffff;']) .
-            Html::tag('p', 'Si tienes alguna duda, no dudes en contactarnos.', ['style' => 'color: #ffffff;']);
+        $rol = Html::encode($model->rol->nombre ?? '');
+        $cuerpo = $this->cuerpoHuk('¡Bienvenido/a a HUK-THE-ICHI!', [
+            "Hola <strong>$nombre</strong>, se creó tu cuenta en el panel de HUK-THE-ICHI GLOBAL GROUP"
+                . ($rol !== '' ? " como <strong>$rol</strong>." : '.'),
+            $this->recuadroHuk('Usuario: <strong>' . Html::encode($model->usuario) . '</strong><br>Email: <strong>' . Html::encode($model->email) . '</strong>'),
+            'Podés ingresar con tu usuario o con tu email.',
+            'Si no conocés tu contraseña, en la pantalla de ingreso tocá <strong>«¿Olvidaste tu contraseña?»</strong> y te llegará un enlace para crearla.',
+        ], ['Ingresar al panel', $this->urlPanel()]);
+
+        return $this->enviarHuk($model->email, 'Bienvenido/a', $cuerpo);
     }
-
-    private function mensajeConsultor($model)
-    {
-        $nombre = Html::encode($model->nombrecompleto);
-        $loginUrl = Url::to(['site/login'], true);
-
-        return Html::tag('h2', "¡Bienvenido, $nombre!", ['style' => 'color: #ffffff;']) .
-            Html::tag('p', 'Ahora formas parte del equipo de trabajo de Zebra Brand Consulting.', ['style' => 'color: #ffffff;']) .
-            Html::tag('p', 'Podrás gestionar tus tareas asignadas, subir entregables, revisar observaciones de los clientes y mantener una comunicación efectiva con todo el equipo.', ['style' => 'color: #ffffff;']) .
-            Html::tag('p', 'Puedes acceder al sistema dando <a href="' . $loginUrl . '" target="_blank" style="color: #ffffff; text-decoration: underline;">clic aquí</a>.', ['style' => 'color: #ffffff;']);
-    }
-
-
-    private function mensajeGestor($model)
-    {
-        $nombre = Html::encode($model->nombrecompleto);
-        $loginUrl = Url::to(['site/login'], true);
-
-        return Html::tag('h2', "¡Bienvenido, $nombre!", ['style' => 'color: #ffffff;']) .
-            Html::tag('p', 'Has sido registrado como Gestor de proyectos.', ['style' => 'color: #ffffff;']) .
-            Html::tag('p', 'Desde el sistema podrás planificar tareas, asignarlas a los consultores, monitorear avances y coordinar entregables con los clientes.', ['style' => 'color: #ffffff;']) .
-            Html::tag('p', 'Accede al sistema desde <a href="' . $loginUrl . '" target="_blank" style="color: #ffffff; text-decoration: underline;">aquí</a>.', ['style' => 'color: #ffffff;']);
-    }
-
-
-    private function mensajeAdministrador($model)
-    {
-        $nombre = Html::encode($model->nombrecompleto);
-        $loginUrl = Url::to(['site/login'], true);
-
-        return Html::tag('h2', "¡Bienvenido, $nombre!", ['style' => 'color: #ffffff;']) .
-            Html::tag('p', 'Como Administrador, tendrás acceso completo para gestionar usuarios, permisos y configuraciones del sistema.', ['style' => 'color: #ffffff;']) .
-            Html::tag('p', 'Puedes acceder al sistema desde <a href="' . $loginUrl . '" target="_blank" style="color: #ffffff; text-decoration: underline;">este enlace</a>.', ['style' => 'color: #ffffff;']);
-    }
-
-    private function mensajeGenerico($model)
-    {
-        $nombre = Html::encode($model->nombrecompleto);
-        $loginUrl = Url::to(['site/login'], true);
-
-        return Html::tag('h2', "¡Bienvenido, $nombre!", ['style' => 'color: #ffffff;']) .
-            Html::tag('p', 'Has sido registrado en el sistema de Zebra Brand Consulting.', ['style' => 'color: #ffffff;']) .
-            Html::tag('p', 'Ingresa al sistema desde <a href="' . $loginUrl . '" target="_blank" style="color: #ffffff; text-decoration: underline;">este enlace</a>.', ['style' => 'color: #ffffff;']);
-    }
-
-
-
-
-
-
-
 
 
     public function enviarCorreodeEditar($model)
@@ -338,186 +297,64 @@ class CorreoService implements InterfaceCorreos
 
 
 
+    /** Bloqueo hecho por un administrador (con motivo). */
     public function enviarCorreoDeBloqueo($model, $motivo)
     {
-        $conf = Configuracion::find()->one();
-        $mensaje = Html::tag('h1', 'Estimado/a: ' . $model->nombrecompleto, [
-            'style' => 'color: white; font-family: Arial, sans-serif;'
+        $cuerpo = $this->cuerpoHuk('Tu cuenta fue bloqueada', [
+            'Hola <strong>' . Html::encode($model->nombrecompleto) . '</strong>, un administrador bloqueó tu acceso al panel por este motivo:',
+            $this->recuadroHuk(nl2br(Html::encode($motivo))),
+            'Si creés que es un error, comunicate con el administrador.',
         ]);
-
-        $mensaje .= Html::tag('p', 'Lamentamos informarte que tu cuenta ha sido bloqueada por el siguiente motivo:', [
-            'style' => 'color: white; font-size: 15px;'
-        ]);
-
-        $mensaje .= Html::tag('p', "<strong>$motivo</strong>", [
-            'style' => 'color: white; font-size: 15px; font-weight: bold;'
-        ]);
-
-        $mensaje .= Html::tag('p', 'Si consideras que esto fue un error, por favor contacta al administrador del sistema.', [
-            'style' => 'color: white; font-size: 14px;'
-        ]);
-
-        $result = Yii::$app->mailer->compose('layouts/template2', [
-            'content' => $mensaje,
-            'config' => $conf,
-        ])
-            ->setTo($model->email)
-            ->setFrom([$conf->email => $conf->titulo_pagina])
-            ->setSubject($conf->titulo_pagina . ' - Bloqueo de cuenta')
-            ->send();
-
-        if ($result) {
-            return true;
-        } else {
-            Yii::error("El correo no pudo ser enviado por razones desconocidas.", __METHOD__);
-            return false;
-        }
+        return $this->enviarHuk($model->email, 'Cuenta bloqueada', $cuerpo);
     }
 
+    /** Activación hecha por un administrador (con motivo). */
     public function enviarCorreoDedesBloqueo($model, $motivo)
     {
-        $conf = Configuracion::find()->one();
-        $mensaje = Html::tag('h1', 'Estimado/a: ' . $model->nombrecompleto, [
-            'style' => 'color: white; font-family: Arial, sans-serif;'
-        ]);
-
-        $mensaje .= Html::tag('p', 'Tu cuenta ha sido activada nuevamente en el sistema. Motivo de activación:', [
-            'style' => 'color: white; font-size: 15px;'
-        ]);
-
-        $mensaje .= Html::tag('p', "<strong>$motivo</strong>", [
-            'style' => 'color: white; font-size: 15px; font-weight: bold;'
-        ]);
-
-        $mensaje .= Html::tag('p', 'Ya puedes ingresar con tus credenciales habituales.', [
-            'style' => 'color: white; font-size: 14px;'
-        ]);
-
-        $result = Yii::$app->mailer->compose('layouts/template2', [
-            'content' => $mensaje,
-            'config' => $conf,
-        ])
-            ->setTo($model->email)
-            ->setFrom([$conf->email => $conf->titulo_pagina])
-            ->setSubject($conf->titulo_pagina . ' - Activación de cuenta')
-            ->send();
-
-        if ($result) {
-            return true;
-        } else {
-            Yii::error("El correo no pudo ser enviado por razones desconocidas.", __METHOD__);
-            return false;
-        }
+        $cuerpo = $this->cuerpoHuk('Tu cuenta fue activada', [
+            'Hola <strong>' . Html::encode($model->nombrecompleto) . '</strong>, ya podés volver a ingresar al panel. Motivo:',
+            $this->recuadroHuk(nl2br(Html::encode($motivo))),
+        ], ['Ingresar al panel', $this->urlPanel()]);
+        return $this->enviarHuk($model->email, 'Cuenta activada', $cuerpo);
     }
 
-
-
+    /** Enlace de 30 minutos para crear una contraseña nueva. */
     public function enviarCorreoRecuperacion($id, $enlace)
     {
-        $pass = Usuarios::findOne(['idusuario' => $id]);
-        $conf = Configuracion::find()->one();
-        $nombre = Html::encode($pass->nombrecompleto);
-        $enlaceSeguro = Html::encode($enlace);
-
-        $mensaje = Html::tag('h2', 'Recuperación de contraseña', ['style' => 'color: #ffffff;']);
-        $mensaje .= Html::tag('p', "Hola <strong style='color: #ffffff;'>$nombre</strong>, recibimos una solicitud para restablecer tu contraseña.", ['style' => 'color: #ffffff;']);
-        $mensaje .= Html::tag('p', 'Hacé clic en el botón para crear una nueva. El enlace vence en 30 minutos y sirve una sola vez.', ['style' => 'color: #ffffff;']);
-        $mensaje .= Html::tag('p',
-            Html::a('Crear nueva contraseña', $enlace, [
-                'target' => '_blank',
-                'style' => 'display: inline-block; background-color: #bd944f; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;',
-            ]),
-            ['style' => 'text-align: center; margin: 24px 0;']
-        );
-        $mensaje .= Html::tag('p', 'Si el botón no funciona, copiá este enlace en tu navegador:', ['style' => 'color: #ffffff;']);
-        $mensaje .= Html::tag('p', $enlaceSeguro, ['style' => 'color: #e6c27a; word-break: break-all; font-size: 13px;']);
-        $mensaje .= Html::tag('p', 'Si no pediste este cambio, ignorá este mensaje: tu contraseña actual sigue funcionando.', ['style' => 'color: #ffffff;']);
-
-
-
-        $result = Yii::$app->mailer->compose('layouts/template2', [
-            'content' => $mensaje,
-            'config' => $conf,
-        ])
-            ->setTo($pass->email)
-            ->setFrom([$conf->email => $conf->titulo_pagina])
-            ->setSubject($conf->titulo_pagina . ' - Recuperacion de contraseña')
-            ->send();
-
-        if ($result) {
-            return true; // Retorna true si el envío fue exitoso.
-        } else {
-            Yii::error("El correo no pudo ser enviado por razones desconocidas.", __METHOD__);
-            return false;
-        }
-
+        $usuario = Usuarios::findOne(['idusuario' => $id]);
+        $cuerpo = $this->cuerpoHuk('Recuperación de contraseña', [
+            'Hola <strong>' . Html::encode($usuario->nombrecompleto) . '</strong>, recibimos una solicitud para restablecer tu contraseña.',
+            'Hacé clic en el botón para crear una nueva. El enlace vence en <strong>30 minutos</strong> y sirve una sola vez.',
+        ], ['Crear nueva contraseña', $enlace])
+            . Html::tag('p', 'Si el botón no funciona, copiá este enlace en tu navegador:', ['style' => 'color: #ffffff; margin: 0 0 6px;'])
+            . Html::tag('p', Html::encode($enlace), ['style' => 'color: #e6c27a; word-break: break-all; font-size: 13px; margin: 0 0 14px;'])
+            . Html::tag('p', 'Si no pediste este cambio, ignorá este mensaje: tu contraseña actual sigue funcionando.', ['style' => 'color: #ffffff; margin: 0 0 14px;']);
+        return $this->enviarHuk($usuario->email, 'Recuperación de contraseña', $cuerpo);
     }
+
+    /** Bloqueo automático por intentos fallidos. */
     public function enviarCorreoDeBloqueoporintentos($id)
     {
-        $pass = Usuarios::findOne(['idusuario' => $id]);
-        $conf = Configuracion::find()->one();
-
-        $mensaje = Html::tag('h1', '¡Cuenta Bloqueada!', ['style' => 'color: #ffffff;']);
-        $mensaje .= Html::tag('p',
-            Html::tag('strong', 'Estimado Usuario:', ['style' => 'color: #ffffff;']) . ' ' .
-            Html::tag('span', $pass->nombrecompleto, ['style' => 'color: #ffffff;']) .
-            '<br><span style="color: #ffffff;">Tu cuenta ha sido bloqueada temporalmente por exceder el número de intentos fallidos.</span>'
-        );
-
-        $result = Yii::$app->mailer->compose('layouts/template2', [
-            'content' => $mensaje,
-            'config' => $conf,
-        ])
-            ->setTo($pass->email)
-            ->setFrom([$conf->email => $conf->titulo_pagina])
-            ->setSubject($conf->titulo_pagina . ' - Tu cuenta ha sido bloqueada temporalmente')
-            ->send();
-
-        if ($result) {
-            return true;
-        } else {
-            Yii::error("El correo no pudo ser enviado por razones desconocidas.", __METHOD__);
-            return false;
-        }
+        $usuario = Usuarios::findOne(['idusuario' => $id]);
+        $cuerpo = $this->cuerpoHuk('Cuenta bloqueada temporalmente', [
+            'Hola <strong>' . Html::encode($usuario->nombrecompleto) . '</strong>, hubo <strong>' . AuthService::MAX_INTENTOS
+                . ' intentos fallidos</strong> de ingreso con tu cuenta, así que la bloqueamos por <strong>'
+                . AuthService::MINUTOS_BLOQUEO . ' minutos</strong> por seguridad.',
+            'Si fuiste vos y no recordás tu contraseña, podés crear una nueva con «¿Olvidaste tu contraseña?».',
+            'Si <strong>no</strong> fuiste vos, cambiá tu contraseña apenas vuelvas a ingresar.',
+        ], ['¿Olvidaste tu contraseña?', Url::to(['/admin/cuenta/forget'], true)]);
+        return $this->enviarHuk($usuario->email, 'Cuenta bloqueada temporalmente', $cuerpo);
     }
 
+    /** Un administrador quitó el bloqueo por intentos. */
     public function enviarCorreoDesbloqueoPorIntentos($usuario)
     {
-        $conf = Configuracion::find()->one();
-        $mensaje = Html::tag('h1', '¡Cuenta desbloqueada!', ['style' => 'color: #ffffff;']);
-        $mensaje .= Html::tag('p',
-            Html::tag('span', "Estimado/a {$usuario->nombrecompleto},", ['style' => 'color: #ffffff;']) .
-            '<br><br><span style="color: #ffffff;">Tu cuenta fue desbloqueada luego de haber sido bloqueada por múltiples intentos fallidos.</span>' .
-            '<br><span style="color: #ffffff;">Si no reconoces estos intentos, cambia tu contraseña lo antes posible.</span>'
-        );
-
-        return Yii::$app->mailer->compose('layouts/template2', [
-            'content' => $mensaje,
-            'config' => $conf,
-        ])
-            ->setTo($usuario->email)
-            ->setFrom([$conf->email => $conf->titulo_pagina])
-            ->setSubject($conf->titulo_pagina . ' - Tu cuenta ha sido desbloqueada')
-            ->send();
-
-        if ($result) {
-            return true;
-        } else {
-            Yii::error("El correo no pudo ser enviado por razones desconocidas.", __METHOD__);
-            return false;
-        }
-
+        $cuerpo = $this->cuerpoHuk('Cuenta desbloqueada', [
+            'Hola <strong>' . Html::encode($usuario->nombrecompleto) . '</strong>, un administrador desbloqueó tu cuenta, que estaba bloqueada por intentos fallidos. Ya podés ingresar.',
+            'Si no reconocés esos intentos, cambiá tu contraseña desde <strong>Mi perfil</strong>.',
+        ], ['Ingresar al panel', $this->urlPanel()]);
+        return $this->enviarHuk($usuario->email, 'Cuenta desbloqueada', $cuerpo);
     }
-
-
-
-
-
-
-
-
-
-
 
 
     public function enviarCorreodeCreacioncampania($model, $correoCliente)

@@ -110,6 +110,8 @@ class Usuarios extends \yii\db\ActiveRecord implements IdentityInterface
             'fecha_nacimiento' => 'Fecha Nacimiento',
             'movil' => 'Celular / WhatsApp',
             'fecha_registro' => 'Fecha Registro',
+            'ultimo_acceso' => 'Último acceso',
+            'ultimo_acceso_ip' => 'IP del último acceso',
             'estado' => 'Estado',
             'sexo' => 'Sexo',
             'cargo' => 'Puesto de trabajo',

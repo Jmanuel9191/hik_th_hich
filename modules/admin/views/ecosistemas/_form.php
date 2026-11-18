@@ -2,13 +2,14 @@
 
 /**
  * Formulario de ecosistema (crear / editar).
- * Editor e imágenes: assets_b/js/huk-ecosistemas.js (por atributos data-*).
+ * Editor: assets_b/js/huk-ecosistemas.js. Imágenes: app\widgets\CampoImagen.
  *
  * @var yii\web\View $this
  * @var app\models\Ecosistema $model
  */
 
 use app\models\Ecosistema;
+use app\widgets\CampoImagen;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -49,27 +50,10 @@ use yii\helpers\Url;
             <div class="box-header with-border"><h3 class="box-title">Imágenes</h3></div>
             <div class="box-body">
                 <?php foreach (Ecosistema::IMAGENES as $campo => $etiqueta): ?>
-                    <?php $idImg = 'prev-' . $campo; $actual = $model->url($model->$campo); ?>
-                    <div class="form-group huk-img-campo <?= $model->hasErrors($campo) ? 'has-error' : '' ?>">
-                        <label class="control-label"><?= Html::encode($etiqueta) ?></label>
-                        <div class="huk-img-prev <?= $campo === 'icono' ? 'is-icono' : '' ?>">
-                            <?= Html::img($actual ?: 'data:,', ['id' => $idImg, 'alt' => '', 'class' => $actual ? '' : 'hidden']) ?>
-                        </div>
-                        <?= Html::activeFileInput($model, $campo, [
-                            'accept' => $campo === 'icono' ? '.svg,.png,.webp' : '.jpg,.jpeg,.png,.webp',
-                            'data-preview' => '#' . $idImg,
-                        ]) ?>
-                        <?php if ($actual): ?>
-                            <label class="huk-img-quitar">
-                                <?= Html::checkbox('Ecosistema[quitar][' . $campo . ']', false, ['value' => 1, 'data-quitar' => '#' . $idImg]) ?>
-                                Quitar esta imagen
-                            </label>
-                        <?php endif; ?>
-                        <p class="help-block"><?= Html::encode(Ecosistema::MEDIDAS[$campo]) ?></p>
-                        <?php if ($model->hasErrors($campo)): ?>
-                            <p class="help-block help-block-error"><?= Html::encode($model->getFirstError($campo)) ?></p>
-                        <?php endif; ?>
-                    </div>
+                    <?= $form->field($model, $campo)->widget(CampoImagen::class, $campo === 'icono'
+                        ? ['url' => $model->url($model->$campo), 'medida' => 'Cuadrado, fondo transparente', 'extensiones' => ['svg', 'png', 'webp'], 'maxMb' => 1, 'icono' => true]
+                        : ['url' => $model->url($model->$campo), 'medida' => trim(strstr(Ecosistema::MEDIDAS[$campo], '(', true))]
+                    )->label($etiqueta) ?>
                 <?php endforeach; ?>
             </div>
         </div>

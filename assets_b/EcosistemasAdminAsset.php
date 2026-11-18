@@ -21,6 +21,6 @@ class EcosistemasAdminAsset extends AssetBundle
 
     public $depends = [
         'app\assets_b\AdminPanelAsset',
-        'app\assets_b\TinyMceAsset',
+        'app\assets_b\EditorAsset', // TinyMCE + huk-editor.js
     ];
 }

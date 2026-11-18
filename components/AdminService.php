@@ -51,15 +51,37 @@ class AdminService implements InterfaceAdmin
     public function listUsuarios($queryParams)
     {
         $searchModel = new UsuariosSearch();
-        $dataProvider = $searchModel->search($queryParams);
+        $dataProvider = $searchModel->search($this->conPestana((array) $queryParams));
         $dataProvider->setSort([
-            'defaultOrder' => ['idusuario' => SORT_DESC]
+            'defaultOrder' => ['idusuario' => SORT_DESC],
+            'attributes' => ['nombrecompleto', 'usuario', 'email', 'movil', 'idrol', 'estado', 'idusuario', 'ultimo_acceso'],
         ]);
         return [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'conteo' => $this->conteoPorPestana(),
         ];
 
+    }
+
+    /**
+     * Pestañas del listado: "Activos" (por defecto) y "Bloqueados" (UsuariosSearch[estado] = 0).
+     * Los bloqueados por intentos siguen en Activos (es temporal) con su etiqueta.
+     */
+    private function conPestana(array $params): array
+    {
+        $params['UsuariosSearch']['estado'] = ($params['UsuariosSearch']['estado'] ?? '') === '0' ? '0' : '1';
+        return $params;
+    }
+
+    /** Cantidad de usuarios del panel en cada pestaña. */
+    public function conteoPorPestana(): array
+    {
+        $base = Usuarios::find()->where(['idrol' => Rol::PANEL]);
+        return [
+            'activos' => (int) (clone $base)->andWhere(['estado' => '1'])->count(),
+            'bloqueados' => (int) (clone $base)->andWhere(['estado' => ['0', '']])->count(),
+        ];
     }
 
     public function obtenerUsuario($id)
@@ -91,6 +113,11 @@ class AdminService implements InterfaceAdmin
                     HistorialUsuarios::registrar($model->idusuario, 'Creación',
                         'Usuario creado como "' . ($model->rol->nombre ?? $model->idrol) . '".'
                         . ($ecos ? "\nEcosistemas: " . implode(', ', $ecos) : ''), Yii::$app->user->id);
+                    try {
+                        $this->correoService->enviarCorreodeBienvenida($model);
+                    } catch (\Throwable $e) {
+                        Yii::error('Correo de bienvenida: ' . $e->getMessage(), __METHOD__); // el usuario igual queda creado
+                    }
                     $this->alertService->agregarMensajeExito('El usuario ha sido creado correctamente.');
                     return ['exito' => true];
                 }
@@ -104,7 +131,8 @@ class AdminService implements InterfaceAdmin
 
     /** Campos que la edición del usuario NUNCA cambia (tienen su propia acción o son internos). */
     const CAMPOS_PROTEGIDOS = ['contrasena', 'estado', 'intentos_fallidos', 'bloqueado_hasta', 'auth_key',
-        'google_token', 'reset_token_hash', 'reset_token_expira', 'fecha_registro', 'requiere_cambio_contrasena'];
+        'google_token', 'reset_token_hash', 'reset_token_expira', 'fecha_registro', 'requiere_cambio_contrasena',
+        'ultimo_acceso', 'ultimo_acceso_ip'];
 
     public function actualizarUsuario($datos, $id)
     {
@@ -254,6 +282,10 @@ class AdminService implements InterfaceAdmin
         if ($model === null || !Rol::entraAlPanel($model->idrol)) {
             return ['exito' => false, 'mensaje' => 'Usuario no encontrado.'];
         }
+        // Si ya usó el panel, se bloquea (así se conserva quién hizo qué).
+        if ($model->ultimo_acceso !== null) {
+            return ['exito' => false, 'mensaje' => 'Este usuario ya ingresó al panel: no se elimina, bloquealo.'];
+        }
         $model->delete();
         Yii::info('Usuario #' . $id . ' (' . $model->usuario . ') eliminado por #' . Yii::$app->user->id, 'usuarios');
         return ['exito' => true, 'mensaje' => 'Usuario eliminado.'];
@@ -266,7 +298,7 @@ class AdminService implements InterfaceAdmin
     public function exportarUsuarios($params)
     {
         $search = new UsuariosSearch();
-        $dp = $search->search($params);
+        $dp = $search->search($this->conPestana((array) $params));
         $modelos = $dp->query->with(['rol', 'ecosistemas'])->orderBy(['nombrecompleto' => SORT_ASC])->all();
 
         $fecha = fn($v) => $v ? date('d/m/Y', strtotime($v)) : '';
@@ -294,6 +326,7 @@ class AdminService implements InterfaceAdmin
             'Dirección' => fn($m) => $m->direccion,
             'Fecha de nacimiento' => fn($m) => $fecha($m->fecha_nacimiento),
             'Fecha de registro' => fn($m) => $m->fecha_registro ? date('d/m/Y H:i', strtotime($m->fecha_registro)) : '',
+            'Último acceso' => fn($m) => $m->ultimo_acceso ? date('d/m/Y H:i', strtotime($m->ultimo_acceso)) : 'Nunca',
         ];
 
         // Texto de los filtros aplicados (para el PDF)
@@ -310,7 +343,7 @@ class AdminService implements InterfaceAdmin
             $filtros[] = 'Ecosistema: ' . (Ecosistema::findOne($search->idecosistema)->nombre ?? $search->idecosistema);
         }
         if ((string) $search->estado !== '') {
-            $filtros[] = 'Estado: ' . ($search->estado === '1' ? 'Activo' : 'Bloqueado');
+            $filtros[] = $search->estado === '1' ? 'Activos' : 'Bloqueados';
         }
 
         return ['titulo' => 'Usuarios', 'columnas' => $columnas, 'modelos' => $modelos, 'filtros' => $filtros];

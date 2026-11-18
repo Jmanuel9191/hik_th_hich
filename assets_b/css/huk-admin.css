@@ -258,17 +258,19 @@ a.huk-adm-btn{display:flex;align-items:center;justify-content:center;text-decora
   .huk-adm-login-card .huk-adm-mobile-logo{display:block}
 }
 
+
 /* 7. AVISOS EN LOGIN Y RECUPERAR CONTRASEÑA -------------------------------- */
 .huk-adm-alert{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:8px;margin:0 0 20px;font-size:14px;line-height:1.45;border-left:4px solid}
 .huk-adm-alert .fa{font-size:17px;margin-top:1px}
 .huk-adm-alert.is-ok{background:#e5f2ea;border-color:var(--adm-ok);color:#1f5a37}
 .huk-adm-alert.is-error{background:#f8e4e0;border-color:var(--adm-danger);color:#7d2a1f}
 .huk-adm-forgot .fa{margin-right:6px;font-size:12px}
-.btn-group-justified > .btn, .btn-group-justified > .btn-group {
+.btn-group-justified > .btn, .btn-group-justified > .btn-group, .input-group-addon {
     
     width: auto !important;
 }
-
+.input-group-addon {
+    padding: 11px 12px!important;}
 /* 8. ECOSISTEMAS ----------------------------------------------------------- */
 .huk-filtros{display:inline-flex;gap:8px;flex-wrap:wrap;margin-left:12px;vertical-align:middle}
 .huk-eco-num{font-family:var(--adm-font-head);font-weight:700;color:var(--adm-gold-dark)}
@@ -328,3 +330,94 @@ a.huk-adm-btn{display:flex;align-items:center;justify-content:center;text-decora
 .huk-barra-acciones .dropdown-menu{border-top:2px solid var(--adm-gold);border-radius:0 0 6px 6px}
 .huk-barra-acciones .dropdown-menu>li>a{padding:8px 16px;color:var(--adm-text);font-weight:500}
 .huk-barra-acciones .dropdown-menu>li>a .fa{width:18px;color:var(--adm-gold-dark)}
+
+/* 12. PESTAÑAS DE LOS LISTADOS (Activos / Bloqueados) ---------------------- */
+.huk-tabs{margin-bottom:12px;border-bottom:2px solid #e8e1d2}
+.huk-tabs>li>a{color:var(--adm-muted);font-weight:600;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;border-radius:0;padding:10px 18px}
+.huk-tabs>li>a:hover{background:transparent;color:var(--adm-gold-dark);border-bottom-color:#e6c27a}
+.huk-tabs>li.active>a,.huk-tabs>li.active>a:hover,.huk-tabs>li.active>a:focus{color:var(--adm-text);border:none;border-bottom:3px solid var(--adm-gold);background:transparent}
+.huk-tabs .badge{background:#e8e1d2;color:var(--adm-text);margin-left:4px}
+.huk-tabs>li.active .badge{background:var(--adm-gold);color:#fff}
+
+/* 13. INICIO (accesos a los módulos) ------------------------------------------ */
+.huk-inicio-sub{margin:4px 0 0;color:var(--adm-muted);font-size:14px}
+.huk-acceso{display:flex;align-items:center;gap:16px;background:#fff;border-radius:8px;padding:20px;margin-bottom:20px;border-top:3px solid var(--adm-gold);box-shadow:0 1px 3px rgba(0,0,0,.06);color:var(--adm-text);transition:transform .15s,box-shadow .15s}
+.huk-acceso:hover,.huk-acceso:focus{color:var(--adm-text);transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.08)}
+.huk-acceso-icono{flex:0 0 52px;height:52px;border-radius:50%;background:var(--adm-ink);color:var(--adm-gold-light);display:flex;align-items:center;justify-content:center;font-size:22px}
+.huk-acceso-texto strong{display:block;font-family:Arimo,Arial,sans-serif;font-size:17px}
+.huk-acceso-texto small{display:block;color:var(--adm-muted);font-size:13px;margin-top:2px}
+
+/* 14. DATOS GENERALES ------------------------------------------------------------ */
+.huk-aviso-remitente{background:#fbf6ea;border-left:3px solid var(--adm-gold);border-radius:4px;padding:12px 14px 4px;margin-top:6px}
+.huk-aviso-remitente p{font-size:13px;color:var(--adm-text);margin:0 0 10px}
+.huk-aviso-remitente .fa-exclamation-triangle{color:var(--adm-gold-dark)}
+.huk-pasos-mapa{padding-left:18px;margin:0 0 14px;color:var(--adm-text);font-size:13px}
+.huk-pasos-mapa li{margin-bottom:3px}
+.huk-mapa-preview{border:1px solid #e8e1d2;border-radius:6px;overflow:hidden;background:#faf8f3}
+.huk-mapa-preview iframe{display:block;width:100%;height:280px;border:0}
+.huk-mapa-preview iframe[hidden]{display:none}
+.huk-mapa-aviso{margin:0;padding:40px 16px;text-align:center;color:var(--adm-muted);font-size:13px}
+.huk-mapa-aviso[hidden]{display:none}
+.huk-form-usuario.huk-datos-generales{padding:0}
+
+/* 15. BANNERS -------------------------------------------------------------------- */
+.huk-con-orden .huk-orden{white-space:nowrap;width:70px}
+.huk-con-orden .huk-orden .btn{margin-right:3px}
+.huk-orden-vacio{display:inline-block;width:25px}
+.huk-banner-mini{display:block;width:150px;height:48px;object-fit:cover;border-radius:4px;border:1px solid var(--adm-line)}
+.huk-banner-movil{display:inline-block;margin-top:3px;font-size:11px;color:var(--adm-muted)}
+.huk-banner-boton{display:inline-block;background:var(--adm-ink);color:var(--adm-gold-light);font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px}
+.huk-ayuda{font-size:12.5px;color:var(--adm-muted);margin:6px 0 0}
+/* Vista previa del banner (ver) */
+.huk-vista{position:relative;overflow:hidden;border-radius:8px;background:#0b0b0b}
+.huk-vista>img{display:block;width:100%;object-fit:cover}
+.huk-vista-pc>img{aspect-ratio:16/5}
+.huk-vista-movil{max-width:260px;margin:0 auto;border:6px solid #0b0b0b;border-radius:22px}
+.huk-vista-movil>img{aspect-ratio:4/5}
+.huk-vista-capa{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:6% 8%;background:linear-gradient(90deg,rgba(0,0,0,.72) 0,rgba(0,0,0,.35) 55%,rgba(0,0,0,0) 100%);color:#fff}
+.huk-vista-capa h2{font-family:var(--adm-font-head);font-size:28px;line-height:1.1;margin:0 0 10px;color:#fff;max-width:75%}
+.huk-vista-capa p{font-size:14px;margin:0 0 14px;max-width:60%;color:#f1ece2}
+.huk-vista-boton{align-self:flex-start;background:var(--adm-gold);color:#fff;font-weight:700;font-size:13px;padding:8px 16px;border-radius:4px;text-transform:uppercase;letter-spacing:.03em}
+.huk-vista-movil .huk-vista-capa{justify-content:flex-end;padding:18px;background:linear-gradient(0deg,rgba(0,0,0,.78) 0,rgba(0,0,0,0) 70%)}
+.huk-vista-movil .huk-vista-capa h2{font-size:18px;max-width:100%}
+.huk-vista-movil .huk-vista-capa p{font-size:12px;max-width:100%}
+
+/* 16. CAMPO DE UNA IMAGEN (app\widgets\CampoImagen) ------------------------------ */
+.huk-imagen .file-drop-zone{border:2px dashed rgba(var(--adm-gold-rgb),.55);border-radius:10px;background:#fcfbf8;min-height:150px;margin:8px}
+.huk-imagen .file-drop-zone.highlighted{border-color:var(--adm-gold)!important;background:#f7f1e4!important}
+.huk-imagen .file-drop-zone-title{color:var(--adm-muted);font-family:var(--adm-font);font-size:16px;padding:36px 10px}
+.huk-imagen .file-drop-zone-title small{font-size:12px}
+.huk-imagen .file-preview{border-radius:10px;border-color:var(--adm-line);padding:0}
+.huk-imagen .krajee-default.file-preview-frame{width:100%;margin:0;box-shadow:none;border:0;float:none}
+.huk-imagen .krajee-default.file-preview-frame .kv-file-content{width:100%;height:auto!important}
+.huk-imagen .krajee-default .file-preview-image{width:100%!important;height:auto!important;max-height:260px!important;object-fit:contain}
+.huk-imagen.is-icono .krajee-default .file-preview-image{max-height:110px!important}
+.huk-imagen .file-drop-zone.clickable:hover,.huk-imagen .file-drop-zone.clickable:focus{border-color:var(--adm-gold)}
+.huk-imagen .krajee-default.file-preview-frame:not(.file-preview-error):hover{box-shadow:none}
+.huk-imagen .file-footer-caption{margin-bottom:4px}
+.huk-imagen-botones{display:flex;gap:8px;margin-top:8px}
+.huk-imagen-botones .btn{flex:1 1 0}
+.huk-imagen .huk-imagen-quitar{display:none;color:var(--adm-danger)}
+.huk-imagen .huk-imagen-quitar:hover{border-color:var(--adm-danger);color:var(--adm-danger);background:#fbeeec}
+.huk-imagen.tiene-imagen .huk-imagen-quitar{display:block}
+
+/* 17. EQUIPO --------------------------------------------------------------------- */
+.huk-equipo-mini{display:flex;align-items:center;justify-content:center;width:48px;height:56px;object-fit:cover;border-radius:4px;border:1px solid var(--adm-line)}
+.huk-equipo-mini.is-vacia{background:#faf8f3;color:var(--adm-sand);font-size:22px}
+.huk-equipo-redes .fa{color:var(--adm-gold-dark);font-size:15px;margin-right:4px}
+.huk-aviso-contacto{font-size:13px;color:var(--adm-text);background:#fbf6ea;border-left:3px solid var(--adm-gold);border-radius:4px;padding:10px 12px;margin:0}
+.huk-aviso-contacto .fa{color:var(--adm-gold-dark)}
+/* Vista previa de la tarjeta */
+.huk-tarjeta{max-width:300px;margin:0 auto;background:#0b0b0b;border-radius:6px;overflow:hidden}
+.huk-tarjeta-foto{position:relative;aspect-ratio:6/7;background:#1a1610}
+.huk-tarjeta-foto img{display:block;width:100%;height:100%;object-fit:cover}
+.huk-tarjeta-sinfoto{display:flex;align-items:center;justify-content:center;height:100%;font-size:64px;color:#3a3326}
+.huk-tarjeta-redes{position:absolute;left:0;top:16px;display:flex;flex-direction:column;gap:6px}
+.huk-tarjeta-redes span{display:flex;align-items:center;justify-content:center;width:32px;height:32px;background:var(--adm-gold);color:#fff;font-size:15px}
+.huk-tarjeta-datos{padding:18px 16px 20px;text-align:center;color:#f1ece2}
+.huk-tarjeta-datos h3{font-family:var(--adm-font-head);font-size:20px;color:#fff;margin:0 0 4px}
+.huk-tarjeta-puesto{color:var(--adm-gold-light);font-weight:600;margin:0 0 10px}
+.huk-tarjeta-datos p{font-size:13px;margin:0 0 4px}
+.huk-tarjeta-datos p .fa{color:var(--adm-gold);margin-right:4px}
+.huk-tarjeta-datos .huk-vista-boton{display:inline-block;margin-top:12px}
+.detail-view td{word-break:break-word}

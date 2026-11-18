@@ -32,7 +32,7 @@ class CuentaService implements InterfaceCuenta
                 $model->setAttribute($campo, $modelAnterior->getAttribute($campo));
             }
         }
-        if ($loaded && $model->validate(array_diff($model->activeAttributes(), AdminService::CAMPOS_PROTEGIDOS))) {
+        if ($loaded && $model->validate(array_diff($model->activeAttributes(), AdminService::CAMPOS_PROTEGIDOS, ['idrol', 'ecosistemasIds']))) {
 
             if ($model->save(false)) {
                 // Actualiza los datos en la sesión actual manualmente (sin romper sesión)

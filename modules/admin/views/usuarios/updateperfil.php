@@ -1,184 +1,75 @@
 <?php
+
+/**
+ * Editar mis datos. El tipo de usuario, el estado y la contraseña no se cambian desde acá.
+ * País → Ciudad: huk-usuarios.js.
+ *
+ * @var yii\web\View $this
+ * @var app\models\Usuarios $model
+ */
+
+use app\components\Ubicaciones;
+use app\models\Usuarios;
 use kartik\form\ActiveForm;
 use kartik\select2\Select2;
+use kartik\widgets\DatePicker;
 use yii\helpers\Html;
-use yii\helpers\Url;
-$this->title = 'ACTUALIZAR CUENTA';
-$format = <<< SCRIPT
-function format(state) {
-if (!state.id) return state.text; // optgroup
-return state.text;
-}
-SCRIPT;
-$escape = new \yii\web\JsExpression("function(m) { return m; }");
-$this->registerJs($format, \yii\web\View::POS_HEAD);
+
+\app\assets_b\UsuariosAdminAsset::register($this);
+
+$this->title = 'Editar mis datos';
 ?>
 
-<!-- Main content -->
+<section class="content-header">
+    <h1><i class="fa fa-user-circle"></i> Editar mis datos</h1>
+</section>
+
 <section class="content">
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="box">
+    <div class="box box-primary">
+        <?php $form = ActiveForm::begin([
+            'id' => 'perfil-form',
+            'type' => ActiveForm::TYPE_HORIZONTAL,
+            'formConfig' => ['labelSpan' => 3, 'deviceSize' => ActiveForm::SIZE_SMALL],
+            'options' => ['class' => 'huk-form-usuario'],
+        ]); ?>
 
-
-        <div class="col-xs-12">
-            <h1 class="app-page-title">Mi cuenta</h1>
-        </div>
-        
-        
-            <div class="col-12">
-                <div class="app-card app-card-settings shadow-sm p-4">
-
-                    <div class="app-card-body">
-
-
-                        <?php $form = ActiveForm::begin([
-                            'options' => ['enctype' => 'multipart/form-data'],
-                            'class' => 'settings-form',
-
-                            'type' => ActiveForm::TYPE_HORIZONTAL,
-                            'formConfig' => ['labelSpan' => 3, 'deviceSize' => ActiveForm::SIZE_SMALL
-                            ] // important
-                        ]); ?>
-
-                        <div class="col-12 col-lg-6 col-md-6 col-sm-12 mspeo">
-                            <div class="mb-3">
-                                <?= $form->field($model, 'nombrecompleto')->textInput(['class' => 'form-control', 'placeholder' => '']) ?>
-
-                                <?= $form->field($model, 'email')->textInput(['class' => 'form-control  ', 'placeholder' => ' ']) ?>
-
-                                <?= $form->field($model, 'usuario')->textInput(['class' => 'form-control', 'placeholder' => '']) ?>
-
-
-                                <?= $form->field($model, 'telefono')->textInput(['class' => 'form-control  ', 'placeholder' => '']) ?>
-
-
-                                <?= $form->field($model, 'direccion')->textInput(['class' => 'form-control  ', 'placeholder' => '']) ?>
-
-
-                                <?= $form->field($model, 'sexo')->widget(Select2::classname(), [
-                                    'data' => [
-                                        'Hombre' => 'Hombre',
-                                        'Mujer' => 'Mujer',
-                                    ],
-                                    'options' => [
-                                        'placeholder' => 'Seleccione Sexo...',
-                                    ],
-                                    'pluginOptions' => [
-                                        'allowClear' => true, // Permitir limpiar la selección
-                                    ],
-                                ]) ?>
-
-                            </div>
-                        </div>
-
-
-                        <div class="col-12 col-lg-6 col-md-6 col-sm-12 ">
-                            <div class="mb-3">
-                               
-
-
-                                <?= $form->field($model, 'fecha_nacimiento')->widget(
-                                    \kartik\widgets\DatePicker::className(), [
-                                    // modify template for custom rendering
-                                    'language' => 'es',
-                                    'removeButton' => false,
-                                    'options' => ['class' => 'form-control  ', 'placeholder' => ''],
-                                    'pluginOptions' => [
-                                        'autoclose' => true,
-                                        'format' => 'yyyy-mm-dd',
-                                        'todayBtn' => "linked",
-                                        //'keyboardNavigation' => false,
-                                        //'forceParse' => false
-                                    ]
-                                ]) ?>
-
-                               <?= $form->field($model, 'cargo')->textInput(['class' => 'form-control  ', 'placeholder' => '']) ?>
-
-                               <?= $form->field($model, 'ciudad')->textInput(['class' => 'form-control  ', 'placeholder' => '']) ?>
-
-                            </div>
-                        </div>
-
-                        <!-- NUEVO: cada usuario puede subir/cambiar su
-                             propio sello acá, en "Mi cuenta". Opcional. -->
-                       
-<div class="col-12 col-lg-12 col-md-12 col-sm-12 qadede">
-                            <div class="mb-3">
-                                <label class="control-label" style="display:block; font-weight:bold; margin-bottom:5px;">
-                                    Sello / firma (opcional)
-                                </label>
-                                <?= $form->field($model, 'foto_sello', ['template' => "{input}\n{error}"])->widget(\sadovojav\cutter\Cutter::className(), [
-                                    'cropperOptions' => [
-                                        'aspectRatio' => 350 / 200,
-                                    ],
-                                ]) ?>
-                                <p class="text-muted" style="font-size:12px; margin-top:5px;">
-                                    Se usa para estampar tu sello/firma en los resultados de laboratorio.
-                                </p>
-                            </div>
-                        </div>
-
-
-                        <div class="form-group clsgua" >
-
-                            <div class="col-12 col-sm-12 col-md-12 col-lg-12" align="center">
-
-                                <div class="mb-3">
-                                    <?= Html::submitButton($model->isNewRecord ? 'GUARDAR' : 'ACTUALIZAR',    ['class' => 'btn btn btn-success btform']
-                                    ) ?>
-                                </div>
-                            </div>
-                        </div>
-
-                        <?php ActiveForm::end(); ?>
-
-                        <?php
-                        // Arregla el preview del widget Cutter: arma <img
-                        // src="/imagen/..."> sin el baseUrl de la app (asume
-                        // que el sitio vive en la raíz del dominio). Esto
-                        // SOLO corrige lo que se ve — no toca el campo
-                        // oculto que realmente se guarda al enviar el form.
-                        $this->registerJs("
-                            document.querySelectorAll('.image-cutter .preview-image').forEach(function(img) {
-                                var src = img.getAttribute('src');
-                                if (src && src.indexOf('/imagen/') === 0) {
-                                    img.setAttribute('src', '" . Yii::$app->request->baseUrl . "' + src);
-                                }
-                            });
-                        ");
-                        ?>
-
-                        <script>
-                            // Definir la URL generada por Yii2 en una variable JavaScript global
-                            var urlGetPaises = '<?= Url::to(['administrador/get-paises']) ?>';
-                        </script>
-
-
-
-                    </div><!--//app-card-body-->
-
-                </div><!--//app-card-->
+        <div class="row">
+            <div class="col-12 col-lg-6 col-md-6 col-sm-12">
+                <?= $form->field($model, 'nombrecompleto')->textInput(['maxlength' => 100]) ?>
+                <?= $form->field($model, 'email')->textInput(['maxlength' => 100, 'type' => 'email']) ?>
+                <?= $form->field($model, 'usuario')->textInput(['maxlength' => 100, 'autocomplete' => 'off']) ?>
+                <?= $form->field($model, 'telefono')->textInput(['maxlength' => 15]) ?>
+                <?= $form->field($model, 'movil')->textInput(['maxlength' => 15])
+                    ->hint('Solo números, con código de país. Ej.: 59176303932') ?>
             </div>
+            <div class="col-12 col-lg-6 col-md-6 col-sm-12">
+                <?= $form->field($model, 'pais_operacion')->widget(Select2::class, [
+                    'data' => Usuarios::PAISES,
+                    'language' => 'es',
+                    'options' => ['placeholder' => 'Seleccione el país', 'data-pais-select' => true, 'data-ciudades' => Ubicaciones::CIUDADES],
+                    'pluginOptions' => ['allowClear' => true],
+                ]) ?>
+                <?= $form->field($model, 'ciudad')->widget(Select2::class, [
+                    'data' => Ubicaciones::ciudadesDe($model->pais_operacion, $model->ciudad),
+                    'language' => 'es',
+                    'options' => ['placeholder' => 'Primero elegí el país', 'data-ciudad-select' => true],
+                    'pluginOptions' => ['allowClear' => true, 'tags' => true],
+                ])->hint('Si tu ciudad no aparece, escribila y presioná Enter.') ?>
+                <?= $form->field($model, 'direccion')->textInput(['maxlength' => 100]) ?>
+                <?= $form->field($model, 'fecha_nacimiento')->widget(DatePicker::class, [
+                    'language' => 'es',
+                    'removeButton' => false,
+                    'options' => ['placeholder' => 'Opcional'],
+                    'pluginOptions' => ['autoclose' => true, 'format' => 'yyyy-mm-dd', 'todayBtn' => 'linked'],
+                ]) ?>
+            </div>
+        </div>
 
+        <div class="huk-form-acciones text-center">
+            <?= Html::submitButton('<i class="fa fa-save"></i> Guardar', ['class' => 'btn btn-success btform']) ?>
+            <?= Html::a('Cancelar', ['cuenta'], ['class' => 'btn btn-default btform']) ?>
+        </div>
 
-
-        </div><!--//row-->
-
-
-    </div><!--//container-fluid-->
-</section><!--//app-content-->
-
-
-
-
-
-<script src="../assets_b/js/paisciud.js"></script>
-
-
-<style>
-   .qadede .form-group.highlight-addon {
-    margin-right: 0!important;
-    margin-left: 0!important;
-}
-</style>
+        <?php ActiveForm::end(); ?>
+    </div>
+</section>

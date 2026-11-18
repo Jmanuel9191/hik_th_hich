@@ -101,15 +101,12 @@ class AuthService implements InterfaceAuth
 
         $user->intentos_fallidos = 0;
         $user->bloqueado_hasta = null;
+        $user->ultimo_acceso = date('Y-m-d H:i:s');
+        $user->ultimo_acceso_ip = Yii::$app->request->userIP;
         $user->save(false);
 
 
         Yii::$app->user->switchIdentity($user, $model->rememberMe ? 3600 * 24 * 30 : 0);
-        //  Redirección obligatoria si requiere cambio de contraseña
-        if ($user->requiere_cambio_contrasena == 1) {
-            Yii::$app->response->redirect(['admin/cuenta/cambiar-clave-obligatoria'])->send();
-            Yii::$app->end();
-        }
         return true;
 
     }

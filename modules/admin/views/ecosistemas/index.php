@@ -9,6 +9,7 @@
  * @var bool $puedeCrear
  * @var bool $puedeEstado
  * @var bool $puedeGaleria
+ * @var bool $puedeEliminar
  */
 
 use yii\grid\GridView;
@@ -84,7 +85,7 @@ $this->title = 'Ecosistemas';
                     [
                         'class' => 'yii\grid\ActionColumn',
                         'header' => 'Operaciones',
-                        'template' => '<div class="btn-group btn-group-justified" role="group">{view}{update}{galeria}{estado}</div>',
+                        'template' => '<div class="btn-group btn-group-justified" role="group">{view}{update}{galeria}{estado}{delete}</div>',
                         'buttons' => [
                             'view' => fn($url) => Html::a('<i class="fa fa-eye"></i>', $url, ['class' => 'btn btn-success', 'title' => 'Ver e historial']),
                             'update' => fn($url) => Html::a('<i class="fa fa-pencil"></i>', $url, ['class' => 'btn btn-info', 'title' => 'Editar']),
@@ -100,8 +101,15 @@ $this->title = 'Ecosistemas';
                                     'data-nombre' => $m->nombre,
                                 ])
                                 : '',
+                            'delete' => fn($url, $m) => Html::a('<i class="fa fa-trash"></i>', '#', [
+                                'class' => 'btn btn-danger',
+                                'title' => 'Eliminar',
+                                'data-eco-eliminar' => $url,
+                                'data-nombre' => $m->nombre,
+                            ]),
                         ],
                         'urlCreator' => fn($action, $m) => Url::to([$action, 'id' => $m->idecosistema]),
+                        'visibleButtons' => ['delete' => $puedeEliminar],
                     ],
                 ],
             ]) ?>

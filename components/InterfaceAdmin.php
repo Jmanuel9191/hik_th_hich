@@ -7,6 +7,7 @@ interface InterfaceAdmin
     public function obtenerRolesActivos();
     public function listHistorial($queryParams, $idusuario = null);
     public function listUsuarios($queryParams);
+    public function conteoPorPestana(): array;
     public function obtenerUsuario($id);
     public function nuevoUsuario($postData);
     public function actualizarUsuario($dates, $id);

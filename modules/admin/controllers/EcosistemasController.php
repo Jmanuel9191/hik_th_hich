@@ -40,6 +40,7 @@ class EcosistemasController extends Controller
                     'estado' => ['POST'],
                     'galeria-subir' => ['POST'],
                     'galeria-borrar' => ['POST'],
+                    'delete' => ['POST'],
                 ],
             ],
         ];
@@ -53,6 +54,7 @@ class EcosistemasController extends Controller
             'puedeCrear' => $this->permisos->tienePermiso('ecosistemas_crear'),
             'puedeEstado' => $this->permisos->tienePermiso('ecosistemas_estado'),
             'puedeGaleria' => $this->permisos->tienePermiso('ecosistemas_galeria'),
+            'puedeEliminar' => $this->permisos->tienePermiso('ecosistemas_eliminar'),
         ]);
     }
 
@@ -101,6 +103,13 @@ class EcosistemasController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return $this->ecosistemas->cambiarEstado($id);
+    }
+
+    /** Eliminar (solo si no tiene proyectos asignados). Responde JSON. */
+    public function actionDelete($id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return $this->ecosistemas->eliminar($id);
     }
 
     public function actionGaleria($id)

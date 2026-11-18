@@ -51,7 +51,7 @@ class ChangePasswordForm extends Model
     public function attributeLabels()
     {
         return [
-            'currentPassword' => 'Anterior contraseña',
+            'currentPassword' => 'Contraseña actual',
             'newPassword' => 'Nueva contraseña',
             'confirmPassword' => 'Confirmar contraseña',
 
@@ -61,15 +61,11 @@ class ChangePasswordForm extends Model
 
     public function validateCurrentPassword($attribute, $params)
     {
-        // Validar que la contraseña actual sea correcta
-        $user = Yii::$app->session->get('user');
-
-        if ($user) {
-            $usuario = Usuarios::findOne(['idusuario' => $user['id']]); // Obtener el modelo de usuario para acceder a la contraseña hasheada
-
-            if (!$usuario || !password_verify($this->currentPassword, $usuario->contrasena)) {
-                $this->addError($attribute, 'La contraseña actual no es correcta.');
-            }
+        // Validar contra el usuario que inició sesión (antes leía session 'user', que en el panel no existe,
+        // y por eso no verificaba nada).
+        $usuario = Yii::$app->user->isGuest ? null : Usuarios::findOne(Yii::$app->user->id);
+        if (!$usuario || !Yii::$app->security->validatePassword((string) $this->currentPassword, $usuario->contrasena)) {
+            $this->addError($attribute, 'La contraseña actual no es correcta.');
         }
 
 

@@ -12,4 +12,8 @@ interface InterfaceEcosistemas
     public function subirGaleria($id);
     public function borrarImagenGaleria($idimagen);
     public function historial($id);
+    /** Cuántos proyectos tiene asignados (no se puede eliminar si tiene). */
+    public function proyectosAsignados($id);
+    /** Elimina el ecosistema con sus imágenes y galería, si no tiene proyectos. */
+    public function eliminar($id);
 }

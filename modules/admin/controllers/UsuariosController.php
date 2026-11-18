@@ -64,14 +64,11 @@ class UsuariosController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new UsuariosSearch();
         $this->permisosService->verificarAdministrador();
         $this->permisosService->verificarPermiso('usuarios_listar');
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-              $this->cuentaService->limpiarFlashes();
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+        $lista = $this->adminService->listUsuarios(Yii::$app->request->queryParams); // pestañas Activos / Bloqueados
+        $this->cuentaService->limpiarFlashes();
+        return $this->render('index', $lista + [
             'puedeExportar' => $this->permisosService->tienePermiso('usuarios_exportar'),
         ]);
     }
@@ -199,55 +196,48 @@ public function actionUpdatepassword($id)
 }
 
 
-      public function actionCuenta()
+    /** Mi perfil: mis datos + lo que pasó con mi cuenta. */
+    public function actionCuenta()
     {
-          $model = Usuarios::findOne(Yii::$app->user->id);
-        $roles = $this->adminService->obtenerRolesActivos();
-    if (Yii::$app->request->get('flashclear')) {
-            Yii::$app->session->removeFlash('flash');
-        }
+        $model = Usuarios::findOne(Yii::$app->user->id);
         return $this->render('perfil', [
             'model' => $model,
-            'roles' => $roles,
+            'historial' => $this->adminService->historialUsuario($model->idusuario),
         ]);
     }
 
-
-   public function actionUpdateperfil()
+    /** Editar mis datos (no puedo cambiar mi rol, estado ni contraseña desde acá). */
+    public function actionUpdateperfil()
     {
-
         $model = Usuarios::findOne(Yii::$app->user->id);
         if (Yii::$app->request->isPost) {
             $resultado = $this->cuentaService->actualizarUsuario($model, Yii::$app->request->post());
             if ($resultado && $resultado['exito']) {
                 return $this->redirect(['cuenta']);
             }
-            $modelFinal = $resultado['model'] ?? $model;
-            return $this->render('updateperfil', [
-                'model' => $modelFinal,
-            ]);
+            $model = $resultado['model'] ?? $model;
         }
-        // Primera vez que se carga el formulario
-         $this->cuentaService->limpiarFlashes();
-        return $this->render('updateperfil', [
-            'model' => $model,
-            'render' => 'updateperfil',
-        ]);
+        return $this->render('updateperfil', ['model' => $model]);
     }
 
- 
-
-
+    /** Cambiar mi contraseña: pide la actual. Cierra mis otras sesiones; esta sigue abierta. */
     public function actionUpdatepasswordperfil()
     {
-        $model = Usuarios::findOne(Yii::$app->user->id);
-        $resultado = $this->cuentaService->procesarFormularioCambioPassword($model, Yii::$app->request->post());
-        if ($resultado && $resultado['exito']) {
-            return $this->redirect(['cuenta']);        }
-         $this->cuentaService->limpiarFlashes();
-        return $this->render('updatepasswordperfil', [
-            'model' => $resultado['formModel'] ?? new ChangePasswordForm(),
-        ]);
+        $usuario = Usuarios::findOne(Yii::$app->user->id);
+        $form = new ChangePasswordForm();
+        if ($form->load(Yii::$app->request->post()) && $form->validate()) {
+            $usuario->updateAttributes([
+                'contrasena' => Yii::$app->security->generatePasswordHash($form->newPassword),
+                'auth_key' => Yii::$app->security->generateRandomString(),
+            ]);
+            Yii::$app->session->set(Yii::$app->user->authKeyParam, $usuario->auth_key);
+            HistorialUsuarios::registrar($usuario->idusuario, 'Cambio de contraseña',
+                'El usuario cambió su contraseña desde Mi perfil.', $usuario->idusuario);
+            Yii::$app->session->setFlash('flash', ['type' => 'success', 'message' => 'Tu contraseña fue actualizada.']);
+            return $this->redirect(['cuenta']);
+        }
+        $form->currentPassword = $form->newPassword = $form->confirmPassword = null;
+        return $this->render('updatepasswordperfil', ['model' => $form]);
     }
 
     public function actionEstado($id)
