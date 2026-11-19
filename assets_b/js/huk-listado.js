@@ -3,6 +3,7 @@
    1. Orden:   <button data-listado-mover="URL">                     → POST y recarga la tabla
    2. Estado:  <a data-listado-estado="URL" data-accion="activar|desactivar" data-nombre="..." [data-aviso="..."]>
    3. Borrar:  <a data-listado-eliminar="URL" data-nombre="..." [data-aviso="..."]>
+   4. Destacar: <button data-listado-destacar="URL">                → POST y recarga (sin confirmar)
    Responden JSON {exito, mensaje}. La tabla va dentro de un Pjax: se recarga ese bloque.
    ========================================================================== */
 (function ($) {
@@ -61,6 +62,13 @@
         Swal.fire({ icon: "success", titleText: r.mensaje }).then(function () { window.location.reload(); });
       });
     });
+  });
+
+  /* 4. Destacar / quitar destacado */
+  $(document).on("click", "[data-listado-destacar]", function (e) {
+    e.preventDefault();
+    var $b = $(this).prop("disabled", true);
+    enviar($b.data("listado-destacar"), function () { recargar($b); }).always(function () { $b.prop("disabled", false); });
   });
 
   /* 3. Eliminar */

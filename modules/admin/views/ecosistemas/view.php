@@ -41,6 +41,8 @@ $gerentes = array_map(fn($u) => $u->nombrecompleto, $model->usuarios);
                             ['label' => 'Estado', 'format' => 'raw', 'value' => $model->estado === '1'
                                 ? Html::tag('span', 'Activo (se ve en la web)', ['class' => 'label label-success'])
                                 : Html::tag('span', 'Inactivo', ['class' => 'label label-default'])],
+                            ['label' => 'Destacado', 'format' => 'raw', 'value' => $model->destacado === '1'
+                                ? '<i class="fa fa-star huk-estrella is-activa"></i> Sí (Inicio, Estrategia y primero en la web)' : 'No'],
                             'resumen',
                             ['label' => 'URL', 'value' => '/ecosistemas/' . $model->slug],
                             ['label' => 'Gerentes asignados', 'value' => $gerentes ? implode(', ', $gerentes) : 'Ninguno'],

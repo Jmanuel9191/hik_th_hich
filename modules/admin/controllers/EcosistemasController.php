@@ -38,6 +38,7 @@ class EcosistemasController extends Controller
                 'class' => VerbFilter::class,
                 'actions' => [
                     'estado' => ['POST'],
+                    'destacar' => ['POST'],
                     'galeria-subir' => ['POST'],
                     'galeria-borrar' => ['POST'],
                     'delete' => ['POST'],
@@ -103,6 +104,13 @@ class EcosistemasController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         return $this->ecosistemas->cambiarEstado($id);
+    }
+
+    /** Destacado (prioritario 2026–2035). Responde JSON (huk-listado.js). */
+    public function actionDestacar($id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return $this->ecosistemas->cambiarDestacado($id);
     }
 
     /** Eliminar (solo si no tiene proyectos asignados). Responde JSON. */

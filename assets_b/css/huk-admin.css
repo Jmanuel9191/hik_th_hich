@@ -421,3 +421,160 @@ a.huk-adm-btn{display:flex;align-items:center;justify-content:center;text-decora
 .huk-tarjeta-datos p .fa{color:var(--adm-gold);margin-right:4px}
 .huk-tarjeta-datos .huk-vista-boton{display:inline-block;margin-top:12px}
 .detail-view td{word-break:break-word}
+/* 18. PÁGINAS (Nosotros) ----------------------------------------------------------- */
+.huk-tabs>li.huk-tab-externa{float:right}
+.huk-tabs>li.huk-tab-externa>a,.huk-tabs>li.huk-tab-externa>span{display:block;color:var(--adm-muted);font-weight:500;font-size:13px;padding:10px 6px}
+.huk-tabs>li.huk-tab-externa .fa{font-size:11px;margin-left:3px}
+.huk-bloque>.box-header .label{margin-left:8px;vertical-align:middle}
+.huk-bloque>.box-header .box-tools{top:7px}
+.huk-bloque>.box-header .box-tools .btn{margin-left:4px}
+.huk-bloque.is-oculto>.box-body{opacity:.6}
+.huk-bloque .huk-aviso-contacto{margin-bottom:14px}
+.huk-aviso-arriba{margin-bottom:16px!important}
+.huk-bloque-contenido{display:grid;grid-template-columns:1fr;gap:20px}
+.huk-bloque-contenido.con-imagen{grid-template-columns:minmax(0,1fr) 240px}
+.huk-bloque-datos{margin:0}
+.huk-bloque-datos dt{font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--adm-muted);margin-top:12px}
+.huk-bloque-datos dt:first-child{margin-top:0}
+.huk-bloque-datos dd{margin:2px 0 0;font-size:14px}
+.huk-bloque-datos dd p:last-child{margin-bottom:0}
+.huk-bloque-titulo{font-family:var(--adm-font-head);font-size:18px}
+.huk-bloque-frase{margin:0;padding:6px 12px;border-left:3px solid var(--adm-gold);font-size:15px;font-style:italic;color:var(--adm-text);background:#fbf6ea}
+.huk-bloque-imagen{margin:0;text-align:center}
+.huk-bloque-imagen img{display:block;width:100%;max-height:220px;object-fit:cover;border-radius:6px;border:1px solid var(--adm-line)}
+.huk-bloque-imagen .huk-eco-vacio{height:140px}
+.huk-bloque-imagen figcaption{font-size:12px;color:var(--adm-muted);margin-top:4px}
+.huk-bloque-lista{margin-top:18px;padding-top:14px;border-top:1px solid var(--adm-line)}
+.huk-bloque-lista:first-child{margin-top:0;padding-top:0;border-top:0}
+.huk-bloque-lista .huk-barra-acciones h4{margin:0 auto 0 0;font-family:var(--adm-font-head);font-size:15px}
+.huk-item-mini{display:block;width:72px;height:44px;object-fit:cover;border-radius:4px;border:1px solid var(--adm-line)}
+.huk-item-mini.is-icono{width:40px;height:40px;object-fit:contain;padding:4px;background:#faf8f3}
+.huk-item-ops{width:130px}
+@media (max-width:767px){.huk-bloque-contenido.con-imagen{grid-template-columns:1fr}.huk-bloque>.box-header .box-tools{position:static;margin-top:8px}}
+/* 19. DESTACADOS (Equipo, Ecosistemas) Y MAPA DE EXPANSIÓN ------------------------ */
+.huk-estrella{background:transparent;border:0;color:var(--adm-sand);font-size:17px;padding:0 4px;line-height:1}
+.huk-estrella:hover,.huk-estrella:focus{color:var(--adm-gold);outline:none}
+.huk-estrella.is-activa,i.huk-estrella.is-activa{color:var(--adm-gold)}
+.huk-inicio-sub .fa-star{color:var(--adm-gold)}
+.huk-item-cifra{font-family:var(--adm-font-head);font-weight:700;color:var(--adm-gold-dark);white-space:nowrap}
+.huk-bloque-mapa{background:#0b0b0b;border-radius:6px;padding:12px 10px 8px}
+.huk-bloque-mapa figcaption{color:var(--adm-sand)}
+.huk-mapa{display:block;width:100%;max-height:340px}
+.huk-mapa-pais{fill:#2a2a2a;stroke:#0b0b0b;stroke-width:1}
+.huk-mapa-pais.is-activo{fill:var(--adm-gold)}
+.huk-mapa-pais:hover{fill:#3a3a3a}
+.huk-mapa-pais.is-activo:hover{fill:var(--adm-gold-light)}
+/* 20. BANCO DE PROYECTOS Y MONEDAS ------------------------------------------------ */
+.huk-proyecto-tipos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.huk-proyecto-tipo{display:block;margin:0;padding:12px 14px 12px 36px;border:1px solid var(--adm-line);border-radius:8px;cursor:pointer;font-weight:400;position:relative;background:#fff}
+.huk-proyecto-tipo input{position:absolute;left:12px;top:15px;accent-color:var(--adm-gold)}
+.huk-proyecto-tipo strong{display:block;font-size:14px}
+.huk-proyecto-tipo small{display:block;color:var(--adm-muted);font-size:12.5px;margin-top:2px}
+.huk-proyecto-tipo.is-activo{border-color:var(--adm-gold);background:#fbf6ea;box-shadow:0 0 0 1px var(--adm-gold)}
+.huk-proyecto-checks label{display:inline-block;margin:0 16px 6px 0;font-weight:400}
+.huk-proyecto-checks input{accent-color:var(--adm-gold);margin-right:4px}
+.huk-ayuda-numeros{margin:-6px 0 12px}
+.huk-proyecto-codigo{display:inline-block;font-family:var(--adm-font-head);font-size:11.5px;font-weight:700;letter-spacing:.04em;color:var(--adm-gold-dark)}
+.huk-proyecto-titulo{display:block}
+.huk-proyecto-tipo-label{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:10px;background:#efe7d6;color:var(--adm-text);white-space:nowrap}
+.huk-proyecto-tipo-label.is-inversion{background:var(--adm-ink);color:var(--adm-gold-light)}
+.huk-label-archivado{background:#8d877b}
+.huk-sin-foto{display:flex;align-items:center;justify-content:center;background:#faf8f3;color:var(--adm-sand);font-size:18px}
+.huk-boton-derecha{margin-left:auto}
+.huk-proyecto-banner img{display:block;width:100%;aspect-ratio:16/5;object-fit:cover;border-radius:8px;margin-bottom:20px;border:1px solid var(--adm-line)}
+.huk-proyecto-resumen{font-size:15.5px;font-weight:500;color:var(--adm-text);border-left:3px solid var(--adm-gold);padding-left:12px}
+.huk-proyecto-sub{font-family:var(--adm-font-head);font-size:15px;margin:14px 0 6px}
+.huk-proyecto-sub:first-child{margin-top:0}
+.huk-proyecto-foto{display:block;width:100%;border-radius:6px}
+.huk-proyecto-foto-vacia{height:180px}
+.huk-proyecto-numeros th{width:48%}
+.huk-videos{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.huk-video{margin:0;overflow:hidden}
+.huk-video-reproductor{background:#0b0b0b;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center}
+.huk-video-reproductor video{max-width:100%;max-height:100%;display:block}
+.huk-video-reproductor iframe{width:100%;height:100%;border:0}
+.huk-video-datos strong{display:block}
+.huk-video-datos small{display:block;color:var(--adm-muted);margin:2px 0 8px;word-break:break-all}
+.huk-video-acciones .btn{margin-right:3px}
+.huk-o{text-align:center;color:var(--adm-muted);font-size:12px;margin:-4px 0 10px}
+.huk-subida-progreso[hidden]{display:none}
+.huk-subida-progreso .progress{margin-bottom:4px;height:22px;border-radius:11px;background:#efe7d6}
+.huk-subida-progreso .progress-bar{background-color:var(--adm-gold);line-height:22px;font-weight:600;min-width:2.5em}
+@media (max-width:767px){.huk-proyecto-tipos{grid-template-columns:1fr}}
+/* 21. AVANCES DE PROYECTO -------------------------------------------------------- */
+.huk-avance>.box-header{padding-right:120px}
+.huk-avance>.box-header .label{margin-left:6px;vertical-align:middle}
+.huk-avance>.box-header .box-tools .btn{margin-left:3px}
+.huk-avance.is-oculto>.box-body{opacity:.55}
+.huk-avance-fecha{display:block;font-size:12px;font-weight:600;color:var(--adm-gold-dark);letter-spacing:.03em;margin-bottom:2px}
+.huk-label-porcentaje{background:var(--adm-gold);color:#fff}
+.huk-avance-fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin:12px 0}
+.huk-avance-fotos figure{position:relative;margin:0}
+.huk-avance-fotos img{display:block;width:100%;height:90px;object-fit:cover;border-radius:6px;border:1px solid var(--adm-line)}
+.huk-avance-quitar{position:absolute;top:4px;right:4px;width:22px;height:22px;border:0;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;font-size:11px;line-height:22px;padding:0}
+.huk-avance-quitar:hover{background:var(--adm-danger)}
+.huk-avance-videos{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin:12px 0}
+.huk-avance-video .huk-video-reproductor{border-radius:6px;overflow:hidden;margin-bottom:4px}
+.huk-avance-docs{list-style:none;padding:0;margin:10px 0}
+.huk-avance-docs li{padding:4px 0;border-bottom:1px dashed var(--adm-line)}
+.huk-avance-agregar{margin-top:12px;padding:10px 12px;background:#faf8f3;border-radius:6px}
+.huk-avance-agregar summary{cursor:pointer;font-weight:600;color:var(--adm-gold-dark)}
+.huk-avance-agregar form{margin-top:10px}
+.huk-avance-etapa{font-size:15px;margin-bottom:8px}
+.huk-progreso-avance{height:24px;border-radius:12px;background:#efe7d6;margin-bottom:6px}
+.huk-progreso-avance .progress-bar{background:var(--adm-gold);line-height:24px;font-weight:700;min-width:2.5em;width:0}
+.huk-progreso-mini{height:18px;margin:0;max-width:200px}
+.huk-progreso-mini .progress-bar{line-height:18px;font-size:11px}
+/* 21b. AVANCES: DESCRIPCIONES Y SUBIDA DE VARIOS ---------------------------------- */
+.huk-leyenda{font-size:12.5px;color:var(--adm-text);margin-top:4px;line-height:1.35;word-break:break-word}
+.huk-leyenda-editar{padding:0 2px;color:var(--adm-gold-dark)}
+.huk-avance-fotos figure .huk-leyenda{font-size:12px}
+.huk-avance-docs .huk-leyenda{margin:2px 0 0 18px;color:var(--adm-muted)}
+.huk-subida-lista{list-style:none;padding:0;margin:0 0 10px}
+.huk-subida-lista li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--adm-line)}
+.huk-subida-nombre{font-size:12.5px;word-break:break-all}
+.huk-subida-nombre .fa{color:var(--adm-gold-dark)}
+.huk-avance-enlace{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+@media (max-width:767px){.huk-subida-lista li,.huk-avance-enlace{grid-template-columns:1fr}}
+/* 22. INVERSORES Y ACUERDO DE CONFIDENCIALIDAD ------------------------------------- */
+.huk-inversor-tipos{grid-template-columns:repeat(2,minmax(0,220px))}
+.huk-checks-columna label{display:block;margin:0 0 6px}
+.huk-decision .huk-check-area{margin:0 0 4px}
+.huk-decision .huk-check-area label{font-weight:500}
+.huk-decision .btn-block{margin-top:12px}
+.huk-pidio{display:inline-block;margin-left:4px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--adm-gold-dark);background:#fbf6ea;border-radius:8px;padding:0 6px}
+.huk-subir-documento{display:flex;gap:6px;margin-top:10px}
+.huk-subir-documento .form-control{flex:1 1 auto}
+.huk-nda-texto{max-height:560px;overflow:auto}
+.huk-nda-dato{font-size:15px;margin:0 0 4px}
+.huk-nda-dato strong{font-family:var(--adm-font-head);font-size:22px;color:var(--adm-gold-dark)}
+.huk-filtro-monto{display:flex;gap:4px;min-width:190px}
+.huk-filtro-monto .form-control{flex:1 1 0;min-width:0;padding:6px 8px}
+
+/* 23. INVERSIONES (PAGOS) ------------------------------------------------------- */
+.huk-filtros-pagos{background:#faf8f3;border:1px solid var(--adm-line);border-radius:8px;padding:12px 14px 4px;margin:0 0 14px}
+.huk-filtros-pagos .form-group{margin-bottom:10px}
+.huk-filtro-fechas{display:flex;gap:6px}
+.huk-filtro-fechas .form-control{flex:1 1 0;min-width:0}
+.huk-filtros-botones{display:flex;gap:8px;justify-content:flex-end;align-items:flex-end;min-height:59px;margin:0 0 10px}
+.huk-totales-pagos{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 12px}
+.huk-totales-titulo{color:var(--adm-muted);font-size:13px}
+.huk-total-moneda{background:#fff;border:1px solid var(--adm-line);border-left:4px solid var(--adm-gold);border-radius:6px;padding:6px 12px}
+.huk-total-moneda strong{font-size:18px;color:var(--adm-gold-dark);margin-right:6px}
+.huk-total-moneda small{color:var(--adm-muted)}
+.huk-tabla-pagos td{vertical-align:top !important}
+.huk-pago-anulado td{color:#9a948a;background:#fbf7f6 !important}
+.huk-pago-anulado td:nth-child(-n+5){text-decoration:line-through}
+.huk-pago-anulado .huk-pago-monto{color:#9a948a}
+.huk-pago-motivo{margin-top:4px;color:#a33a2c;font-size:12.5px}
+.huk-tipos-pago{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.huk-tipo-pago{display:block;margin:0;padding:9px 10px;border:1px solid var(--adm-line);border-radius:8px;cursor:pointer;font-weight:400;background:#fff}
+.huk-tipo-pago input{margin-right:6px;accent-color:var(--adm-gold)}
+.huk-tipo-pago.is-activo{border-color:var(--adm-gold);background:#fbf6ea}
+.huk-pago-equivalente{background:#fbf6ea;border:1px dashed var(--adm-gold);border-radius:8px;padding:10px 12px 2px;margin:0 0 14px}
+.huk-ronda-dato{display:flex;justify-content:space-between;gap:10px;margin:0 0 8px}
+.huk-ronda-dato span{color:var(--adm-muted)}
+.huk-ronda-dato strong{font-size:20px;color:var(--adm-gold-dark)}
+@media (max-width:767px){.huk-tipos-pago{grid-template-columns:1fr 1fr}}
+.huk-pago-form .hint-block{margin-top:6px}
+.huk-pago-form input[type=file]{margin-bottom:2px}

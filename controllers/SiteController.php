@@ -1,6 +1,8 @@
 <?php
 namespace app\controllers;
 use app\components\InterfaceTarea;
+use app\components\InterfaceBanners;
+use app\components\InterfacePaginas;
 use app\models\LoginWeb;
 use Yii;
 use yii\web\Controller;
@@ -40,8 +42,14 @@ class SiteController extends BaseController
 
     public function actionIndex()
     {
-        //$this->checkUserAuthentication();
-        return $this->render('index');
+        // Banners del Inicio: los que se muestran hoy (Panel → Banners)
+        $banners = Yii::$container->get(InterfaceBanners::class)->paraWeb();
+        // Tarjetas Conectar · Transformar · Multiplicar (Panel → Páginas → Nosotros → Quiénes somos)
+        $paginas = Yii::$container->get(InterfacePaginas::class);
+        $tarjetas = $paginas->tarjetasInicio();
+        // Resumen de Quiénes somos (+ destacados y cifras), mismo panel
+        $quienes = $paginas->quienesInicio();
+        return $this->render('index', ['banners' => $banners, 'tarjetas' => $tarjetas, 'quienes' => $quienes]);
     }
     /**
      * Login action.

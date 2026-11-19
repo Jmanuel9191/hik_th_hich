@@ -76,6 +76,9 @@ class EcosistemaService implements InterfaceEcosistemas
         if (isset($filtro['estado']) && in_array($filtro['estado'], ['0', '1'], true)) {
             $query->andWhere(['estado' => $filtro['estado']]);
         }
+        if (isset($filtro['destacado']) && in_array($filtro['destacado'], ['0', '1'], true)) {
+            $query->andWhere(['destacado' => $filtro['destacado']]);
+        }
         return new ActiveDataProvider([
             'query' => $query,
             'sort' => ['defaultOrder' => ['numero' => SORT_ASC], 'attributes' => ['numero', 'nombre', 'fecha_registro']],
@@ -197,6 +200,16 @@ class EcosistemaService implements InterfaceEcosistemas
         return ['exito' => true, 'mensaje' => $activar ? 'Ecosistema activado.' : 'Ecosistema desactivado.'];
     }
 
+    public function cambiarDestacado($id)
+    {
+        $model = $this->buscar($id, 'ecosistemas_estado');
+        $destacar = $model->destacado !== '1';
+        $model->updateAttributes(['destacado' => $destacar ? '1' : '0', 'fecha_actualizacion' => date('Y-m-d H:i:s')]);
+        EcosistemaHistorial::registrar($model->idecosistema, 'Destacado',
+            $destacar ? 'Marcado como destacado (prioritario: Inicio, Estrategia y primero en la web)' : 'Ya no es destacado');
+        return ['exito' => true, 'mensaje' => $destacar ? 'Marcado como destacado.' : 'Ya no es destacado.'];
+    }
+
     /* ---------------- Galería ---------------- */
 
     /** Para Kartik FileInput: [] = ok, ['error' => '...'] = falló. */
@@ -226,14 +239,10 @@ class EcosistemaService implements InterfaceEcosistemas
 
     /* ---------------- Eliminar ---------------- */
 
-    /**
-     * Proyectos asignados al ecosistema. Hoy siempre 0: el módulo Proyectos todavía no existe.
-     * Cuando se cree la tabla de proyectos (con su columna idecosistema), se cuenta acá y
-     * eliminar() deja de permitir borrar ecosistemas con proyectos.
-     */
+    /** Proyectos del banco de proyectos que pertenecen al ecosistema (si tiene, no se puede eliminar). */
     public function proyectosAsignados($id)
     {
-        return 0;
+        return (int) \app\models\Proyecto::find()->where(['idecosistema' => (int) $id])->count();
     }
 
     public function eliminar($id)

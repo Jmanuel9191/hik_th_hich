@@ -23,16 +23,21 @@ $this->title = 'Equipo';
 
 <section class="content-header">
     <h1><i class="fa fa-id-badge"></i> Equipo</h1>
-    <p class="huk-inicio-sub">Las personas que se muestran en la página. Salen en el orden de esta lista.</p>
+    <p class="huk-inicio-sub">Las personas que se muestran en la página. Salen en el orden de esta lista; las <i class="fa fa-star"></i> destacadas van en el Inicio y primero en Liderazgo.</p>
 </section>
 
 <section class="content">
     <div class="box">
         <div class="box-body">
             <?php Pjax::begin(['id' => 'equipo-grid', 'timeout' => 5000]); ?>
-            <?php if ($puede['crear']): ?>
+            <?php if ($puede['crear'] || $puede['exportar']): ?>
                 <div class="huk-barra-acciones">
-                    <?= Html::a('<i class="fa fa-plus"></i> Agregar persona', ['create'], ['class' => 'btn btn-success', 'data-pjax' => '0']) ?>
+                    <?php if ($puede['crear']): ?>
+                        <?= Html::a('<i class="fa fa-plus"></i> Agregar persona', ['create'], ['class' => 'btn btn-success', 'data-pjax' => '0']) ?>
+                    <?php endif; ?>
+                    <?php if ($puede['exportar']): ?>
+                        <?= $this->render('/_exportar', ['ruta' => 'exportar']) ?>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
             <?= GridView::widget([
@@ -98,6 +103,21 @@ $this->title = 'Equipo';
                             }
                             return $iconos ? Html::tag('span', implode(' ', $iconos), ['class' => 'huk-equipo-redes']) : Html::tag('span', '—', ['class' => 'text-muted']);
                         },
+                    ],
+                    [
+                        'attribute' => 'destacado',
+                        'label' => 'Destacado',
+                        'format' => 'raw',
+                        'filter' => ['1' => 'Destacados', '0' => 'No destacados'],
+                        'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
+                        'contentOptions' => ['class' => 'text-center'],
+                        'value' => fn($m) => $puede['editar']
+                            ? Html::button('<i class="fa fa-star' . ($m->destacado === '1' ? '' : '-o') . '"></i>', [
+                                'class' => 'btn btn-xs huk-estrella' . ($m->destacado === '1' ? ' is-activa' : ''),
+                                'title' => $m->destacado === '1' ? 'Quitar destacado' : 'Destacar (sale en el Inicio y primero en Liderazgo)',
+                                'data-listado-destacar' => Url::to(['destacar', 'id' => $m->idmiembro]),
+                            ])
+                            : ($m->destacado === '1' ? '<i class="fa fa-star huk-estrella is-activa"></i>' : ''),
                     ],
                     [
                         'attribute' => 'estado',

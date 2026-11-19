@@ -26,6 +26,9 @@ $fecha = fn($v, $hora = false) => $v ? date($hora ? 'd/m/Y H:i' : 'd/m/Y', strto
 // Vista previa: misma estructura para computadora y celular
 $capa = function () use ($model) {
     $html = '';
+    if ($model->antetitulo) {
+        $html .= Html::tag('small', Html::encode($model->antetitulo), ['class' => 'huk-vista-ante']);
+    }
     if ($model->titulo) {
         $html .= Html::tag('h2', Html::encode($model->titulo));
     }

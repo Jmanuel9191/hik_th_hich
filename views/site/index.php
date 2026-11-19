@@ -1,36 +1,17 @@
 <?php
-use yii\helpers\Url;
-/* @var $this yii\web\View */
 
-$configuracion = \app\models\Configuracion::find()->one();
-
-
-
-
+/**
+ * Inicio.
+ *
+ * @var yii\web\View $this
+ * @var app\models\Banners[] $banners    banners vigentes (Panel → Banners)
+ * @var app\models\PaginaItem[] $tarjetas Conectar · Transformar · Multiplicar (Panel → Páginas → Nosotros)
+ * @var array $quienes  resumen de Quiénes somos: historia, destacados y cifras (Panel → Páginas → Nosotros)
+ */
 ?>
 
-<div class="container">
-    <div class="row">
-        <div class="col-lg-12 cnstr">
+<?= $this->render('widgets/banner_mid', ['banners' => $banners, 'conTarjetas' => !empty($tarjetas)]) ?>
 
-            <h2 class="text-center">EN CONSTRUCCION</h2>
-                <p class="text-center">Estamos trabajando en esta seccion</p>
+<?= $this->render('widgets/tarjetas', ['tarjetas' => $tarjetas, 'conBanner' => !empty($banners)]) ?>
 
-
-        </div><!-- End .col-lg-9 -->
-
-
-
-
-
-
-    </div><!-- End .row -->
-</div><!-- End .container -->
-
-<div class="mb-4"></div><!-- margin -->
-
-
-
-
-
-
+<?= $this->render('widgets/quienes', $quienes) ?>

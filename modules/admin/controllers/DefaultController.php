@@ -77,9 +77,13 @@ class DefaultController extends BaseController
         $permisos = Yii::$container->get(\app\components\InterfacePermisosService::class);
         $superadmin = (int) (Yii::$app->user->identity->idrol ?? 0) === \app\components\Rol::SUPERADMIN;
         $accesos = array_values(array_filter([
+            $permisos->tienePermiso('inversores_listar') ? ['Inversores', 'handshake-o', ['/admin/inversores/index'], 'Solicitudes de la web, aprobación con áreas y acuerdo de confidencialidad.'] : null,
+            $permisos->tienePermiso('inversiones_listar') ? ['Inversiones', 'money', ['/admin/inversiones/index'], 'Pagos de cada inversor en cada proyecto, comprobantes y % de la ronda.'] : null,
+            $permisos->tienePermiso('proyectos_listar') ? ['Proyectos', 'briefcase', ['/admin/banco-proyectos/index'], 'El banco de proyectos que ven los inversores de cada área.'] : null,
             $permisos->tienePermiso('ecosistemas_listar') ? ['Ecosistemas', 'th-large', ['/admin/ecosistemas/index'], 'Contenido, imágenes y galería de cada ecosistema.'] : null,
             $permisos->tienePermiso('banners_listar') ? ['Banners', 'picture-o', ['/admin/banners/index'], 'Las imágenes grandes de la portada, con su texto y botón.'] : null,
             $permisos->tienePermiso('equipo_listar') ? ['Equipo', 'id-badge', ['/admin/equipo/index'], 'Las personas que se muestran en la página, con foto y biografía.'] : null,
+            $permisos->tienePermiso('paginas_ver') ? ['Páginas', 'files-o', ['/admin/paginas/index', 'pagina' => 'nosotros'], 'Textos de Nosotros (y del Inicio), Estrategia y Gobierno y ESG.'] : null,
             $permisos->tienePermiso('configuracion_editar') ? ['Datos generales', 'globe', ['/admin/datos-generales/index'], 'Título, contacto, redes sociales y mapa de la página.'] : null,
             $superadmin ? ['Usuarios', 'users', ['/admin/usuarios/index'], 'Altas, bloqueos e historial del personal del panel.'] : null,
             $superadmin ? ['Roles y permisos', 'key', ['/admin/roles/index'], 'Qué puede hacer cada tipo de usuario.'] : null,

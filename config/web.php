@@ -137,6 +137,9 @@ $config = [
         'admin' => [
             'class' => 'app\modules\admin\Module',
         ],
+        'cuenta' => [
+    'class' => 'app\modules\cuenta\Module',
+]
     ],
     'params' => $params,
 ];
@@ -171,8 +174,13 @@ Yii::$container->set(\app\components\InterfaceEcosistemas::class, \app\component
 Yii::$container->set(\app\components\InterfaceConfiguracion::class, \app\components\ConfiguracionService::class);
 Yii::$container->set(\app\components\InterfaceBanners::class, \app\components\BannerService::class);
 Yii::$container->set(\app\components\InterfaceEquipo::class, \app\components\EquipoService::class);
-
-
+Yii::$container->set(\app\components\InterfacePaginas::class, \app\components\PaginasService::class);
+Yii::$container->set(\app\components\InterfaceProyecto::class, \app\components\ProyectoService::class);
+Yii::$container->set(\app\components\InterfaceMonedas::class, \app\components\MonedaService::class);
+Yii::$container->set(\app\components\InterfaceAvances::class, \app\components\AvanceService::class);
+Yii::$container->set(\app\components\InterfaceInversores::class, \app\components\InversorService::class);
+Yii::$container->set(\app\components\InterfaceNda::class, \app\components\NdaService::class);
+Yii::$container->set(\app\components\InterfaceInversiones::class, \app\components\InversionService::class);
 
 // --- Sistema anterior: los usa la web pública vieja (controllers/). Se sacan al limpiar la web. ---
 Yii::$container->set('app\components\InterfaceTarea', 'app\components\TareasService');

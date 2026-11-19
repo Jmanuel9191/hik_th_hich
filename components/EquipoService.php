@@ -121,6 +121,16 @@ class EquipoService implements InterfaceEquipo
         return ['exito' => true, 'mensaje' => $activar ? 'Activado.' : 'Desactivado.'];
     }
 
+    public function cambiarDestacado($id)
+    {
+        $model = $this->buscar($id);
+        $destacar = $model->destacado !== '1';
+        $model->updateAttributes(['destacado' => $destacar ? '1' : '0', 'fecha_actualizacion' => date('Y-m-d H:i:s')]);
+        EquipoHistorial::registrar($model->idmiembro, 'Destacado',
+            $destacar ? 'Marcado como destacado (sale en el Inicio y primero en Liderazgo)' : 'Ya no es destacado');
+        return ['exito' => true, 'mensaje' => $destacar ? 'Marcado como destacado.' : 'Ya no es destacado.'];
+    }
+
     public function mover($id, $direccion)
     {
         $model = $this->buscar($id);
@@ -159,4 +169,39 @@ class EquipoService implements InterfaceEquipo
             'pagination' => ['pageSize' => 10, 'pageParam' => 'hpage'],
         ]);
     }
+
+    public function exportar($params)
+    {
+        $search = new EquipoSearch();
+        $modelos = $search->search($params)->query->all();
+        $columnas = [
+            'Orden' => fn(Equipo $m) => $m->orden,
+            'Nombre' => fn($m) => $m->nombre,
+            'Puesto' => fn($m) => $m->puesto,
+            'Email' => fn($m) => $m->email,
+            'Teléfono' => fn($m) => $m->telefono,
+            'LinkedIn' => fn($m) => $m->linkedin,
+            'Facebook' => fn($m) => $m->facebook,
+            'Instagram' => fn($m) => $m->instagram,
+            'X / Twitter' => fn($m) => $m->twitter,
+            'Destacado' => fn($m) => $m->destacado === '1' ? 'Sí' : 'No',
+            'Visible en la web' => fn($m) => $m->estado === '1' ? 'Sí' : 'No',
+            'Biografía' => fn($m) => trim(html_entity_decode(strip_tags((string) $m->biografia), ENT_QUOTES | ENT_HTML5, 'UTF-8')),
+            'Fecha de registro' => fn($m) => $m->fecha_registro ? date('d/m/Y', strtotime($m->fecha_registro)) : '',
+        ];
+        $filtros = [];
+        foreach (['nombre' => 'Nombre', 'puesto' => 'Puesto'] as $c => $e) {
+            if ((string) $search->$c !== '') {
+                $filtros[] = $e . ': ' . $search->$c;
+            }
+        }
+        if ((string) $search->estado !== '') {
+            $filtros[] = 'Visible: ' . ($search->estado === '1' ? 'sí' : 'no');
+        }
+        if ((string) $search->destacado !== '') {
+            $filtros[] = 'Destacado: ' . ($search->destacado === '1' ? 'sí' : 'no');
+        }
+        return ['titulo' => 'Equipo', 'columnas' => $columnas, 'modelos' => $modelos, 'filtros' => $filtros];
+    }
+
 }

@@ -3,7 +3,7 @@
 /**
  * Header público HUK (estructura tipo Industo, colores HUK).
  * 3 piezas:
- *   1. Barra superior negra   (bienvenida · horario · redes · idioma)
+ *   1. Barra superior negra   (bienvenida · ciudad · redes · idioma)
  *   2. Franja principal       (logo + 3 datos de contacto + menú dorado con borde inclinado)
  *   3. Header compacto        (logo + menú) que baja al hacer scroll — lo activa huk.js
  * En celular: logo + botón ☰ que abre un menú lateral (offcanvas de Bootstrap).
@@ -11,6 +11,7 @@
  * @var \yii\web\View $this
  * @var callable $c        lector de configuración: $c('email')
  * @var string   $empresa
+ * @var string   $ubicacion  ciudad y país de la barra superior
  * @var ?string  $logoUrl
  * @var array    $menu     [['label'=>..., 'url'=>[...], 'items'=>[...]?], ...]
  * @var string   $ruta     controlador/acción actual
@@ -69,9 +70,10 @@ $logo = static function (string $clase) use ($logoUrl, $empresa): string {
     return Html::a($contenido, Url::home(), ['class' => 'huk-brand', 'aria-label' => $empresa . ' - Inicio']);
 };
 
-$botonCuenta = Yii::$app->user->isGuest
-    ? Html::a('Acceso inversores <i class="fa-solid fa-arrow-right ms-1" aria-hidden="true"></i>', ['cuenta/login'], ['class' => 'huk-hd-cta'])
-    : Html::a('<i class="fa-solid fa-user me-1" aria-hidden="true"></i> Mi cuenta', ['cuenta/index'], ['class' => 'huk-hd-cta']);
+// Sesión de inversores (módulo cuenta, aparte de la sesión vieja de la web).
+$botonCuenta = \app\modules\cuenta\Module::sesion()->isGuest
+    ? Html::a('Acceso inversores <i class="fa-solid fa-arrow-right ms-1" aria-hidden="true"></i>', ['/cuenta/acceso/ingresar'], ['class' => 'huk-hd-cta'])
+    : Html::a('<i class="fa-solid fa-user me-1" aria-hidden="true"></i> Mi cuenta', ['/cuenta/panel/index'], ['class' => 'huk-hd-cta']);
 
 $telefonoLink = 'tel:' . preg_replace('/[^0-9+]/', '', $c('telefono_empresa'));
 
@@ -97,10 +99,8 @@ $flagUrl = static fn (string $archivo): string => Url::to('@web/assets_b/img/fla
     <div class="container">
         <p class="huk-hd-welcome mb-0">BIENVENIDO A <b><?= Html::encode($empresa) ?></b></p>
         <div class="huk-hd-top-right">
-            <?php if ($c('horarios')): ?>
-                <span class="huk-hd-hours d-none d-md-inline"><i class="fa-regular fa-clock me-2" aria-hidden="true"></i><?= Html::encode($c('horarios')) ?></span>
-                <span class="huk-hd-slash d-none d-md-inline-block" aria-hidden="true"></span>
-            <?php endif; ?>
+            <span class="huk-hd-hours d-none d-md-inline"><i class="fa-solid fa-location-dot me-2" aria-hidden="true"></i><?= Html::encode($ubicacion) ?></span>
+            <span class="huk-hd-slash d-none d-md-inline-block" aria-hidden="true"></span>
             <?php if ($redes): ?>
                 <div class="huk-hd-social">
                     <?php foreach ($redes as $icono => $url): ?>
@@ -147,7 +147,7 @@ $flagUrl = static fn (string $archivo): string => Url::to('@web/assets_b/img/fla
                 <?php if ($c('direccion_empresa')): ?>
                     <div class="huk-hd-info-item">
                         <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-                        <span><b>Dirección</b><?= $c('direccion_empresa') ?></span>
+                        <span><b>Dirección</b><?= Html::encode($c('direccion_empresa')) ?></span>
                     </div>
                 <?php endif; ?>
                 <?php if ($c('email')): ?>

@@ -332,6 +332,96 @@ class CorreoService implements InterfaceCorreos
         return $this->enviarHuk($usuario->email, 'Recuperación de contraseña', $cuerpo);
     }
 
+    /* ===================== INVERSORES (web) ===================== */
+
+    private function urlCuentaInversor(): string
+    {
+        return Url::to(['/cuenta/acceso/ingresar'], true);
+    }
+
+    /** Enlace para copiar si el botón no anda. */
+    private function enlaceTexto(string $enlace): string
+    {
+        return Html::tag('p', 'Si el botón no funciona, copiá este enlace en tu navegador:', ['style' => 'color: #ffffff; margin: 0 0 6px;'])
+            . Html::tag('p', Html::encode($enlace), ['style' => 'color: #e6c27a; word-break: break-all; font-size: 13px; margin: 0 0 14px;']);
+    }
+
+    /** Registro desde la web: confirmar el correo. */
+    public function enviarCorreoVerificacionInversor($usuario, $enlace)
+    {
+        $cuerpo = $this->cuerpoHuk('Confirmá tu correo', [
+            'Hola <strong>' . Html::encode($usuario->nombrecompleto) . '</strong>, gracias por tu interés en invertir con nosotros.',
+            'Para enviar tu solicitud, confirmá tu correo con el botón. El enlace vence en <strong>24 horas</strong>.',
+        ], ['Confirmar mi correo', $enlace]) . $this->enlaceTexto($enlace)
+            . Html::tag('p', 'Si no hiciste este registro, ignorá este mensaje.', ['style' => 'color: #ffffff; margin: 0 0 14px;']);
+        return $this->enviarHuk($usuario->email, 'Confirmá tu correo', $cuerpo);
+    }
+
+    /** Alta desde el panel: el inversor crea su contraseña. */
+    public function enviarCorreoActivacionInversor($usuario, $enlace)
+    {
+        $cuerpo = $this->cuerpoHuk('Activá tu cuenta de inversor', [
+            'Hola <strong>' . Html::encode($usuario->nombrecompleto) . '</strong>, nuestro equipo registró tu solicitud de inversor.',
+            'Para entrar a la plataforma, creá tu contraseña con el botón. El enlace vence en <strong>72 horas</strong> y sirve una sola vez.',
+        ], ['Crear mi contraseña', $enlace]) . $this->enlaceTexto($enlace);
+        return $this->enviarHuk($usuario->email, 'Activá tu cuenta de inversor', $cuerpo);
+    }
+
+    public function enviarCorreoRecuperacionInversor($usuario, $enlace)
+    {
+        $cuerpo = $this->cuerpoHuk('Recuperación de contraseña', [
+            'Hola <strong>' . Html::encode($usuario->nombrecompleto) . '</strong>, recibimos una solicitud para restablecer tu contraseña.',
+            'Hacé clic en el botón para crear una nueva. El enlace vence en <strong>30 minutos</strong> y sirve una sola vez.',
+        ], ['Crear nueva contraseña', $enlace]) . $this->enlaceTexto($enlace)
+            . Html::tag('p', 'Si no pediste este cambio, ignorá este mensaje: tu contraseña actual sigue funcionando.', ['style' => 'color: #ffffff; margin: 0 0 14px;']);
+        return $this->enviarHuk($usuario->email, 'Recuperación de contraseña', $cuerpo);
+    }
+
+    /** Aviso al distribuidor: hay una solicitud nueva para revisar. */
+    public function enviarCorreoNuevaSolicitudInversor(array $emails, $usuario, $enlacePanel)
+    {
+        $cuerpo = $this->cuerpoHuk('Nueva solicitud de inversor', [
+            '<strong>' . Html::encode($usuario->nombrecompleto) . '</strong> (' . Html::encode($usuario->email) . ') confirmó su correo y su solicitud está <strong>pendiente de revisión</strong>.',
+            'Revisala en el panel para coordinar con la persona, asignarle áreas y aprobarla o rechazarla.',
+        ], ['Ver la solicitud', $enlacePanel]);
+        $ok = true;
+        foreach (array_unique($emails) as $email) {
+            $ok = $this->enviarHuk($email, 'Nueva solicitud de inversor', $cuerpo) && $ok;
+        }
+        return $ok;
+    }
+
+    public function enviarCorreoInversorAprobado($usuario, array $areas)
+    {
+        $lista = implode('<br>', array_map(fn($a) => '• ' . Html::encode($a), $areas));
+        $cuerpo = $this->cuerpoHuk('¡Tu solicitud fue aprobada!', array_values(array_filter([
+            'Hola <strong>' . Html::encode($usuario->nombrecompleto) . '</strong>, ya podés ver los proyectos de estas áreas:',
+            $lista !== '' ? $this->recuadroHuk($lista) : null,
+            'Al entrar por primera vez vas a leer y aceptar el acuerdo de confidencialidad.',
+        ])), ['Entrar a mi cuenta', $this->urlCuentaInversor()]);
+        return $this->enviarHuk($usuario->email, 'Tu solicitud fue aprobada', $cuerpo);
+    }
+
+    public function enviarCorreoInversorRechazado($usuario, $motivo)
+    {
+        $cuerpo = $this->cuerpoHuk('Sobre tu solicitud de inversor', [
+            'Hola <strong>' . Html::encode($usuario->nombrecompleto) . '</strong>, gracias por tu interés. Por ahora no pudimos aprobar tu solicitud.',
+            $this->recuadroHuk('<strong>Motivo:</strong> ' . Html::encode($motivo)),
+            'Si querés más información, respondé este correo o escribinos por los medios de contacto de la web.',
+        ]);
+        return $this->enviarHuk($usuario->email, 'Sobre tu solicitud de inversor', $cuerpo);
+    }
+
+    public function enviarCorreoCuentaInversor($usuario, $bloqueada, $motivo)
+    {
+        $cuerpo = $this->cuerpoHuk($bloqueada ? 'Tu cuenta fue suspendida' : 'Tu cuenta fue reactivada', [
+            'Hola <strong>' . Html::encode($usuario->nombrecompleto) . '</strong>, ' . ($bloqueada
+                ? 'suspendimos el acceso a tu cuenta de inversor.' : 'tu cuenta de inversor vuelve a estar activa.'),
+            $this->recuadroHuk('<strong>Motivo:</strong> ' . Html::encode($motivo)),
+        ], $bloqueada ? null : ['Entrar a mi cuenta', $this->urlCuentaInversor()]);
+        return $this->enviarHuk($usuario->email, $bloqueada ? 'Tu cuenta fue suspendida' : 'Tu cuenta fue reactivada', $cuerpo);
+    }
+
     /** Bloqueo automático por intentos fallidos. */
     public function enviarCorreoDeBloqueoporintentos($id)
     {

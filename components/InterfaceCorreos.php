@@ -44,6 +44,15 @@ interface InterfaceCorreos
 
 
     public function enviarCorreoRecuperacion($id, $enlace);
+
+    /* Inversores (web) */
+    public function enviarCorreoVerificacionInversor($usuario, $enlace);
+    public function enviarCorreoActivacionInversor($usuario, $enlace);
+    public function enviarCorreoRecuperacionInversor($usuario, $enlace);
+    public function enviarCorreoNuevaSolicitudInversor(array $emails, $usuario, $enlacePanel);
+    public function enviarCorreoInversorAprobado($usuario, array $areas);
+    public function enviarCorreoInversorRechazado($usuario, $motivo);
+    public function enviarCorreoCuentaInversor($usuario, $bloqueada, $motivo);
     public function enviarCorreoDesbloqueoPorIntentos($usuario);
     public function enviarCorreoDeBloqueoporintentos($id);
     public function enviarCorreoRechazoRecurso($recurso, $comentario, $destinatarios);

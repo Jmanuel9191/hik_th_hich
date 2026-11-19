@@ -11,12 +11,13 @@ class EquipoSearch extends Model
     public $nombre;
     public $puesto;
     public $estado;
+    public $destacado;
 
     public function rules()
     {
         return [
             [['nombre', 'puesto'], 'string', 'max' => 150],
-            [['estado'], 'in', 'range' => ['0', '1']],
+            [['estado', 'destacado'], 'in', 'range' => ['0', '1']],
         ];
     }
 
@@ -29,7 +30,8 @@ class EquipoSearch extends Model
         }
         $query->andFilterWhere(['like', 'nombre', $this->nombre])
             ->andFilterWhere(['like', 'puesto', $this->puesto])
-            ->andFilterWhere(['estado' => $this->estado]);
+            ->andFilterWhere(['estado' => $this->estado])
+            ->andFilterWhere(['destacado' => $this->destacado]);
         return $dp;
     }
 }

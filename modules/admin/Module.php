@@ -20,7 +20,7 @@ class Module extends \yii\base\Module
      * (los del sistema anterior: órdenes, doctores, inventario, etc.) responde 404.
      * Para volver a activar uno, agregalo acá.
      */
-    const CONTROLADORES_ACTIVOS = ['default', 'cuenta', 'usuarios', 'ecosistemas', 'roles', 'datos-generales', 'banners', 'equipo'];
+    const CONTROLADORES_ACTIVOS = ['default', 'cuenta', 'usuarios', 'ecosistemas', 'roles', 'datos-generales', 'banners', 'equipo', 'paginas', 'banco-proyectos', 'monedas', 'inversores', 'nda', 'inversiones'];
     //public $basePath = '@webroot/admin/';
 
     /**

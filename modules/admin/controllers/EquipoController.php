@@ -13,7 +13,7 @@ use yii\web\Response;
 
 /**
  * Equipo que se muestra en la web. Permisos equipo_* (Superadmin y Editor de contenido por defecto).
- * Estado, orden y eliminar responden JSON (huk-listado.js).
+ * Estado, destacado, orden y eliminar responden JSON (huk-listado.js).
  */
 class EquipoController extends Controller
 {
@@ -36,7 +36,7 @@ class EquipoController extends Controller
             ],
             'verbs' => [
                 'class' => VerbFilter::class,
-                'actions' => ['estado' => ['POST'], 'mover' => ['POST'], 'delete' => ['POST']],
+                'actions' => ['estado' => ['POST'], 'destacar' => ['POST'], 'mover' => ['POST'], 'delete' => ['POST']],
             ],
         ];
     }
@@ -45,6 +45,18 @@ class EquipoController extends Controller
     {
         $this->permisos->verificarPermiso('equipo_listar');
         return $this->render('index', $this->equipo->listar(Yii::$app->request->queryParams) + $this->puede());
+    }
+
+    /** Exporta el listado (con los filtros que tenga) a xlsx, csv o pdf. */
+    public function actionExportar($formato = 'xlsx')
+    {
+        $this->permisos->verificarPermiso('equipo_exportar');
+        if (!isset(\app\components\Exportador::FORMATOS[$formato])) {
+            throw new \yii\web\BadRequestHttpException('Formato no válido.');
+        }
+        $d = $this->equipo->exportar(Yii::$app->request->queryParams);
+        Yii::info('Exportación de equipo (' . $formato . ', ' . count($d['modelos']) . ' registros) por #' . Yii::$app->user->id, 'exportar');
+        return \app\components\Exportador::enviar($d['titulo'], $d['columnas'], $d['modelos'], $formato, $d['filtros']);
     }
 
     public function actionView($id)
@@ -73,6 +85,13 @@ class EquipoController extends Controller
         $this->permisos->verificarPermiso('equipo_estado');
         Yii::$app->response->format = Response::FORMAT_JSON;
         return $this->equipo->cambiarEstado($id);
+    }
+
+    public function actionDestacar($id)
+    {
+        $this->permisos->verificarPermiso('equipo_editar');
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return $this->equipo->cambiarDestacado($id);
     }
 
     public function actionMover($id, $direccion)
@@ -106,6 +125,7 @@ class EquipoController extends Controller
         $p = $this->permisos;
         return ['puede' => [
             'crear' => $p->tienePermiso('equipo_crear'),
+            'exportar' => $p->tienePermiso('equipo_exportar'),
             'editar' => $p->tienePermiso('equipo_editar'),
             'estado' => $p->tienePermiso('equipo_estado'),
             'eliminar' => $p->tienePermiso('equipo_eliminar'),

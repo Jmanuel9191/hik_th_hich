@@ -47,6 +47,8 @@ $fecha = [
             <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-font"></i> Textos y botón</h3></div>
             <div class="box-body">
                 <p class="text-muted">Todo es opcional: si lo dejás vacío, el banner muestra solo la imagen.</p>
+                <?= $form->field($model, 'antetitulo')->textInput(['maxlength' => 120, 'placeholder' => 'Ej.: HUK-THE-ICHI GLOBAL GROUP · ONE VISION'])
+                    ->hint('Texto corto en dorado, arriba del título (sale en mayúsculas).') ?>
                 <?= $form->field($model, 'titulo')->textInput(['maxlength' => 150]) ?>
                 <?= $form->field($model, 'texto')->textarea(['rows' => 3, 'maxlength' => 400]) ?>
                 <div class="row">

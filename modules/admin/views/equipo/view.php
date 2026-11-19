@@ -97,6 +97,8 @@ $fecha = fn($v) => $v ? date('d/m/Y H:i', strtotime($v)) : '—';
                                     ['label' => 'Estado', 'format' => 'raw', 'value' => $model->estado === '1'
                                         ? Html::tag('span', 'Activo (se muestra en la web)', ['class' => 'label label-success'])
                                         : Html::tag('span', 'Inactivo', ['class' => 'label label-default'])],
+                                    ['attribute' => 'destacado', 'format' => 'raw', 'value' => $model->destacado === '1'
+                                        ? '<i class="fa fa-star huk-estrella is-activa"></i> Sí (Inicio y Liderazgo)' : 'No'],
                                     'puesto',
                                     ['attribute' => 'telefono', 'value' => $model->telefono ?: '—'],
                                     ['attribute' => 'email', 'value' => $model->email ?: '—'],

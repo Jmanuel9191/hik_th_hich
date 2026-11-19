@@ -9,6 +9,9 @@ interface InterfaceBanners
     /** @return array ['searchModel' => BannersSearch, 'dataProvider' => ActiveDataProvider, 'extremos' => [min, max] del orden] */
     public function listar($params);
 
+    /** Para la web: los banners que se muestran hoy (activos y dentro de sus fechas), en orden. @return Banners[] */
+    public function paraWeb();
+
     /** Banner o 404. */
     public function buscar($id): Banners;
 

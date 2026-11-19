@@ -44,7 +44,8 @@ $mapaActual = DatosGeneralesForm::extraerMapa($model->mapa);
                     <?= $form->field($model, 'titulo_pagina')->textInput(['maxlength' => 200])
                         ->hint('Es el nombre que aparece en la pestaña del navegador y en Google.') ?>
                     <?= $form->field($model, 'nombre_empresa')->textInput(['maxlength' => 200]) ?>
-                    <?= $form->field($model, 'direccion_empresa', $icono('map-marker'))->textInput(['maxlength' => 250]) ?>
+                     <?= $form->field($model, 'nombre_empresa')->textInput(['maxlength' => 200]) ?>
+                   <?= $form->field($model, 'meta_descripcion', $icono('map-marker'))->textInput(['maxlength' => 500]) ?>
                     <?= $form->field($model, 'horarios', $icono('clock-o'))->textInput(['maxlength' => 500])
                         ->hint('Ej.: Lun a Vie: 09:00 a 18:00') ?>
                 </div>

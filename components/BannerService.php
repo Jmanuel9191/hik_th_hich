@@ -16,7 +16,7 @@ use yii\web\UploadedFile;
  */
 class BannerService implements InterfaceBanners
 {
-    const CAMPOS_TEXTO = ['titulo', 'texto', 'boton_texto', 'boton_url', 'fecha_inicio', 'fecha_fin'];
+    const CAMPOS_TEXTO = ['antetitulo', 'titulo', 'texto', 'boton_texto', 'boton_url', 'fecha_inicio', 'fecha_fin'];
 
     public function listar($params)
     {
@@ -27,6 +27,11 @@ class BannerService implements InterfaceBanners
             // Para no mostrar ↑ en el primero ni ↓ en el último
             'extremos' => [(int) Banners::find()->min('orden'), (int) Banners::find()->max('orden')],
         ];
+    }
+
+    public function paraWeb()
+    {
+        return Banners::vigentes()->all();
     }
 
     public function buscar($id): Banners

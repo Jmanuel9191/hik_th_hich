@@ -9,6 +9,8 @@ interface InterfaceEcosistemas
     public function puedeGestionar($ecosistema);
     public function guardar($model, $post);
     public function cambiarEstado($id);
+    /** Marca o quita "Destacado" (prioritario 2026–2035). */
+    public function cambiarDestacado($id);
     public function subirGaleria($id);
     public function borrarImagenGaleria($idimagen);
     public function historial($id);

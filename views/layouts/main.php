@@ -19,12 +19,20 @@ AppAsset::register($this);
 $cfg = Configuracion::find()->asArray()->one() ?? [];
 $c = static fn (string $k): string => trim((string) ($cfg[$k] ?? ''));
 
-$empresa = $c('nombre_empresa') ?: 'HUK-THE-ICHI GLOBAL GROUP';
+$empresa = $c('titulo_pagina') ?: 'HUK-THE-ICHI GLOBAL GROUP';
+
+// Texto y lemas del pie: Panel → Páginas → Nosotros → Pie de página (si el bloque está oculto, no se muestran).
+$pie = \app\models\PaginaSeccion::findOne(['pagina' => 'nosotros', 'clave' => 'pie', 'estado' => '1']);
 
 // Logo y favicon: si el archivo no existe, no se pide (evita el 404).
 $web = Yii::getAlias('@webroot');
 $logoUrl = is_file($web . '/assets_b/img/logo.png') ? Url::to('@web/assets_b/img/logo.png') : null;
+$logoUrlf = is_file($web . '/assets_b/img/logo-footer.png') ? Url::to('@web/assets_b/img/logo-footer.png') : null;
 $faviconUrl = is_file($web . '/assets_b/img/favicon.png') ? Url::to('@web/assets_b/img/favicon.png') : null;
+$fenixUrl = is_file($web . '/assets_b/img/fenix.gif') ? Url::to('@web/assets_b/img/fenix.gif') : null;
+
+// Ciudad y país: barra superior del header y footer. Editalo acá.
+$ubicacion = 'Santa Cruz, Bolivia';
 
 // Menú principal: editá rutas y textos acá.
 $ruta = Yii::$app->controller->id . '/' . Yii::$app->controller->action->id;
@@ -33,13 +41,16 @@ $esPanel = Yii::$app->controller->module->id === 'cuenta';
 if (!$esPanel) {
     GTranslateAsset::register($this); // traductor: solo en el sitio público
 }
+// Ecosistemas activos del panel (por número): submenú del header y columna del footer.
+$ecosistemas = \app\models\Ecosistema::paraWeb()->orderBy(['numero' => SORT_ASC])->all();
+$linksEcosistemas = array_map(static fn ($e) => ['label' => $e->nombre, 'url' => ['site/ecosistema', 'slug' => $e->slug]], $ecosistemas);
+
 $menu = [
     ['label' => 'Inicio',      'url' => ['site/index']],
-    ['label' => 'Nosotros',    'url' => ['site/nosotros'], 'items' => [
-        ['label' => 'Quiénes somos', 'url' => ['site/nosotros']],
-        ['label' => 'Equipo',        'url' => ['site/equipo']],
-    ]],
-    ['label' => 'Ecosistemas', 'url' => ['site/ecosistemas']],
+    ['label' => 'Nosotros',    'url' => ['site/nosotros']],
+    ['label' => 'Ecosistemas', 'url' => ['site/ecosistemas'], 'items' => $linksEcosistemas, 'enFooter' => false],
+    ['label' => 'Proyectos',   'url' => ['site/proyectos']],
+    ['label' => 'Expansión',   'url' => ['site/expansion']],
     ['label' => 'Contacto',    'url' => ['site/contacto']],
 ];
 
@@ -77,76 +88,87 @@ $red = static function (string $icono, string $url, string $clase): string {
 </head>
 <body>
 <?php $this->beginBody() ?>
+<div class="huk-progress" aria-hidden="true"></div>
 
 <?= $this->render('_header', [
-    'c' => $c, 'empresa' => $empresa, 'logoUrl' => $logoUrl, 'menu' => $menu,
+    'c' => $c, 'empresa' => $empresa, 'ubicacion' => $ubicacion, 'logoUrl' => $logoUrl, 'menu' => $menu,
     'ruta' => $ruta, 'redes' => $redes, 'red' => $red, 'esPanel' => $esPanel,
 ]) ?>
 
 <main id="contenido">
     <?= $content ?>
+    <!-- Líneas de fondo con trazos que suben y bajan (CSS sección 20 · huk.js punto 13). Empiezan debajo del banner. -->
+    <div class="huk-lineas" aria-hidden="true" data-lineas>
+        <div class="container"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
 </main>
 
-<!-- Footer -->
-<footer class="container-fluid footer bg-dark py-5">
-    <div class="container py-5">
-        <div class="row g-5">
-            <div class="col-md-6 col-xl-4">
-                <h3 class="text-white mb-4"><?= Html::encode($empresa) ?></h3>
-                <p class="mb-3">Sembramos progreso, extraemos futuro.</p>
+<!-- Footer (estructura de la plantilla, colores HUK) -->
+<footer class="huk-ft">
+    <div class="container">
+        <div class="huk-ft-cols">
+            <div data-reveal="left">
+                <?= Html::a($logoUrlf ? Html::img($logoUrlf, ['alt' => $empresa]) : Html::tag('span', Html::encode($empresa), ['class' => 'huk-logo-text']), Url::home(), ['class' => 'huk-ft-logo', 'aria-label' => $empresa . ' - Inicio']) ?>
+                <?php if ($pie && $pie->texto): ?>
+                    <p class="huk-ft-texto"><?= nl2br(Html::encode($pie->texto)) ?></p>
+                <?php endif; ?>
+                <?php if ($pie && $pie->frase): ?>
+                    <p class="huk-ft-lema"><?= Html::encode($pie->frase) ?></p>
+                <?php endif; ?>
                 <?php if ($redes): ?>
-                    <div class="d-flex">
+                    <div class="huk-ft-redes">
                         <?php foreach ($redes as $icono => $url): ?>
-                            <?= $red($icono, $url, 'btn btn-light btn-md-square me-2') ?>
+                            <?= $red($icono, $url, '') ?>
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
             </div>
-            <div class="col-md-6 col-xl-4">
-                <div class="footer-item d-flex flex-column">
-                    <h4 class="text-white mb-4">Enlaces</h4>
-                    <?php foreach ($menu as $item): ?>
-                        <?php foreach ($item['items'] ?? [$item] as $link): ?>
-                            <?= Html::a(Html::encode($link['label']), $link['url']) ?>
-                        <?php endforeach; ?>
-                    <?php endforeach; ?>
-                </div>
+
+            <div data-reveal="left" data-reveal-delay="150">
+                <h5>Información</h5>
+                <?php if ($c('telefono_empresa')): ?>
+                    <?= Html::a('<i class="fa-solid fa-phone" aria-hidden="true"></i><span>' . Html::encode($c('telefono_empresa')) . '</span>', 'tel:' . preg_replace('/[^0-9+]/', '', $c('telefono_empresa')), ['class' => 'huk-ft-dato']) ?>
+                <?php endif; ?>
+                <?php if ($c('email')): ?>
+                    <?= Html::a('<i class="fa-solid fa-envelope" aria-hidden="true"></i><span>' . Html::encode($c('email')) . '</span>', 'mailto:' . $c('email'), ['class' => 'huk-ft-dato']) ?>
+                <?php endif; ?>
+                <p class="huk-ft-dato">
+                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                    <span><?php if ($c('direccion_empresa')): ?><?= Html::encode($c('direccion_empresa')) ?><br><?php endif; ?><?= Html::encode($ubicacion) ?></span>
+                </p>
+
             </div>
-            <div class="col-md-6 col-xl-4">
-                <div class="footer-item d-flex flex-column">
-                    <h4 class="text-white mb-4">Contacto</h4>
-                    <?php if ($c('direccion_empresa')): ?>
-                        <span><i class="fa-solid fa-location-dot text-primary me-2" aria-hidden="true"></i><?= Html::encode($c('direccion_empresa')) ?></span>
-                    <?php endif; ?>
-                    <?php if ($c('email')): ?>
-                        <?= Html::mailto('<i class="fa-solid fa-envelope text-primary me-2" aria-hidden="true"></i>' . Html::encode($c('email')), $c('email')) ?>
-                    <?php endif; ?>
-                    <?php if ($c('telefono_empresa')): ?>
-                        <?= Html::a(
-                            '<i class="fa-solid fa-phone text-primary me-2" aria-hidden="true"></i>' . Html::encode($c('telefono_empresa')),
-                            'tel:' . preg_replace('/[^0-9+]/', '', $c('telefono_empresa'))
-                        ) ?>
-                    <?php endif; ?>
-                </div>
+
+            <div data-reveal="right" data-reveal-delay="150">
+                <h5>Ecosistemas</h5>
+                <?php foreach ($linksEcosistemas as $link): ?>
+                    <?= Html::a(Html::encode($link['label']), $link['url']) ?>
+                <?php endforeach; ?>
             </div>
+
+            <div data-reveal="right">
+                <h5>Enlaces</h5>
+                <?php foreach ($menu as $item): ?>
+                    <?php if ($item['enFooter'] ?? true): ?>
+                        <?= Html::a(Html::encode($item['label']), $item['url']) ?>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+                <?= Html::a('Acceso inversores', ['/cuenta/acceso/ingresar']) ?>
+            </div>
+        </div>
+
+        <?php if ($fenixUrl): ?>
+            <div class="huk-ft-fenix" data-reveal="nada" data-reveal-delay="200"><img src="<?= $fenixUrl ?>" alt="Emblema HUK-THE-ICHI" width="110" height="132" loading="lazy"></div>
+        <?php endif; ?>
+
+        <div class="huk-ft-bot" data-reveal data-reveal-delay="300">
+        <span class="huk-ft-bot-lema">&copy; <?= date('Y') ?>  <?= Html::encode($empresa) ?></span>
+            <?php /* Licencia gratuita de HTML Codex: este crédito NO se puede quitar
+                     salvo que se compre la licencia de remoción. */ ?>
+            <span>Desarrollado por <a href="#" rel="noopener" target="_blank">Zebra Brand Consulting</a></span>
         </div>
     </div>
 </footer>
-
-<div class="container-fluid copyright py-4">
-    <div class="container">
-        <div class="row g-4 align-items-center">
-            <div class="col-md-6 text-center text-md-start">
-                <span class="text-body">&copy; <?= date('Y') ?> <?= Html::encode($empresa) ?>. Todos los derechos reservados.</span>
-            </div>
-            <div class="col-md-6 text-center text-md-end text-body">
-                <?php /* Licencia gratuita de HTML Codex: este crédito NO se puede quitar
-                         salvo que se compre la licencia de remoción. */ ?>
-                Designed By <a class="border-bottom text-white" href="https://htmlcodex.com" rel="noopener">HTML Codex</a>
-            </div>
-        </div>
-    </div>
-</div>
 
 <a href="#" class="huk-back-top" aria-label="Volver arriba"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></a>
 <?php $this->endBody() ?>

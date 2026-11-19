@@ -17,6 +17,7 @@ class EcosistemasAdminAsset extends AssetBundle
 
     public $js = [
         'js/huk-ecosistemas.js',
+        'js/huk-listado.js', // botón Destacado
     ];
 
     public $depends = [

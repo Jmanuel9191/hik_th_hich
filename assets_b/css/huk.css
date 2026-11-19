@@ -30,15 +30,15 @@
   --huk-gold-grad:   linear-gradient(135deg,#e6c27a 0%,#b8954f 50%,#8a6a2e 100%);
 
   /* Oscuros */
-  --huk-ink:         #040404;   /* header, footer, secciones oscuras */
+  --huk-ink:         #0b0b0b;   /* header, footer, secciones oscuras */
   --huk-ink-2:       #161616;
   --huk-ink-3:       #2a2a2a;   /* líneas sobre oscuro */
   --huk-brown:       #2b2418;   /* degradados cálidos */
-  --huk-sand:        #a9a290;   /* texto suave sobre oscuro */
+  --huk-sand:        #bbb7ad;   /* texto suave sobre oscuro */
   --huk-dark-grad:   radial-gradient(circle at 78% 40%,#3a2d14 0,#0b0b0b 62%);
 
   /* Claros */
-  --huk-bg:          #f4f1ea;   /* fondo de página */
+  --huk-bg:          white;   /* fondo de página */
   --huk-card:        #ffffff;
   --huk-text:        #111111;
   --huk-muted:       #6b665c;
@@ -100,7 +100,7 @@ img{max-width:100%;height:auto}
 
 .btn{font-family:var(--huk-font-body);font-weight:600;letter-spacing:.02em;border-radius:var(--huk-radius);transition:all var(--huk-speed) var(--huk-ease)}
 .btn-primary,.btn.btn-primary{background:var(--huk-gold-grad);background-size:160% 160%;background-position:0 0;border:0;color:#0b0b0b}
-.btn-primary:hover,.btn.btn-primary:hover,.btn-primary:focus{background-position:100% 100%;color:#0b0b0b;box-shadow:0 8px 20px rgba(var(--huk-gold-rgb),.35)}
+.btn-primary:hover,.btn.btn-primary:hover,.btn-primary:focus{background-position:100% 100%;color:#caa65f;box-shadow:0 8px 20px rgba(var(--huk-gold-rgb),.35)}
 .btn-outline-primary{color:var(--huk-gold-dark);border-color:var(--huk-gold)}
 .btn-outline-primary:hover{background:var(--huk-gold);border-color:var(--huk-gold);color:#0b0b0b}
 .btn-dark,.btn.btn-dark{background:var(--huk-ink);border-color:var(--huk-ink);color:var(--huk-gold-light)}
@@ -213,13 +213,7 @@ img{max-width:100%;height:auto}
 .huk-steps span b{color:var(--huk-gold)}
 .huk-steps span:hover{border-color:var(--huk-gold);transform:translateY(-2px)}
 
-/* Footer */
-.huk-footer{background:var(--huk-ink);color:var(--huk-sand);padding:4.5rem 0 0}
-.huk-footer h4{color:#fff;font-size:1.2rem;margin-bottom:1.2rem}
-.huk-footer h4::after{content:"";display:block;width:34px;height:2px;background:var(--huk-gold);margin-top:.5rem}
-.huk-footer a{color:var(--huk-sand)}
-.huk-footer a:hover{color:var(--huk-gold-light)}
-.huk-footer .huk-copy{border-top:1px solid var(--huk-ink-3);margin-top:3rem;padding:1.25rem 0;text-align:center;font-size:.8rem}
+/* Footer: ver sección 12 */
 
 /* Selector de idioma (GTranslate) */
 .huk-lang select,.huk-lang .gt_selector{background:var(--huk-ink-2);color:#f3efe6;border:1px solid var(--huk-ink-3);border-radius:var(--huk-radius);padding:.3rem .5rem;font-size:.8rem}
@@ -391,7 +385,7 @@ img{max-width:100%;height:auto}
 .huk-auth .huk-auth-side{background:var(--huk-dark-grad);color:#f3efe6;padding:3rem;display:flex;flex-direction:column;justify-content:flex-end}
 .huk-auth .huk-auth-form{display:flex;align-items:center;justify-content:center;padding:3rem 1.5rem;background:var(--huk-bg)}
 .huk-auth .huk-auth-form > div{width:100%;max-width:420px}
-@media (max-width:767.98px){.huk-auth{grid-template-columns:1fr}.huk-auth .huk-auth-side{display:none}}
+@media (max-width:768px){.huk-auth{grid-template-columns:1fr}.huk-auth .huk-auth-side{display:none}}
 
 /* 8. ACCESIBILIDAD Y MOVIMIENTO REDUCIDO ---------------------------------- */
 :focus-visible{outline:2px solid var(--huk-gold);outline-offset:3px}
@@ -407,7 +401,7 @@ img{max-width:100%;height:auto}
 :root{--huk-nav-h:64px;--huk-nav-overlap:32px;--huk-nav-bg:#bd944f}
 
 /* 9.1 Barra superior */
-.huk-hd-top{background:#0b0b0b;color:var(--huk-sand);font-size:.85rem}
+.huk-hd-top{background:#000000;color:var(--huk-sand);font-size:.85rem}
 .huk-hd-top .container{display:flex;justify-content:space-between;align-items:center;gap:1rem;min-height:46px}
 .huk-hd-top b{color:var(--huk-gold);font-weight:600}
 .huk-hd-top-right{display:flex;align-items:center;gap:1.25rem}
@@ -420,28 +414,27 @@ img{max-width:100%;height:auto}
 /* 9.2 Franja principal: logo + datos de contacto */
 .huk-hd-main{background:var(--huk-ink);position:relative;z-index:20;overflow-x:clip}
 .huk-hd-main>.container{position:relative}
-.huk-hd-brandrow{display:flex;align-items:flex-start;justify-content:space-between;gap:2rem;padding:1.25rem 0 calc(var(--huk-nav-overlap) + 1.1rem);  padding-bottom: 25px;
-    padding-top: 25px;}
+.huk-hd-brandrow{display:flex;align-items:flex-start;justify-content:space-between;gap:2rem;padding:1.25rem 0 calc(var(--huk-nav-overlap) + 1.1rem);  padding-bottom: 30px;
+    padding-top: 30px;}
 .huk-hd-brandrow>.huk-brand{align-self:center;margin-top:calc(var(--huk-nav-overlap) * .5)}
 .huk-brand{display:inline-flex;align-items:center;flex-shrink:0}
-.huk-logo{    max-height: 72px;
-    width: auto;
-    margin-top: -20px}
-.huk-logo-sm{max-height:46px;width:auto}
+/* Logo con ancho fijo: con max-width en % el enlace quedaba del ancho real del PNG (500px) y empujaba los datos */
+.huk-logo{width:300px;max-width:100%;height:auto;margin-top:-20px}
+.huk-logo-sm{max-height:40px;width:auto}
 .huk-logo-text{font-family:var(--huk-font-head);font-weight:700;font-size:1.4rem;color:var(--huk-gold);letter-spacing:.03em}
-.huk-hd-info{display:flex;gap:2.25rem}
-.huk-hd-info-item{display:flex;align-items:center;gap:.85rem;color:var(--huk-sand);font-size:.9rem;line-height:1.35}
+.huk-hd-info{display:flex;gap:1.8rem}
+.huk-hd-info-item{display:flex;align-items:center;gap:.85rem;color:var(--huk-sand);font-size:.8rem;line-height:1.35}
 a.huk-hd-info-item:hover{color:var(--huk-gold-light)}
-.huk-hd-info-item i{font-size:1.9rem;color:var(--huk-gold);width:2.2rem;text-align:center;transition:transform var(--huk-speed) var(--huk-ease)}
+.huk-hd-info-item i{font-size:1.5rem;color:var(--huk-gold);width:2.2rem;text-align:center;transition:transform var(--huk-speed) var(--huk-ease)}
 .huk-hd-info-item:hover i{transform:scale(1.1) rotate(-6deg)}
-.huk-hd-info-item b{display:block;color:#fff;font-size:1rem;font-weight:600}
+.huk-hd-info-item b{display:block;color:#fff;font-size:0.9rem;font-weight:600}
 
 /* 9.3 Menú dorado con borde izquierdo inclinado, se extiende hasta el borde derecho de la pantalla */
 .huk-hd-navwrap{position:absolute;right:calc(var(--bs-gutter-x,1.5rem) * .5);bottom:0;transform:translateY(50%);display:flex;justify-content:flex-end;z-index:30}
 .huk-hd-nav{position:relative;z-index:0;display:flex;align-items:center;gap:.25rem;min-height:var(--huk-nav-h);padding:0 0 0 4rem}
 /* El fondo dorado inclinado va en un pseudo-elemento: así el recorte no corta los submenús */
-.huk-hd-nav::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--huk-nav-bg);clip-path:polygon(2.75rem 0,100% 0,100% 100%,0 100%)}
-.huk-hd-nav::after{content:"";position:absolute;left:100%;top:0;bottom:0;width:50vw;z-index:-1;background:var(--huk-nav-bg)}
+/* Un solo fondo que sigue hasta el borde derecho (antes eran dos piezas y se veía la unión) */
+.huk-hd-nav::before{content:"";position:absolute;inset:0 -50vw 0 0;z-index:-1;background:var(--huk-nav-bg);clip-path:polygon(2.75rem 0,100% 0,100% 100%,0 100%)}
 
 .huk-nav{list-style:none;margin:0;padding:0;display:flex;align-items:center}
 .huk-nav-item{position:relative}
@@ -502,13 +495,18 @@ a.huk-hd-info-item:hover{color:var(--huk-gold-light)}
   .huk-hd-info-item:nth-child(2){display:none}         /* oculta la dirección en laptops chicas */
   .huk-nav-main .huk-nav-link{padding:0 .8rem}
 }
+
+
+@media (max-width:519px){.huk-logo{width:200px}}
+@media (max-width:767px) and (min-width:520px){.huk-logo{width:250px}}
+@media (max-width:991.98px) and (min-width:768px){.huk-logo{width:260px}}
 @media (max-width:991.98px){
   .huk-hd-info,.huk-hd-navwrap,.huk-sticky-nav,.huk-sticky .huk-hd-cta{display:none}
   .huk-hd-toggler{display:inline-flex;align-items:center;justify-content:center}
   .huk-hd-brandrow{padding:1rem 0;align-items:center;    }
   .huk-hd-brandrow>.huk-brand{margin-top:0;         max-height: initial;
         max-width: 70% !important;}
-  .huk-logo{max-height:54px}
+ 
   #contenido{padding-top:0}
   #contenido>.huk-hero:first-child,#contenido>.huk-under-nav:first-child{margin-top:0;padding-top:5rem}
   .huk-sticky .container{min-height:64px}
@@ -520,12 +518,12 @@ a.huk-hd-info-item:hover{color:var(--huk-gold-light)}
 
 .huk-hd-welcome{font-size: 13px;}
 
-
-@media (min-width:992px) and (max-width:1200px){
-
-  .huk-logo {
-    max-height: 55px!important;
-}
+@media (min-width:992px){
+   .huk-quienes-lado{padding-top:60px;} 
+  }
+@media (min-width:992px) and (max-width:1199.98px){
+ 
+  .huk-logo{width:250px}
     .huk-hd-welcome {
     font-size: 11px!important;
 }
@@ -538,6 +536,8 @@ a.huk-hd-info-item:hover{color:var(--huk-gold-light)}
 
 
 @media (min-width:768px) and (max-width:991px){
+
+  .huk-hd-top .container{justify-content:center}   /* barra superior centrada (sin el "Bienvenido") */
 
   .huk-nav.huk-nav-sticky {display: none!important;}
   .huk-logo {
@@ -621,3 +621,342 @@ body{top:0!important}
 
 
 .huk-lang-btn span{    FONT-SIZE: 14PX;}
+
+/* 12. FOOTER (estructura de la plantilla, colores HUK) ----------------------
+   Logo + texto + lema + redes · Oficina · Contacto · Enlaces · fénix · barra final */
+.huk-ft{background:var(--huk-ink);color:#f3efe6;padding:6rem 0 2.25rem}
+.huk-ft-cols{display:grid;grid-template-columns:1.45fr 1.4fr 1fr .65fr;gap:3rem}   /* más ancho para Información, menos para Enlaces */
+.huk-ft-logo{display:inline-block}
+.huk-ft-logo img{max-width:300px;height:auto}
+.huk-ft h5{font-family:var(--huk-font-head);font-weight:700;font-size:1.3rem;color:#fff;margin:0}
+.huk-ft h5::after{content:"";display:block;width:40px;height:3px;background:var(--huk-gold-grad);margin:1rem 0 1.25rem}
+.huk-ft-cols p,.huk-ft-cols a{color:var(--huk-sand);font-size:.97rem;line-height:1.9;margin:0}
+.huk-ft-cols a{display:block}
+.huk-ft-cols a:hover{color:var(--huk-gold-light)}
+.huk-ft-cols .huk-ft-texto{margin-top:1.4rem}
+.huk-ft-cols .huk-ft-lema{margin-top:1rem;font-size:.75rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--huk-gold)}
+/* Dato con ícono (Información): ícono dorado + texto; el texto largo queda alineado, no debajo del ícono */
+.huk-ft-cols .huk-ft-dato{display:flex;gap:.7rem;align-items:flex-start}
+.huk-ft-dato i{color:var(--huk-gold);width:1.1rem;line-height:1.9;flex-shrink:0;text-align:center}
+.huk-ft-redes{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.4rem}
+.huk-ft-cols .huk-ft-redes a{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(var(--huk-gold-rgb),.45);border-radius:var(--huk-radius);color:var(--huk-gold-light);font-size:.9rem;line-height:1;transition:all var(--huk-speed) var(--huk-ease)}
+.huk-ft-cols .huk-ft-redes a:hover{background:var(--huk-gold);border-color:var(--huk-gold);color:#0b0b0b;transform:translateY(-2px)}
+/* Botón "Copiar correo" */
+.huk-ft-copiar{display:inline-block;margin:.5rem 0 .75rem;background:none;border:1px solid rgba(243,239,230,.3);color:#f3efe6;font-family:var(--huk-font-body);font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:.55rem .8rem;border-radius:var(--huk-radius);cursor:pointer;transition:all var(--huk-speed) var(--huk-ease)}
+.huk-ft-copiar:hover,.huk-ft-copiar.is-ok{background:var(--huk-gold);border-color:var(--huk-gold);color:#0b0b0b}
+/* Emblema (fénix) */
+.huk-ft-fenix{display:flex;justify-content:center;margin-top:2.5rem}
+.huk-ft-fenix img{width:110px;height:auto}
+/* Barra final */
+.huk-ft-bot{display:flex;justify-content:space-between;align-items:center;gap:1rem 1.5rem;flex-wrap:wrap;border-top:1px solid var(--huk-ink-3);margin-top:2rem;padding-top:1.75rem;font-size:.85rem;color:rgba(243,239,230,.5)}
+.huk-ft-bot-lema{letter-spacing:.1em;text-transform:uppercase;color:var(--huk-gold)}
+.huk-ft-bot a{color:rgba(243,239,230,.7);border-bottom:1px solid currentColor}
+.huk-ft-bot a:hover{color:var(--huk-gold-light)}
+@media (max-width:991.98px){.huk-ft-cols{grid-template-columns:1fr 1fr}}
+@media (max-width:575.98px){.huk-ft{padding-top:4rem}.huk-ft-cols{grid-template-columns:1fr;gap:2.25rem; }.huk-ft-bot{flex-direction:column;text-align:center}}
+
+/* 13. BARRA DE PROGRESO DE LECTURA ------------------------------------------
+   Línea dorada arriba a la izquierda que avanza al bajar. La mueve huk.js. */
+.huk-progress{position:fixed;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,var(--huk-gold),var(--huk-gold-light));transform-origin:left;transform:scaleX(0);z-index:1060;pointer-events:none}
+
+/* 14. PUNTO DORADO QUE SIGUE AL MOUSE ---------------------------------------
+   Lo crea huk.js. Solo con mouse (no en celular) y sin "movimiento reducido".
+   Sobre enlaces y botones se agranda. */
+.huk-cursor{position:fixed;top:0;left:0;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--huk-gold);pointer-events:none;z-index:2000;opacity:0;will-change:transform;transition:opacity .25s,width .25s var(--huk-ease),height .25s var(--huk-ease),margin .25s var(--huk-ease),background-color .25s,box-shadow .25s}
+.huk-cursor.is-on{opacity:1}
+.huk-cursor.is-link{width:36px;height:36px;margin:-18px 0 0 -18px;background:rgba(var(--huk-gold-rgb),.18);box-shadow:0 0 0 1.5px var(--huk-gold)}
+@media (hover:none),(pointer:coarse){.huk-cursor{display:none}}
+
+/* 15. ENTRADA DEL HEADER AL CARGAR LA PÁGINA ---------------------------------
+   Solo CSS (no hace falta JS). Todo termina en ~1,2 s.
+   · Barra superior: sale del fondo con zoom.
+   · Logo: entra desde la izquierda, desenfocado y con un brillo dorado que se apaga.
+   · Lado derecho (teléfono, dirección, email y el menú dorado): entra desde la derecha, uno detrás de otro.
+   "backwards": el efecto solo se aplica antes y durante la animación; después no queda nada (no afecta los submenús).
+   Con "movimiento reducido" la sección 8 lo deja casi instantáneo. El header compacto (sticky) no se anima. */
+:root{--huk-entrada:cubic-bezier(.16,1,.3,1)}
+@keyframes huk-zoom-fondo{from{opacity:0;transform:scale(.9);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+@keyframes huk-desde-izq{0%{opacity:0;transform:translateX(-70px);filter:blur(10px) brightness(1.8)}60%{filter:blur(0) brightness(1.35)}100%{opacity:1;transform:none;filter:none}}
+@keyframes huk-desde-der{from{opacity:0;transform:translateX(60px);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+@keyframes huk-menu-der{from{opacity:0;transform:translateX(140px)}to{opacity:1;transform:none}}
+
+.huk-hd-top .container{animation:huk-zoom-fondo .7s var(--huk-entrada) backwards}
+.huk-hd-brandrow>.huk-brand{animation:huk-desde-izq .95s var(--huk-entrada) .15s backwards}
+.huk-hd-info-item{animation:huk-desde-der .75s var(--huk-entrada) backwards}
+.huk-hd-info-item:nth-child(1){animation-delay:.3s}
+.huk-hd-info-item:nth-child(2){animation-delay:.42s}
+.huk-hd-info-item:nth-child(3){animation-delay:.54s}
+.huk-hd-nav{animation:huk-menu-der .8s var(--huk-entrada) .45s backwards}
+.huk-hd-brandrow>.huk-hd-toggler{animation:huk-desde-der .7s var(--huk-entrada) .3s backwards}
+
+/* 16. FOOTER: APARICIÓN AL BAJAR ---------------------------------------------
+   Usa el sistema data-reveal (sección 6, lo activa huk.js cuando el footer entra en pantalla).
+   Columnas de la izquierda → desde la izquierda · de la derecha → desde la derecha
+   · fénix → "de la nada" · barra final → desde abajo.
+   Variante nueva: data-reveal="nada" (crece desde chico, desenfocado y con un brillo dorado). */
+.huk-ft{overflow-x:clip}   /* que lo que entra desde los costados no genere scroll horizontal */
+.huk-ft [data-reveal="left"]{transform:translateX(-60px)}
+.huk-ft [data-reveal="right"]{transform:translateX(60px)}
+[data-reveal="nada"]{transform:scale(.4);filter:blur(14px) brightness(2);transition:opacity 1.1s var(--huk-ease),transform 1.1s cubic-bezier(.16,1,.3,1),filter 1.1s var(--huk-ease)}
+[data-reveal="nada"].is-in{transform:none;filter:none}
+.huk-ft [data-reveal].is-in{transform:none}
+.no-js [data-reveal="nada"]{filter:none}
+@media (prefers-reduced-motion:reduce){[data-reveal="nada"]{transform:none;filter:none}}
+
+/* 17. BANNER DEL INICIO (Panel → Banners) -------------------------------------
+   Estructura de la plantilla, colores HUK. Vista: views/site/widgets/banner_mid.php · carrusel: huk.js punto 10.
+   · Foto con zoom lento · sombra a la izquierda (::before) · figura dorada que sube y baja
+   · Antetítulo con línea dorada, título, texto y botón: entran de abajo, uno detrás de otro.
+   · Varios banners: se apilan en la misma celda y cambian con un fundido.
+   · .is-solo-imagen: banner sin textos → sin sombra. */
+.huk-banner{position:relative;display:grid;background:var(--huk-ink);color:#fff;overflow:hidden;isolation:isolate}
+#contenido>.huk-banner:first-child{margin-top:calc(-1 * var(--huk-nav-overlap))}   /* se mete debajo del menú dorado */
+.huk-banner-slide{grid-area:1/1;position:relative;display:flex;align-items:center;min-height:clamp(560px,84vh,780px);opacity:0;visibility:hidden;transition:opacity 1s var(--huk-ease),visibility 0s linear 1s}
+.huk-banner-slide.is-activo{opacity:1;visibility:visible;transition:opacity 1s var(--huk-ease),visibility 0s;z-index:1}
+.huk-banner-bg{position:absolute;inset:0;overflow:hidden;z-index:0}
+.huk-banner-bg img{width:100%;height:100%;object-fit:cover;object-position:center;transform:scale(1.1)}
+.huk-banner-slide.is-activo .huk-banner-bg img{animation:huk-banner-zoom 14s ease-out forwards}
+.huk-banner-slide::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(8,8,8,.94) 0%,rgba(8,8,8,.78) 48%,rgba(8,8,8,.25) 100%)}
+.huk-banner-slide.is-solo-imagen::before{display:none}
+.huk-banner-contenido{position:relative;z-index:2;padding-top:calc(5rem + var(--huk-nav-overlap));padding-bottom:6.3rem}
+.huk-banner-ante{display:flex;align-items:center;gap:.9rem;margin:0 0 1.6rem;font-family:var(--huk-font-body);font-size:.85rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--huk-gold)}
+.huk-banner-ante::before{content:"";flex:0 0 48px;height:3px;background:var(--huk-gold)}
+.huk-banner-titulo{font-family:var(--huk-font-head);font-weight:700;font-size:clamp(2.1rem,4.3vw,4rem);line-height:1.08;letter-spacing:-.02em;max-width:20ch;margin:0;color:#fff}
+.huk-banner-texto{font-size:1.15rem;line-height:1.7;color:rgba(255,255,255,.82);max-width:58ch;margin:1.6rem 0 0}
+.huk-banner-btn{display:inline-flex;align-items:center;gap:.7rem;margin-top:2.4rem;padding:1.05rem 1.9rem;text-transform:uppercase;letter-spacing:.06em;font-size:.92rem}
+.huk-banner-btn i{transition:transform var(--huk-speed) var(--huk-ease)}
+.huk-banner-btn:hover i{transform:translateX(5px)}
+/* Entrada de los textos en el banner activo */
+.huk-banner-slide.is-activo .huk-banner-contenido>*{animation:huk-banner-sube .9s cubic-bezier(.2,.7,.2,1) both}
+.huk-banner-slide.is-activo .huk-banner-contenido>:nth-child(2){animation-delay:.12s}
+.huk-banner-slide.is-activo .huk-banner-contenido>:nth-child(3){animation-delay:.24s}
+.huk-banner-slide.is-activo .huk-banner-contenido>:nth-child(4){animation-delay:.36s}
+/* Figura dorada flotante */
+.huk-banner-shard{position:absolute;right:90px;top:calc(70px + var(--huk-nav-overlap));width:90px;height:120px;z-index:3;color:var(--huk-gold);pointer-events:none;animation:huk-flota 6s ease-in-out infinite}
+/* Puntos del carrusel */
+.huk-banner-puntos{position:absolute;left:0;right:0;bottom:2.5rem;z-index:3;display:flex;gap:.6rem}
+.huk-banner-punto{width:34px;height:4px;padding:0;border:0;border-radius:2px;background:rgba(255,255,255,.35);cursor:pointer;transition:background var(--huk-speed),width var(--huk-speed) var(--huk-ease)}
+.huk-banner-punto:hover{background:rgba(255,255,255,.7)}
+.huk-banner-punto.is-activo{width:56px;background:var(--huk-gold)}
+@keyframes huk-banner-zoom{from{transform:scale(1.1)}to{transform:scale(1)}}
+@keyframes huk-banner-sube{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes huk-flota{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+/* Tablet y celular: sin el solape del menú, sombra de arriba hacia abajo, figura más chica */
+@media (max-width:991.98px){
+  #contenido>.huk-banner:first-child{margin-top:0}
+  .huk-banner-contenido{padding-top:5rem;padding-bottom:6rem}
+  .huk-banner-shard{right:24px;top:24px;width:60px;height:80px}
+}
+@media (max-width:767.98px){
+  .huk-banner-slide{min-height:clamp(520px,88vh,720px);align-items:flex-end}
+  .huk-banner-slide::before{background:linear-gradient(180deg,rgba(8,8,8,.45) 0%,rgba(8,8,8,.7) 45%,rgba(8,8,8,.92) 100%)}
+  .huk-banner-contenido{padding-top:6rem;padding-bottom:5rem}
+  .huk-banner-ante{font-size:.72rem;letter-spacing:.16em;gap:.6rem}
+  .huk-banner-ante::before{flex-basis:28px}
+  .huk-banner-texto{font-size:1rem;margin-top:1.1rem}
+  .huk-banner-btn{margin-top:1.6rem;padding:.9rem 1.4rem;font-size:.85rem}
+  .huk-banner-puntos{bottom:1.6rem}
+  .huk-banner-shard{width:46px;height:62px;right:18px;top:18px}
+}
+@media (prefers-reduced-motion:reduce){
+  .huk-banner-shard,.huk-banner-slide.is-activo .huk-banner-bg img{animation:none}
+  .huk-banner-bg img{transform:none}
+}
+
+/* 17b. BANNER: FLECHAS ------------------------------------------------------
+   Pantallas grandes: a los costados, a media altura, sin tapar el texto.
+   Laptops chicas, tablet y celular (y 1400–1439 px, donde el texto queda muy pegado al borde):
+   abajo a la derecha, en la línea de los puntitos. */
+.huk-banner-flecha{position:absolute;top:50%;z-index:4;width:48px;height:48px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid rgba(var(--huk-gold-rgb),.65);background:rgba(11,11,11,.38);color:var(--huk-gold-light);font-size:1rem;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transform:translateY(-50%);transition:background var(--huk-speed) var(--huk-ease),color var(--huk-speed),border-color var(--huk-speed),box-shadow var(--huk-speed)}
+.huk-banner-flecha:hover,.huk-banner-flecha:focus-visible{background:var(--huk-gold);border-color:var(--huk-gold);color:#0b0b0b;box-shadow:0 8px 22px rgba(var(--huk-gold-rgb),.35)}
+.huk-banner-flecha.is-anterior{left:max(6px,calc((100vw - 1320px) / 2 - 70px))}
+.huk-banner-flecha.is-siguiente{right:max(6px,calc((100vw - 1320px) / 2 - 70px))}
+.huk-banner-flecha.is-anterior:hover i{transform:translateX(-2px)}
+.huk-banner-flecha.is-siguiente:hover i{transform:translateX(2px)}
+.huk-banner-flecha i{transition:transform var(--huk-speed) var(--huk-ease)}
+@media (max-width:1279.98px),(min-width:1400px) and (max-width:1439.98px){
+  .huk-banner-flecha{top:auto;bottom:calc(2.5rem + 2px - 20px);width:40px;height:40px;font-size:.85rem;transform:none}
+  .huk-banner-flecha.is-anterior{left:auto;right:calc(var(--bs-gutter-x,1.5rem) * .5 + 52px)}
+  .huk-banner-flecha.is-siguiente{right:calc(var(--bs-gutter-x,1.5rem) * .5)}
+  .huk-banner-flecha:hover,.huk-banner-flecha:focus-visible{transform:none}
+}
+@media (max-width:767.98px){
+  .huk-banner-flecha{bottom:calc(1.6rem + 2px - 20px)}
+}
+
+/* 18. TARJETAS DEL INICIO (Conectar · Transformar · Multiplicar) ------------------
+   Panel → Páginas → Nosotros → Quiénes somos → Tarjetas. Vista: views/site/widgets/tarjetas.php · JS: huk.js punto 11.
+   · Suben y se apoyan sobre el banner (--huk-tarjetas-sube); el banner deja ese lugar libre abajo (.con-tarjetas).
+   · Carrusel: 3 por vista / 2 en tablet / 1 en celular (--tarjetas-por-vista, lo lee el JS).
+   · Flechas y cambio automático solo si hay más tarjetas de las que entran.
+   · Hover: la tarjeta sube, se dibuja la línea dorada de arriba y crece la línea del título. */
+:root{--huk-tarjetas-sube:140px}
+.huk-tarjetas{--tarjetas-por-vista:3;--tarjetas-gap:2rem;position:relative;z-index:2;background:var(--huk-bg);padding:5rem 0;overflow-x:clip}
+.huk-tarjetas.sobre-banner{margin-top:calc(-1 * var(--huk-tarjetas-sube));padding-top:0;background:linear-gradient(to bottom,transparent var(--huk-tarjetas-sube),var(--huk-bg) var(--huk-tarjetas-sube))}
+.huk-tarjetas-carrusel{position:relative}
+.huk-tarjetas-marco{overflow:hidden;padding:16px 0 90px;margin:-16px 0 -90px}   /* deja lugar al hover y a la sombra */
+.huk-tarjetas-pista{display:flex;gap:var(--tarjetas-gap);transition:transform .7s var(--huk-ease);will-change:transform}
+.huk-tarjeta-celda{flex:0 0 calc((100% - (var(--tarjetas-por-vista) - 1) * var(--tarjetas-gap)) / var(--tarjetas-por-vista));display:flex;min-width:0}
+.huk-tarjeta{position:relative;flex:1;background:#171717;color:#fff;border-radius:6px;padding:3.2rem 3rem 3.4rem;box-shadow:0 26px 30px -20px rgba(0,0,0,.45);overflow:hidden;transition:transform .45s var(--huk-ease),box-shadow .45s var(--huk-ease)}
+.huk-tarjeta::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--huk-gold-grad);transform:scaleX(0);transform-origin:left;transition:transform .45s var(--huk-ease)}
+.huk-tarjeta:hover{transform:translateY(-10px);box-shadow:0 38px 36px -24px rgba(0,0,0,.55)}
+.huk-tarjeta:hover::before{transform:scaleX(1)}
+.huk-tarjeta-icono{display:block;width:72px;height:72px;object-fit:contain;margin-bottom:2.2rem;transition:transform .5s var(--huk-ease)}
+.huk-tarjeta:hover .huk-tarjeta-icono{transform:scale(1.1) rotate(-4deg)}   /* el ícono crece y se inclina */
+.huk-tarjeta h3{font-family:var(--huk-font-head);font-weight:700;font-size:1.9rem;line-height:1.15;margin:0;color:#fff}
+.huk-tarjeta h3::after{content:"";display:block;width:104px;height:4px;background:var(--huk-gold);margin:1.4rem 0 1.6rem;transition:width .45s var(--huk-ease)}
+.huk-tarjeta:hover h3::after{width:140px}
+.huk-tarjeta p{margin:0;color:rgba(255,255,255,.72);font-size:1.05rem;line-height:1.75}
+/* Flechas (solo si no entran todas) */
+.huk-tarjetas-flecha{position:absolute;top:50%;z-index:3;width:46px;height:46px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid rgba(var(--huk-gold-rgb),.65);background:rgba(11,11,11,.55);color:var(--huk-gold-light);cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transform:translateY(-50%);transition:background var(--huk-speed) var(--huk-ease),color var(--huk-speed),border-color var(--huk-speed),box-shadow var(--huk-speed)}
+.huk-tarjetas-flecha[hidden]{display:none}
+.huk-tarjetas-flecha:hover,.huk-tarjetas-flecha:focus-visible{background:var(--huk-gold);border-color:var(--huk-gold);color:#0b0b0b;box-shadow:0 8px 22px rgba(var(--huk-gold-rgb),.35)}
+.huk-tarjetas-flecha.is-anterior{left:-23px}
+.huk-tarjetas-flecha.is-siguiente{right:-23px}
+/* El banner deja lugar abajo para las tarjetas (texto, puntitos y flechas de abajo suben) */
+.huk-banner.con-tarjetas .huk-banner-contenido{padding-bottom:calc(6.3rem + var(--huk-tarjetas-sube))}
+.huk-banner.con-tarjetas .huk-banner-puntos{bottom:calc(2.5rem + var(--huk-tarjetas-sube))}
+@media (max-width:1279.98px),(min-width:1400px) and (max-width:1439.98px){
+  .huk-banner.con-tarjetas .huk-banner-flecha{bottom:calc(2.5rem + 2px - 20px + var(--huk-tarjetas-sube))}
+}
+@media (max-width:991.98px){
+
+  .container {
+    padding-left: 17px!important;
+    padding-right: 17px!important;
+}
+
+  :root{--huk-tarjetas-sube:110px}
+  .huk-tarjetas{--tarjetas-por-vista:2;--tarjetas-gap:1.5rem}
+  .huk-tarjeta{padding:2.6rem 2.2rem 2.8rem}
+  .huk-tarjeta h3{font-size:1.65rem}
+  .huk-tarjetas-flecha.is-anterior{left:-8px}
+  .huk-tarjetas-flecha.is-siguiente{right:-8px}
+}
+@media (max-width:767.98px){
+  :root{--huk-tarjetas-sube:80px}
+  .huk-tarjetas{--tarjetas-por-vista:1;padding-bottom:3.5rem}
+  .huk-tarjetas.sobre-banner{padding-top:0}
+  .huk-tarjeta{padding:2.3rem 1.9rem 2.5rem}
+  .huk-tarjeta-icono{width:60px;height:60px;margin-bottom:1.6rem}
+  .huk-tarjetas-flecha{width:40px;height:40px;font-size:.85rem}
+  .huk-tarjetas-flecha.is-anterior{left:-8px}
+  .huk-tarjetas-flecha.is-siguiente{right:-8px}
+  .huk-banner.con-tarjetas .huk-banner-puntos{bottom:calc(1.6rem + var(--huk-tarjetas-sube))}
+  .huk-banner.con-tarjetas .huk-banner-flecha{bottom:calc(1.6rem + 2px - 20px + var(--huk-tarjetas-sube))}
+}
+@media (prefers-reduced-motion:reduce){.huk-tarjetas-pista{transition:none}}
+
+/* 19. INICIO · RESUMEN DE QUIÉNES SOMOS ---------------------------------------
+   Panel → Páginas → Nosotros → Quiénes somos (+ Destacados y Cifras). Vista: views/site/widgets/quienes.php
+   · Izquierda: palabra de fondo, etiqueta, título, texto, frase, destacados, cifras + "Leer más" (entra desde la izquierda).
+   · Derecha: foto vertical con esquinas redondeadas (aparece con zoom; zoom suave al pasar el mouse) y su pie.
+   · Las líneas verticales del fondo ahora son de toda la página: sección 20. */
+.huk-quienes{position:relative;background:#fff;padding:5rem 0;overflow:hidden}
+.huk-quienes-grid{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:5rem;align-items:start}
+.huk-quienes.sin-foto .huk-quienes-grid{grid-template-columns:1fr;max-width:860px}
+.huk-quienes-txt{position:relative}
+.huk-quienes-fondo{position:absolute;top:-3.6rem;left:-0.5rem;font-family:var(--huk-font-head);font-weight:400;font-size:clamp(4.5rem,8vw,7.5rem);line-height:1;color:transparent;-webkit-text-stroke:1px #d9d9d6;white-space:nowrap;pointer-events:none;user-select:none;z-index:0}
+.huk-quienes-txt>*:not(.huk-quienes-fondo){position:relative;z-index:1}
+.huk-quienes-etiqueta{margin:0 0 .9rem;font-family:var(--huk-font-head);font-size:1.1rem;font-weight:700;color:var(--huk-gold-dark)}
+.huk-quienes-titulo{font-family:var(--huk-font-head);font-weight:700;font-size:clamp(2.1rem,4.2vw,3.25rem);line-height:1.12;margin:0;color:var(--huk-text);max-width:21ch}
+.huk-quienes-titulo::after{content:"";display:block;width:70px;height:3px;background:var(--huk-gold);margin-top:1.6rem}
+.huk-quienes-texto{margin-top:1.8rem;font-size:1.08rem;line-height:1.8;color:var(--huk-muted);max-width:62ch}
+.huk-quienes-texto p{margin:0; text-align: justify;}
+.huk-quienes-texto p+p{margin-top:0.6rem}
+.huk-quienes-tesis{margin:1rem 0 0;padding:.25rem 0 .25rem 1.6rem;border-left:3px solid var(--huk-gold);font-family:var(--huk-font-head);font-size:clamp(1.15rem,1.8vw,1.4rem);line-height:1.45;font-style:italic;color:var(--huk-text)}
+.huk-quienes-tesis span{display:block;margin-bottom:.6rem;font-family:var(--huk-font-body);font-size:.8rem;font-weight:600;font-style:normal;letter-spacing:.16em;text-transform:uppercase;color:var(--huk-gold-dark)}
+.huk-quienes-destacados{list-style:none;display:flex;flex-wrap:wrap;gap:1.5rem 2.75rem;margin:2rem 0 0;padding:0 0 1rem;border-bottom:1px solid var(--huk-line)}
+.huk-quienes-destacados li{display:flex;align-items:center;gap:1.1rem;font-family:var(--huk-font-head);font-weight:700;font-size:1rem;line-height:1.25;text-transform:uppercase;color:var(--huk-text);max-width:16rem}
+.huk-quienes-destacados img{width:50px;height:50px;flex:none;object-fit:contain;transition:transform .5s var(--huk-ease)}
+.huk-quienes-destacados li:hover img{transform:scale(1.1) rotate(-4deg)}
+.huk-quienes-pie{display:flex;flex-wrap:wrap;align-items:center;gap:1.75rem 3rem;margin-top:2.25rem}
+/* Cifras arriba de la foto: todas en una fila; el tamaño sigue el ancho de la columna (cqi), así entran siempre */
+.huk-quienes-lado{container-type:inline-size;min-width:0}
+.huk-quienes-cifras{text-align:center; display:grid;grid-auto-flow:column;grid-auto-columns:auto;justify-content:start;column-gap:clamp(.9rem,5cqi,2.75rem);margin-bottom:2.2rem}
+.huk-quienes-cifras b{display:block;font-family:var(--huk-font-head);font-weight:700;font-size:clamp(1.3rem,6.2cqi,3.1rem);white-space:nowrap;line-height:1;color:var(--huk-gold-dark);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.huk-quienes-cifras span{display:block;margin-top:.5rem;font-size:clamp(.78rem,2.9cqi,1rem);line-height:1.3;font-weight:600;color:var(--huk-text)}
+.huk-quienes-btn{display:inline-flex;align-items:center;gap:.7rem;padding:1rem 1.8rem;text-transform:uppercase;letter-spacing:.06em;font-size:.88rem}
+.huk-quienes-btn i{transition:transform var(--huk-speed) var(--huk-ease)}
+.huk-quienes-btn:hover i{transform:translateX(5px)}
+/* Foto */
+.huk-quienes-foto{margin:0;position:relative}
+.huk-quienes-marco{border-radius:22px;overflow:hidden;box-shadow:var(--huk-shadow-lg)}
+.huk-quienes-marco img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+.huk-quienes-foto:hover .huk-quienes-marco img{transform:scale(1.07)}
+.huk-quienes-foto figcaption{margin-top:.6rem;font-size:.8rem;color:var(--huk-muted)}
+/* Aparición de la foto: zoom (usa el sistema data-reveal de la sección 6) */
+[data-reveal="foto"]{transform:scale(.82);transition:opacity 1s var(--huk-ease),transform 1.2s cubic-bezier(.16,1,.3,1)}
+[data-reveal="foto"].is-in{transform:none}
+.huk-quienes [data-reveal="left"]{transform:translateX(-60px)}
+.huk-quienes [data-reveal].is-in{transform:none}
+@media (max-width:1199.98px){.huk-quienes-grid{gap:3.5rem}}
+@media (max-width:991.98px){
+  .huk-quienes{padding:5rem 0}
+  .huk-quienes-grid{grid-template-columns:1fr;gap:3rem}
+  .huk-quienes-fondo{display:none}
+  .huk-quienes-titulo{max-width:none}
+  .huk-quienes-lado{max-width:100%;} 
+  .huk-quienes-texto {
+
+    max-width: 100%!important;
+}
+  
+  /* cifras y foto con el mismo ancho que en computadora */
+}
+@media (max-width:575.98px){
+  .huk-quienes{padding:4rem 0}
+  .huk-quienes-destacados{gap:1.25rem}
+  .huk-quienes-destacados li{font-size:.95rem}
+  .huk-quienes-destacados img{width:46px;height:46px}
+  .huk-quienes-pie{gap:1.5rem}
+  .huk-quienes-btn{width:100%;justify-content:center}
+}
+@media (prefers-reduced-motion:reduce){[data-reveal="foto"],.huk-quienes [data-reveal="left"]{transform:none}}
+
+/* 20. LÍNEAS DE FONDO CON TRAZOS QUE SUBEN Y BAJAN (como Industo) ---------------
+   Capa única dentro de <main> (no pasa por el header ni el footer). huk.js la hace empezar debajo del banner.
+   6 líneas alineadas al container (5 columnas). En cada una corre un trazo dorado: las impares bajan, las pares suben.
+   mix-blend-mode multiply: se ven sobre fondos claros y desaparecen sobre lo oscuro (tarjetas negras, fotos),
+   así parecen ir por detrás del contenido. No bloquea clics. */
+#contenido{position:relative}
+.huk-lineas{position:absolute;left:0;right:0;top:0;bottom:0;z-index:5;pointer-events:none;mix-blend-mode:multiply;overflow:hidden}
+.huk-lineas>.container{position:relative;height:100%;display:flex;justify-content:space-between}
+.huk-lineas span{position:relative;width:1px;height:100%;background:transparent;overflow:hidden}
+.huk-lineas span::after{content:"";position:absolute;left:0;width:1px;height:110px;background:linear-gradient(to bottom,rgba(var(--huk-gold-rgb),0),rgba(var(--huk-gold-rgb),.9) 70%,var(--huk-gold));animation:huk-linea-baja 14s linear infinite}
+.huk-lineas span:nth-child(even)::after{background:linear-gradient(to top,rgba(var(--huk-gold-rgb),0),rgba(var(--huk-gold-rgb),.9) 70%,var(--huk-gold));animation-name:huk-linea-sube}
+.huk-lineas span:nth-child(1)::after{animation-duration:16s;animation-delay:-2s}
+.huk-lineas span:nth-child(2)::after{animation-duration:13s;animation-delay:-7s}
+.huk-lineas span:nth-child(3)::after{animation-duration:18s;animation-delay:-11s}
+.huk-lineas span:nth-child(4)::after{animation-duration:15s;animation-delay:-4s}
+.huk-lineas span:nth-child(5)::after{animation-duration:17s;animation-delay:-9s}
+.huk-lineas span:nth-child(6)::after{animation-duration:14s;animation-delay:-13s}
+@keyframes huk-linea-baja{from{top:-120px}to{top:100%}}
+@keyframes huk-linea-sube{from{top:100%}to{top:-120px}}
+/* Fotos por encima de las líneas (para que queden detrás). Para otra pieza: agregale z-index:6 con position:relative. */
+.huk-quienes-foto{z-index:6}
+@media (max-width:767.98px){.huk-lineas span:nth-child(n+2):nth-child(-n+5){display:none}}   /* celular: solo los bordes */
+@media (prefers-reduced-motion:reduce){.huk-lineas span::after{display:none}}
+
+
+
+@media (max-width:350px){
+.huk-quienes-cifras{
+
+  display: block!important;
+}
+
+.huk-quienes-cifras span{ padding-bottom: 8px;}
+
+.huk-ft-logo img {
+    max-width: 100%!important;
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+}
+.huk-logo-sm {
+    max-height: 20px!important;
+    width: auto;
+}
+}
+  

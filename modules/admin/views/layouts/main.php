@@ -49,6 +49,24 @@ if ($usuario && $permisos->tienePermiso('banners_listar')) {
 if ($usuario && $permisos->tienePermiso('equipo_listar')) {
     $items[] = ['label' => 'EQUIPO', 'url' => ['/admin/equipo/index'], 'icon' => 'id-badge', 'active' => $ctrl === 'equipo'];
 }
+if ($usuario && $permisos->tienePermiso('inversores_listar')) {
+    $items[] = ['label' => 'INVERSORES', 'url' => ['/admin/inversores/index'], 'icon' => 'handshake-o', 'active' => $ctrl === 'inversores'];
+}
+if ($usuario && $permisos->tienePermiso('inversiones_listar')) {
+    $items[] = ['label' => 'INVERSIONES', 'url' => ['/admin/inversiones/index'], 'icon' => 'money', 'active' => $ctrl === 'inversiones'];
+}
+if ($usuario && $permisos->tienePermiso('proyectos_listar')) {
+    $items[] = ['label' => 'PROYECTOS', 'url' => ['/admin/banco-proyectos/index'], 'icon' => 'briefcase', 'active' => $ctrl === 'banco-proyectos'];
+}
+// Páginas institucionales: un ítem por página de app\models\PaginaSeccion::PAGINAS.
+if ($usuario && $permisos->tienePermiso('paginas_ver')) {
+    $paginaActual = $ctrl === 'paginas' ? ($this->params['pagina'] ?? null) : null; // lo ponen las vistas de paginas/
+    $paginas = [];
+    foreach (\app\models\PaginaSeccion::PAGINAS as $idPagina => $p) {
+        $paginas[] = ['label' => mb_strtoupper($p['nombre']), 'url' => ['/admin/paginas/index', 'pagina' => $idPagina], 'icon' => $p['icono'], 'active' => $paginaActual === $idPagina];
+    }
+    $items[] = ['label' => 'PÁGINAS', 'icon' => 'files-o', 'url' => '#', 'options' => ['class' => 'treeview'], 'items' => $paginas];
+}
 if ($esSuperadmin) {
     $items[] = ['label' => 'USUARIOS', 'url' => ['/admin/usuarios/index'], 'icon' => 'users', 'active' => $ctrl === 'usuarios' && Yii::$app->controller->action->id !== 'cuenta'];
 }
@@ -59,6 +77,12 @@ if ($esSuperadmin) {
 }
 if ($usuario && $permisos->tienePermiso('configuracion_editar')) {
     $configuracion[] = ['label' => 'DATOS GENERALES', 'url' => ['/admin/datos-generales/index'], 'icon' => 'globe', 'active' => $ctrl === 'datos-generales'];
+}
+if ($usuario && ($permisos->tienePermiso('nda_editar') || $permisos->tienePermiso('inversores_aprobar'))) {
+    $configuracion[] = ['label' => 'ACUERDO DE CONFIDENCIALIDAD', 'url' => ['/admin/nda/index'], 'icon' => 'file-text-o', 'active' => $ctrl === 'nda'];
+}
+if ($usuario && $permisos->tienePermiso('monedas_editar')) {
+    $configuracion[] = ['label' => 'MONEDAS', 'url' => ['/admin/monedas/index'], 'icon' => 'money', 'active' => $ctrl === 'monedas'];
 }
 if ($configuracion) {
     $items[] = ['label' => 'CONFIGURACIÓN', 'icon' => 'cogs', 'url' => '#', 'options' => ['class' => 'treeview'], 'items' => $configuracion];

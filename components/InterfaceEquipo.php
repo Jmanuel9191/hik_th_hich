@@ -17,6 +17,9 @@ interface InterfaceEquipo
 
     public function cambiarEstado($id);
 
+    /** Marca o quita "Destacado" (sale en el Inicio y primero en Liderazgo). */
+    public function cambiarDestacado($id);
+
     /** Sube (-1) o baja (+1) un lugar en el orden. */
     public function mover($id, $direccion);
 
@@ -24,4 +27,7 @@ interface InterfaceEquipo
     public function eliminar($id);
 
     public function historial($id);
+
+    /** @return array ['titulo', 'columnas', 'modelos', 'filtros'] para Exportador (con los filtros del listado). */
+    public function exportar($params);
 }

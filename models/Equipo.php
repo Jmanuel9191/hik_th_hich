@@ -21,6 +21,7 @@ use yii\db\ActiveRecord;
  * @property string|null $foto
  * @property int $orden
  * @property string $estado
+ * @property string $destacado  '1' sale en el Inicio y primero en Liderazgo
  * @property int|null $idusuario_registro
  * @property string $fecha_registro
  * @property string|null $fecha_actualizacion
@@ -71,6 +72,7 @@ class Equipo extends ActiveRecord
             'foto' => 'Foto',
             'orden' => 'Orden',
             'estado' => 'Estado',
+            'destacado' => 'Destacado',
             'fecha_registro' => 'Creado',
             'fecha_actualizacion' => 'Última modificación',
         ] + array_map(fn($r) => $r[0], self::REDES);
@@ -86,9 +88,15 @@ class Equipo extends ActiveRecord
         return $archivo ? Yii::getAlias('@web/' . self::CARPETA . '/' . $archivo) : null;
     }
 
-    /** Para la web: activos, en orden. */
+    /** Para la web: activos, primero los destacados y después en el orden de la lista. */
     public static function activos()
     {
-        return static::find()->where(['estado' => '1'])->orderBy(['orden' => SORT_ASC, 'idmiembro' => SORT_ASC]);
+        return static::find()->where(['estado' => '1'])->orderBy(['destacado' => SORT_DESC, 'orden' => SORT_ASC, 'idmiembro' => SORT_ASC]);
+    }
+
+    /** Para el Inicio y Liderazgo: solo los destacados activos. */
+    public static function destacados()
+    {
+        return static::activos()->andWhere(['destacado' => '1']);
     }
 }

@@ -10,6 +10,7 @@ use yii\db\ActiveRecord;
  *
  * @property int $idbanner
  * @property string|null $titulo
+ * @property string|null $antetitulo  texto corto en dorado arriba del título
  * @property string|null $texto
  * @property string|null $boton_texto
  * @property string|null $boton_url
@@ -29,7 +30,7 @@ class Banners extends ActiveRecord
 
     /** Campo => [etiqueta, medida recomendada] */
     const IMAGENES = [
-        'imagen' => ['Imagen para computadora', '1920 × 600 px'],
+        'imagen' => ['Imagen para computadora', '1920 × 1000 px'],
         'imagen_movil' => ['Imagen para celular', '800 × 1000 px'],
     ];
 
@@ -41,8 +42,9 @@ class Banners extends ActiveRecord
     public function rules()
     {
         return [
-            [['titulo', 'texto', 'boton_texto', 'boton_url', 'fecha_inicio', 'fecha_fin'], 'filter', 'filter' => fn($v) => trim((string) $v) === '' ? null : trim((string) $v)],
+            [['antetitulo', 'titulo', 'texto', 'boton_texto', 'boton_url', 'fecha_inicio', 'fecha_fin'], 'filter', 'filter' => fn($v) => trim((string) $v) === '' ? null : trim((string) $v)],
             [['titulo'], 'string', 'max' => 150],
+            [['antetitulo'], 'string', 'max' => 120],
             [['texto'], 'string', 'max' => 400],
             [['boton_texto'], 'string', 'max' => 60],
             [['boton_url'], 'string', 'max' => 500],
@@ -79,6 +81,7 @@ class Banners extends ActiveRecord
     {
         return [
             'idbanner' => 'N°',
+            'antetitulo' => 'Antetítulo',
             'titulo' => 'Título',
             'texto' => 'Texto descriptivo',
             'boton_texto' => 'Texto del botón',

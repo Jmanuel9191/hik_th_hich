@@ -16,6 +16,8 @@ class DatosGeneralesForm extends Model
         'nombre_empresa' => 'nombre_empresa',
         'email' => 'email',
         'email_web' => 'email_web',
+         'meta_descripcion' => 'meta_descripcion',
+        
         'direccion_empresa' => 'direccion_empresa',
         'horarios' => 'horarios',
         'telefono_empresa' => 'telefono_empresa',
@@ -39,6 +41,7 @@ class DatosGeneralesForm extends Model
     public $nombre_empresa;
     public $email;
     public $email_web;
+    public $meta_descripcion;
     public $direccion_empresa;
     public $horarios;
     public $telefono_empresa;
@@ -63,7 +66,7 @@ class DatosGeneralesForm extends Model
             [['email_web'], 'string', 'max' => 500],
             [['email', 'email_web'], 'email'],
             [['direccion_empresa', 'telefono_empresa'], 'string', 'max' => 250],
-            [['horarios'], 'string', 'max' => 500],
+            [['horarios', 'meta_descripcion'], 'string', 'max' => 500],
             [['telefono_empresa'], 'match', 'pattern' => $telefono, 'message' => 'Solo números, espacios, +, ( ) y guiones.'],
             [['whatsapp'], 'match', 'pattern' => '/^[0-9]{8,15}$/', 'message' => 'Solo números, con código de país. Ej.: 59175095874'],
             [['telefonos_otros'], 'string', 'max' => 500],
@@ -132,6 +135,8 @@ class DatosGeneralesForm extends Model
             'linkedin' => 'LinkedIn',
             'twitter' => 'X (Twitter)',
             'mapa' => 'Mapa de Google',
+            'meta_descripcion' => 'Descripción para buscadores (meta description)',
+            
         ];
     }
 }

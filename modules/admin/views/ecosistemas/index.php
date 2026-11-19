@@ -23,6 +23,7 @@ $this->title = 'Ecosistemas';
 
 <section class="content-header">
     <h1><i class="fa fa-th-large"></i> <?= Html::encode($this->title) ?></h1>
+    <p class="huk-inicio-sub">Los <i class="fa fa-star"></i> destacados son los prioritarios 2026–2035: salen en el Inicio, en Estrategia y primero en la web.</p>
 </section>
 
 <section class="content">
@@ -35,6 +36,7 @@ $this->title = 'Ecosistemas';
             <?= Html::beginForm(['index'], 'get', ['class' => 'form-inline huk-filtros']) ?>
                 <?= Html::textInput('f[nombre]', $filtro['nombre'] ?? '', ['class' => 'form-control', 'placeholder' => 'Buscar por título']) ?>
                 <?= Html::dropDownList('f[estado]', $filtro['estado'] ?? '', ['1' => 'Activos', '0' => 'Inactivos'], ['class' => 'form-control', 'prompt' => 'Todos']) ?>
+                <?= Html::dropDownList('f[destacado]', $filtro['destacado'] ?? '', ['1' => 'Destacados', '0' => 'No destacados'], ['class' => 'form-control', 'prompt' => 'Destacados y no']) ?>
                 <?= Html::submitButton('<i class="fa fa-search"></i> Filtrar', ['class' => 'btn btn-default']) ?>
             <?= Html::endForm() ?>
         </div>
@@ -64,6 +66,18 @@ $this->title = 'Ecosistemas';
                         'format' => 'raw',
                         'value' => fn($m) => Html::tag('strong', Html::encode($m->nombre))
                             . Html::tag('div', Html::encode($m->resumen), ['class' => 'huk-eco-resumen']),
+                    ],
+                    [
+                        'label' => 'Destacado',
+                        'format' => 'raw',
+                        'contentOptions' => ['class' => 'text-center'],
+                        'value' => fn($m) => $puedeEstado
+                            ? Html::button('<i class="fa fa-star' . ($m->destacado === '1' ? '' : '-o') . '"></i>', [
+                                'class' => 'btn btn-xs huk-estrella' . ($m->destacado === '1' ? ' is-activa' : ''),
+                                'title' => $m->destacado === '1' ? 'Quitar destacado' : 'Destacar (prioritario: Inicio, Estrategia y primero en la web)',
+                                'data-listado-destacar' => Url::to(['destacar', 'id' => $m->idecosistema]),
+                            ])
+                            : ($m->destacado === '1' ? '<i class="fa fa-star huk-estrella is-activa"></i>' : ''),
                     ],
                     [
                         'label' => 'Estado',

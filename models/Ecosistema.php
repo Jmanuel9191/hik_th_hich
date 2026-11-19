@@ -20,6 +20,7 @@ use yii\helpers\Inflector;
  * @property string|null $foto_contenido
  * @property string|null $foto_banner
  * @property string $estado              '1' activo (se ve en la web) / '0' inactivo
+ * @property string $destacado           '1' prioritario 2026–2035: sale en el Inicio, en Estrategia y primero en la web
  * @property string $fecha_registro
  * @property string|null $fecha_actualizacion
  * @property int|null $idusuario_registro
@@ -124,6 +125,18 @@ class Ecosistema extends ActiveRecord
     public function url($archivo)
     {
         return $archivo ? Yii::getAlias('@web/' . self::CARPETA . '/' . (int) $this->idecosistema . '/' . $archivo) : null;
+    }
+
+    /** Para la web: activos, primero los destacados y después por número. */
+    public static function paraWeb()
+    {
+        return static::find()->where(['estado' => '1'])->orderBy(['destacado' => SORT_DESC, 'numero' => SORT_ASC]);
+    }
+
+    /** Para el Inicio y Estrategia → Sectores prioritarios: solo los destacados activos. */
+    public static function destacados()
+    {
+        return static::find()->where(['estado' => '1', 'destacado' => '1'])->orderBy(['numero' => SORT_ASC]);
     }
 
     /** Lista id => "01 · Nombre" para selectores. */
