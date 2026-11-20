@@ -64,7 +64,7 @@
           Swal.fire({ icon: r && r.exito ? "success" : "error", titleText: (r && r.mensaje) || "No se pudo subir." })
             .then(function () { if (r && r.exito) window.location.reload(); });
         })
-        .fail(function () { Swal.fire({ icon: "error", titleText: "Error de conexión. Intentá de nuevo." }); })
+        .fail(function () { Swal.fire({ icon: "error", titleText: "Error de conexión. Intente de nuevo." }); })
         .always(function () { $in.remove(); });
     });
     $in.trigger("click");

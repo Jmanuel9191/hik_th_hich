@@ -27,7 +27,7 @@ use yii\helpers\Html;
             <?php if ($nota): ?><p class="huk-nota"><?= Html::encode($nota) ?></p><?php endif; ?>
             <?php if ($reenviar): ?>
                 <?= Html::beginForm(['/cuenta/acceso/reenviar'], 'post', ['class' => 'huk-reenviar']) ?>
-                <?= Html::input('email', 'email', $email, ['class' => 'form-control', 'placeholder' => 'Tu correo', 'required' => true, 'aria-label' => 'Tu correo']) ?>
+                <?= Html::input('email', 'email', $email, ['class' => 'form-control', 'placeholder' => 'Su correo', 'required' => true, 'aria-label' => 'Su correo']) ?>
                 <?= Html::submitButton('Reenviar', ['class' => 'btn btn-outline-dark']) ?>
                 <?= Html::endForm() ?>
             <?php endif; ?>

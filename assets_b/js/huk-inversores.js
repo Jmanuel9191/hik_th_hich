@@ -19,7 +19,7 @@
         Swal.fire({ icon: r && r.exito ? "success" : "error", titleText: (r && r.mensaje) || "No se pudo completar." })
           .then(function () { if (r && r.exito) window.location.reload(); });
       })
-      .fail(function () { Swal.fire({ icon: "error", titleText: "Error de conexión. Intentá de nuevo." }); });
+      .fail(function () { Swal.fire({ icon: "error", titleText: "Error de conexión. Intente de nuevo." }); });
   }
 
   /* 1 */
@@ -37,7 +37,7 @@
       confirmButtonText: $b.data("boton"),
       cancelButtonText: "Cancelar",
       confirmButtonColor: $b.data("color") || "#bd944f",
-      inputValidator: function (v) { return (!v || v.trim().length < 5) ? "Escribí el motivo." : null; }
+      inputValidator: function (v) { return (!v || v.trim().length < 5) ? "Escriba el motivo." : null; }
     }).then(function (res) {
       if (res.isConfirmed) enviar($b.data("inversor-motivo"), { motivo: res.value });
     });

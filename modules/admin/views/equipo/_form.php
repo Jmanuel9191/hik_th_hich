@@ -68,14 +68,14 @@ $icono = fn($fa) => ['addon' => ['groupOptions' => ['class' => 'huk-adm-field'],
 </div>
 
 <div class="box box-primary">
-    <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-file-text-o"></i> Biografía (opcional)</h3></div>
+    <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-file-text-o"></i> Resumen (biografía) <span class="text-danger">*</span></h3></div>
     <div class="box-body">
-        <?= $form->field($model, 'biografia')->textarea([
+        <?= $form->field($model, 'biografia', ['enableClientValidation' => false])->textarea([ // el editor llena el campo al guardar: se valida en el servidor
             'data-editor' => true,
             'data-editor-alto' => 320,
             'data-tinymce-base' => Url::to('@web/assets_b/lib/tinymce'),
             'rows' => 8,
-        ])->label(false)->hint('Si la completás, en la web aparece el botón "Ver más" con este texto.') ?>
+        ])->label(false)->hint('Obligatorio. Un resumen corto (máx. ' . Equipo::BIO_MAX . ' caracteres): sale en Nosotros → Liderazgo debajo del puesto.') ?>
     </div>
 </div>
 

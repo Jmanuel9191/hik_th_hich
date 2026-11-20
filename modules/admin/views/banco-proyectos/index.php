@@ -9,6 +9,7 @@
  * @var array $ecosistemas id => nombre
  * @var bool $puedeCrear
  * @var bool $puedeExportar
+ * @var bool $verMontos  false para el Editor de contenido (no ve datos financieros)
  */
 
 use app\models\Proyecto;
@@ -79,14 +80,14 @@ $vacio = Html::tag('span', '—', ['class' => 'text-muted']);
                         'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                         'value' => fn(Proyecto $m) => Html::tag('span', Html::encode(Proyecto::TIPOS[$m->tipo] ?? $m->tipo), ['class' => 'huk-proyecto-tipo-label is-' . $m->tipo]),
                     ],
-                    [
+                    ...($verMontos ? [[
                         'label' => 'Monto',
                         'format' => 'raw',
                         'contentOptions' => ['class' => 'text-nowrap'],
                         'value' => fn(Proyecto $m) => $m->monto('monto_objetivo')
                             ? Html::encode($m->monto('monto_objetivo')) . Html::tag('div', Html::encode($m->getAttributeLabel('monto_objetivo')), ['class' => 'huk-eco-resumen'])
                             : $vacio,
-                    ],
+                    ]] : []),
                     [
                         'attribute' => 'estado',
                         'label' => 'Estado',

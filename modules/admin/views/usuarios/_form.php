@@ -70,9 +70,9 @@ $esGerente = (int) $model->idrol === Rol::GERENTE;
             <?= $form->field($model, 'ecosistemasIds')->widget(Select2::class, [
                 'data' => Ecosistema::lista(false),
                 'language' => 'es',
-                'options' => ['placeholder' => 'Elegí uno o varios ecosistemas', 'multiple' => true],
+                'options' => ['placeholder' => 'Elija uno o varios ecosistemas', 'multiple' => true],
                 'pluginOptions' => ['allowClear' => true, 'closeOnSelect' => false, 'width' => '100%'],
-            ])->hint('El gerente solo ve y edita los ecosistemas que elijas acá.') ?>
+            ])->hint('El gerente solo ve y edita los ecosistemas que elija aquí.') ?>
         </div>
 
         <?= $form->field($model, 'pais_operacion')->widget(Select2::class, [
@@ -89,9 +89,9 @@ $esGerente = (int) $model->idrol === Rol::GERENTE;
         <?= $form->field($model, 'ciudad')->widget(Select2::class, [
             'data' => Ubicaciones::ciudadesDe($model->pais_operacion, $model->ciudad),
             'language' => 'es',
-            'options' => ['placeholder' => 'Primero elegí el país', 'data-ciudad-select' => true],
+            'options' => ['placeholder' => 'Primero elija el país', 'data-ciudad-select' => true],
             'pluginOptions' => ['allowClear' => true, 'tags' => true], // tags: deja escribir una ciudad que no está
-        ])->hint('Si tu ciudad no aparece, escribila y presioná Enter.') ?>
+        ])->hint('Si su ciudad no aparece, escríbala y presione Enter.') ?>
 
         <?= $form->field($model, 'cargo')->textInput(['maxlength' => 500]) ?>
 

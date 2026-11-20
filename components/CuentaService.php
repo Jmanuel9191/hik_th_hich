@@ -121,8 +121,8 @@ class CuentaService implements InterfaceCuenta
      */
     public function recuperacionCuenta($email)
     {
-        $mensaje = 'Si el correo está registrado, te enviamos un enlace para crear una nueva contraseña. '
-            . 'Vence en ' . self::MINUTOS_TOKEN_RECUPERACION . ' minutos. Revisá también la carpeta de spam.';
+        $mensaje = 'Si el correo está registrado, le enviamos un enlace para crear una nueva contraseña. '
+            . 'Vence en ' . self::MINUTOS_TOKEN_RECUPERACION . ' minutos. Revise también la carpeta de spam.';
 
         $usuario = Usuarios::findOne(['email' => trim((string) $email), 'estado' => '1']);
         if (!$usuario || !Rol::entraAlPanel($usuario->idrol)) {
@@ -258,7 +258,7 @@ class CuentaService implements InterfaceCuenta
         $usuario->requiere_cambio_contrasena = 0;
 
         if ($usuario->save(false)) {
-            Yii::$app->session->setFlash('success', 'Tu contraseña ha sido actualizada correctamente.');
+            Yii::$app->session->setFlash('success', 'Su contraseña ha sido actualizada correctamente.');
             return ['exito' => true];
         } else {
             Yii::$app->session->setFlash('error', 'No se pudo guardar la nueva contraseña.');

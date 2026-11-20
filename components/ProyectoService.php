@@ -80,7 +80,7 @@ class ProyectoService implements InterfaceProyecto
             throw new NotFoundHttpException('El proyecto no existe.');
         }
         if (!$this->enAlcance($p->idecosistema)) {
-            throw new ForbiddenHttpException('Este proyecto es de un área que no tenés asignada.');
+            throw new ForbiddenHttpException('Este proyecto es de un área que no tiene asignada.');
         }
         return $p;
     }
@@ -141,9 +141,9 @@ class ProyectoService implements InterfaceProyecto
 
     /* ---------------- Estados ---------------- */
 
-    /** desde => [hacia => permiso] */
+    /** desde => [hacia => permiso (o lista: alcanza con uno)]. El Editor (proyectos_pagina) llega hasta "En revisión". */
     const FLUJO = [
-        'borrador' => ['revision' => 'proyectos_editar', 'publicado' => 'proyectos_publicar'],
+        'borrador' => ['revision' => ['proyectos_editar', 'proyectos_pagina'], 'publicado' => 'proyectos_publicar'],
         'revision' => ['publicado' => 'proyectos_publicar', 'borrador' => 'proyectos_editar'],
         'publicado' => ['cerrado' => 'proyectos_publicar', 'borrador' => 'proyectos_publicar', 'archivado' => 'proyectos_publicar'],
         'cerrado' => ['publicado' => 'proyectos_publicar', 'archivado' => 'proyectos_publicar'],
@@ -165,20 +165,34 @@ class ProyectoService implements InterfaceProyecto
         }
         $t = [];
         foreach (self::FLUJO[$p->estado] ?? [] as $hacia => $permiso) {
-            if ($this->permisos->tienePermiso($permiso)) {
+            if ($this->tieneAlguno($permiso)) {
                 $t[$hacia] = self::BOTONES[$hacia];
             }
         }
         return $t;
     }
 
-    /** Lo que falta para poder publicar. */
+    /** ¿Tiene el permiso, o alguno de la lista? */
+    private function tieneAlguno($permisos): bool
+    {
+        foreach ((array) $permisos as $permiso) {
+            if ($this->permisos->tienePermiso($permiso)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Para ver un proyecto alcanza con proyectos_ver o, para el Editor, proyectos_pagina. */
+    private function permisoVer(): string
+    {
+        return $this->permisos->tienePermiso('proyectos_ver') ? 'proyectos_ver' : 'proyectos_pagina';
+    }
+
+    /** Lo que falta para poder publicar. La descripción quedó como ficha interna: en la web se ve la página (secciones y bloques). */
     private function faltantes(Proyecto $p)
     {
-        $f = [];
-        if (trim(strip_tags((string) $p->descripcion)) === '') {
-            $f[] = 'la descripción';
-        }
+        $f = \app\models\ProyectoSeccion::faltantesParaPublicar((int) $p->idproyecto);
         if (!$p->foto_principal) {
             $f[] = 'la foto principal';
         }
@@ -196,12 +210,14 @@ class ProyectoService implements InterfaceProyecto
 
     public function cambiarEstado($id, $estado)
     {
-        $p = $this->buscar($id);
+        $p = $this->buscar($id, $this->permisoVer());
         $permiso = self::FLUJO[$p->estado][$estado] ?? null;
         if ($permiso === null) {
             return ['exito' => false, 'mensaje' => 'Ese cambio de estado no es posible.'];
         }
-        $this->permisos->verificarPermiso($permiso);
+        if (!$this->tieneAlguno($permiso)) {
+            throw new ForbiddenHttpException('No tiene permiso para ese cambio de estado.');
+        }
         if ($estado === 'publicado' && ($f = $this->faltantes($p))) {
             return ['exito' => false, 'mensaje' => 'Para publicar falta completar: ' . implode(', ', $f) . '.'];
         }
@@ -242,7 +258,7 @@ class ProyectoService implements InterfaceProyecto
         }
 
         if (!$p->validate()) {
-            return ['exito' => false, 'mensaje' => 'Revisá los campos marcados.'];
+            return ['exito' => false, 'mensaje' => 'Revise los campos marcados.'];
         }
         foreach (Proyecto::SOLO_TIPO as $tipo => $campos) {
             if ($tipo !== $p->tipo) {
@@ -255,12 +271,12 @@ class ProyectoService implements InterfaceProyecto
             $p->etapasInteres = [];
         }
         if (!$this->enAlcance($p->idecosistema)) {
-            $p->addError('idecosistema', 'Solo podés usar ecosistemas que tenés asignados.');
-            return ['exito' => false, 'mensaje' => 'Revisá los campos marcados.'];
+            $p->addError('idecosistema', 'Solo puede usar ecosistemas que tiene asignados.');
+            return ['exito' => false, 'mensaje' => 'Revise los campos marcados.'];
         }
         if ($p->idgerente && !$this->gerenteDelArea($p->idgerente, $p->idecosistema)) {
             $p->addError('idgerente', 'Ese gerente no tiene asignado este ecosistema (o está bloqueado).');
-            return ['exito' => false, 'mensaje' => 'Revisá los campos marcados.'];
+            return ['exito' => false, 'mensaje' => 'Revise los campos marcados.'];
         }
 
         $tx = Yii::$app->db->beginTransaction();
@@ -288,7 +304,7 @@ class ProyectoService implements InterfaceProyecto
                     $p->idproyecto = null;
                 }
                 $p->addError($campo, $r['error']);
-                return ['exito' => false, 'mensaje' => 'Revisá los campos marcados.'];
+                return ['exito' => false, 'mensaje' => 'Revise los campos marcados.'];
             }
             if ($p->$campo) {
                 $borrar[] = $p->$campo;
@@ -307,6 +323,7 @@ class ProyectoService implements InterfaceProyecto
         $p->save(false);
         $tx->commit();
         foreach ($borrar as $archivo) {
+            ImagenVariante::borrarCopias($carpeta . '/' . $archivo);
             SubidaImagen::borrar($carpeta, $archivo);
         }
         $p->populateRelation('ecosistema', Ecosistema::findOne($p->idecosistema));
@@ -321,7 +338,7 @@ class ProyectoService implements InterfaceProyecto
                 ProyectoHistorial::registrar($p->idproyecto, 'Edición', implode("\n", array_merge($cambios, $cambiosImg)));
             }
         }
-        return ['exito' => true, 'mensaje' => $nuevo ? 'Proyecto creado (en borrador). Ahora podés sumar fotos, videos y documentos.' : 'Cambios guardados.'];
+        return ['exito' => true, 'mensaje' => $nuevo ? 'Proyecto creado (en borrador). Ahora puede sumar fotos, videos y documentos.' : 'Cambios guardados.'];
     }
 
     private function diferencias(Proyecto $p, array $antes, $antesEco)
@@ -423,10 +440,10 @@ class ProyectoService implements InterfaceProyecto
     {
         $p = $this->buscar($id, 'proyectos_eliminar');
         if (!$this->puedeEliminar($p)) {
-            return ['exito' => false, 'mensaje' => 'Solo se pueden eliminar proyectos en borrador. Si ya se publicó, archivalo.'];
+            return ['exito' => false, 'mensaje' => 'Solo se pueden eliminar proyectos en borrador. Si ya se publicó, archívelo.'];
         }
         if (\app\models\InversionPago::find()->where(['idproyecto' => $p->idproyecto])->exists()) {
-            return ['exito' => false, 'mensaje' => 'Tiene pagos registrados en Inversiones: no se puede eliminar. Archivalo.'];
+            return ['exito' => false, 'mensaje' => 'Tiene pagos registrados en Inversiones: no se puede eliminar. Archívelo.'];
         }
         $titulo = $p->codigo . ' · ' . $p->titulo;
         $p->delete(); // galería, videos y documentos se borran en cascada
@@ -441,7 +458,7 @@ class ProyectoService implements InterfaceProyecto
     {
         $p = $this->buscar($id, 'proyectos_editar');
         if (!$this->puedeEditar($p)) {
-            throw new ForbiddenHttpException('No podés editar este proyecto.');
+            throw new ForbiddenHttpException('No puede editar este proyecto.');
         }
         return $p;
     }
@@ -501,17 +518,27 @@ class ProyectoService implements InterfaceProyecto
             return ['exito' => false, 'mensaje' => implode(' ', $v->getFirstErrors())];
         }
         if ($f === null && $v->url === '') {
-            return ['exito' => false, 'mensaje' => 'Subí un archivo de video o pegá un enlace de YouTube o Vimeo.'];
+            return ['exito' => false, 'mensaje' => 'Suba un archivo de video o pegue un enlace de YouTube o Vimeo.'];
         }
         if ($f !== null) {
             $n = ProyectoVideo::find()->where(['idproyecto' => $p->idproyecto, 'tipo' => 'archivo'])->count();
             if ($n >= Proyecto::MAX_VIDEOS_ARCHIVO) {
-                return ['exito' => false, 'mensaje' => 'Este proyecto ya tiene ' . Proyecto::MAX_VIDEOS_ARCHIVO . ' videos subidos (el máximo). Usá un enlace de YouTube o Vimeo, o borrá uno.'];
+                return ['exito' => false, 'mensaje' => 'Este proyecto ya tiene ' . Proyecto::MAX_VIDEOS_ARCHIVO . ' videos subidos (el máximo). Use un enlace de YouTube o Vimeo, o borre uno.'];
             }
-            $r = SubidaArchivo::guardar($f, Proyecto::carpetaDe($p->idproyecto, 'videos'), ProyectoVideo::FORMATOS, Proyecto::MAX_VIDEO_MB);
+            if (($rechazo = VideoFormato::rechazo((string) $f->extension)) !== null) {
+                return ['exito' => false, 'mensaje' => $rechazo];
+            }
+            $carpeta = Proyecto::carpetaDe($p->idproyecto, 'videos');
+            $r = SubidaArchivo::guardar($f, $carpeta, VideoFormato::formatosAceptados(), Proyecto::MAX_VIDEO_MB);
             if (!$r['ok']) {
                 return ['exito' => false, 'mensaje' => $r['error']];
             }
+            $r = $this->prepararVideo($carpeta, $r, (string) $f->extension);
+            if (!$r['ok']) {
+                return ['exito' => false, 'mensaje' => $r['error']];
+            }
+            $aviso = $r['aviso'];
+            $nota = $r['nota'];
             $v->setAttributes(['tipo' => 'archivo', 'url' => null, 'archivo' => $r['archivo'], 'mime' => $r['mime'], 'tamano' => $r['tamano'],
                 'nombre_original' => mb_substr($f->name, 0, 255)], false);
         } else {
@@ -527,7 +554,38 @@ class ProyectoService implements InterfaceProyecto
         $p->updateAttributes(['fecha_actualizacion' => date('Y-m-d H:i:s')]);
         ProyectoHistorial::registrar($p->idproyecto, 'Videos', 'Video agregado: ' . $v->titulo . ($v->tipo === 'archivo'
             ? ' (archivo ' . $v->nombre_original . ', ' . SubidaArchivo::peso($v->tamano) . ')' : ' (enlace)'));
-        return ['exito' => true, 'mensaje' => 'Video agregado.'];
+        return ['exito' => true, 'mensaje' => trim('Video agregado. ' . ($nota ?? '') . ' ' . ($aviso ?? '')), 'aviso' => !empty($aviso)];
+    }
+
+    /**
+     * Deja el video listo para verse en el navegador (VideoFormato): lo convierte a MP4 H.264 si hace falta
+     * y le saca la miniatura. $r: lo que devolvió SubidaArchivo::guardar.
+     * @return array ['ok', 'archivo', 'mime', 'tamano', 'nota' (se convirtió), 'aviso' (puede no verse en todos lados)] o ['ok' => false, 'error']
+     */
+    private function prepararVideo(string $carpeta, array $r, string $ext): array
+    {
+        $ruta = $carpeta . '/' . $r['archivo'];
+        $analisis = VideoFormato::analizar($ruta, $ext);
+        if ($analisis['accion'] === 'rechazar') {
+            SubidaArchivo::borrar($carpeta, $r['archivo']);
+            return ['ok' => false, 'error' => $analisis['aviso']];
+        }
+        if ($analisis['accion'] === 'convertir') {
+            $mp4 = pathinfo($r['archivo'], PATHINFO_FILENAME) . '-h264.mp4';
+            $ok = VideoFormato::convertir($ruta, $carpeta . '/' . $mp4);
+            SubidaArchivo::borrar($carpeta, $r['archivo']); // el original no se sirve nunca
+            if (!$ok) {
+                return ['ok' => false, 'error' => 'No se pudo convertir el video para que se vea en el navegador. '
+                    . 'Pruebe pasarlo a MP4 con HandBrake (gratis, handbrake.fr) y súbalo de nuevo.'];
+            }
+            $r = ['archivo' => $mp4, 'mime' => 'video/mp4', 'tamano' => (int) filesize($carpeta . '/' . $mp4)];
+            $ruta = $carpeta . '/' . $mp4;
+        }
+        VideoFormato::miniatura($ruta, $carpeta . '/' . pathinfo($r['archivo'], PATHINFO_FILENAME) . '.jpg');
+        $convertido = $analisis['accion'] === 'convertir';
+        return ['ok' => true, 'archivo' => $r['archivo'], 'mime' => $r['mime'], 'tamano' => $r['tamano'],
+            'nota' => $convertido ? 'Se convirtió a MP4 para que se vea en todos los navegadores.' : null,
+            'aviso' => $convertido ? null : $analisis['aviso']];
     }
 
     private function videoEditable($idvideo)
@@ -562,6 +620,10 @@ class ProyectoService implements InterfaceProyecto
         [$v, $p] = $this->videoEditable($idvideo);
         if ($v->archivo) {
             SubidaArchivo::borrar(Proyecto::carpetaDe($p->idproyecto, 'videos'), $v->archivo);
+            if ($jpg = $v->miniatura()) {
+                SubidaArchivo::borrar(Proyecto::carpetaDe($p->idproyecto, 'videos'), $jpg);
+                ImagenVariante::borrarCopias(Proyecto::carpetaDe($p->idproyecto, 'videos') . '/' . $jpg);
+            }
         }
         $v->delete();
         ProyectoHistorial::registrar($p->idproyecto, 'Videos', 'Video eliminado: ' . $v->titulo);
@@ -583,7 +645,7 @@ class ProyectoService implements InterfaceProyecto
             return ['exito' => false, 'mensaje' => implode(' ', $d->getFirstErrors())];
         }
         if ($f === null || $f->error === UPLOAD_ERR_NO_FILE) {
-            return ['exito' => false, 'mensaje' => 'Elegí el archivo.'];
+            return ['exito' => false, 'mensaje' => 'Elija el archivo.'];
         }
         $r = SubidaArchivo::guardar($f, Proyecto::carpetaDe($p->idproyecto, 'documentos'), ProyectoDocumento::FORMATOS, Proyecto::MAX_DOCUMENTO_MB);
         if (!$r['ok']) {
@@ -644,7 +706,7 @@ class ProyectoService implements InterfaceProyecto
 
     public function archivoImagen($id, $campo): array
     {
-        $p = $this->buscar($id);
+        $p = $this->buscar($id, $this->permisoVer());
         if (!isset(Proyecto::IMAGENES[$campo]) || !$p->$campo) {
             throw new NotFoundHttpException('Sin imagen.');
         }
@@ -654,7 +716,7 @@ class ProyectoService implements InterfaceProyecto
     public function archivoGaleria($idimagen): array
     {
         $img = ProyectoImagen::findOne((int) $idimagen) ?? throw new NotFoundHttpException('La foto ya no existe.');
-        $p = $this->buscar($img->idproyecto);
+        $p = $this->buscar($img->idproyecto, $this->permisoVer());
         return ['ruta' => $this->existe(Proyecto::carpetaDe($p->idproyecto, 'galeria') . '/' . basename($img->archivo)), 'nombre' => $img->nombre_original, 'mime' => null];
     }
 
@@ -664,15 +726,15 @@ class ProyectoService implements InterfaceProyecto
         if ($v === null || $v->tipo !== 'archivo') {
             throw new NotFoundHttpException('El video ya no existe.');
         }
-        $p = $this->buscar($v->idproyecto);
+        $p = $this->buscar($v->idproyecto, $this->permisoVer());
         return ['ruta' => $this->existe(Proyecto::carpetaDe($p->idproyecto, 'videos') . '/' . basename($v->archivo)), 'nombre' => $v->nombre_original,
-            'mime' => $v->mime === 'video/quicktime' ? 'video/mp4' : $v->mime]; // MOV con H.264 se reproduce como MP4
+            'mime' => ProyectoVideo::mimeReproduccion($v->mime)];
     }
 
     public function archivoDocumento($iddocumento): array
     {
         $d = ProyectoDocumento::findOne((int) $iddocumento) ?? throw new NotFoundHttpException('El documento ya no existe.');
-        $p = $this->buscar($d->idproyecto);
+        $p = $this->buscar($d->idproyecto, $this->permisoVer());
         $ruta = $this->existe(Proyecto::carpetaDe($p->idproyecto, 'documentos') . '/' . basename($d->archivo));
         ProyectoDescarga::registrar($d);
         return ['ruta' => $ruta, 'nombre' => $d->nombre_original, 'mime' => $d->mime];
@@ -741,7 +803,7 @@ class ProyectoService implements InterfaceProyecto
             $filtros[] = 'Etapa: ' . (Proyecto::ETAPAS[$search->etapa] ?? $search->etapa);
         }
         if ($this->alcance() !== null) {
-            $filtros[] = 'Solo tus áreas';
+            $filtros[] = 'Solo sus áreas';
         }
         return ['titulo' => 'Proyectos', 'columnas' => $columnas, 'modelos' => $modelos, 'filtros' => $filtros];
     }

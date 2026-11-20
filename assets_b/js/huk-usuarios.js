@@ -37,7 +37,7 @@
         });
       })
       .fail(function () {
-        Swal.fire({ icon: "error", titleText: "Error de conexión. Intentá de nuevo." });
+        Swal.fire({ icon: "error", titleText: "Error de conexión. Intente de nuevo." });
       });
   }
 
@@ -56,7 +56,7 @@
       cancelButtonText: "Cancelar",
       confirmButtonColor: bloquear ? "#a33a2c" : "#bd944f",
       inputValidator: function (v) {
-        if (!v || !v.trim()) return "Escribí el motivo.";
+        if (!v || !v.trim()) return "Escriba el motivo.";
       },
     }).then(function (res) {
       if (res.isConfirmed) enviar($b.data("usuario-estado"), { motivo: res.value.trim() });

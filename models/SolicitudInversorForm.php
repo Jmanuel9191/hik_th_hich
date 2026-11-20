@@ -29,6 +29,28 @@ class SolicitudInversorForm extends Model
     public $intereses = [];
     public $monto_minimo;
     public $monto_maximo;
+    /** Moneda del monto (Configuración → Monedas, solo activas). */
+    public $idmoneda;
+
+    /** Error del correo cuando ya tiene una cuenta (el registro lo muestra con "Ingresar" y "Recuperar contraseña"). */
+    const CORREO_REPETIDO = 'Ese correo ya tiene una cuenta. Si es suyo, ingrese o recupere su contraseña.';
+
+    /** ¿El error del correo es que ya existe una cuenta con él? */
+    public function correoRepetido(): bool
+    {
+        return $this->getFirstError('email') === self::CORREO_REPETIDO;
+    }
+    /** Moneda que ya tenía el inversor (edición en el panel): sigue siendo válida aunque esté inactiva. */
+    public $idmonedaActual;
+
+    public function init()
+    {
+        parent::init();
+        if ($this->idmoneda === null) { // por defecto, dólares (si existe)
+            $usd = Moneda::find()->select('idmoneda')->where(['codigo' => 'USD', 'estado' => '1'])->scalar();
+            $this->idmoneda = $usd ? (string) $usd : null;
+        }
+    }
     public $plazo_preferido;
     public $participacion_preferida = 'indistinto';
     public $como_nos_conocio;
@@ -38,6 +60,18 @@ class SolicitudInversorForm extends Model
     public $terminos;
     /** Trampa para robots: un humano no la ve ni la completa. */
     public $sitio_hp;
+    /**
+     * Trampa de tiempo (antispam): hora en que se abrió el formulario, firmada por el servidor (no se puede falsificar).
+     * Si se envía en menos de SEGUNDOS_MINIMOS es un robot: ninguna persona llena el formulario tan rápido.
+     */
+    public $inicio;
+    const SEGUNDOS_MINIMOS = 4;
+
+    /** Valor firmado para el campo oculto "inicio" (se genera cada vez que se muestra el formulario). */
+    public static function marcaInicio(): string
+    {
+        return \Yii::$app->security->hashData((string) time(), \Yii::$app->request->cookieValidationKey);
+    }
     /** Panel: aprobar en el mismo paso (solo con permiso inversores_aprobar). */
     public $aprobar_ahora;
 
@@ -52,10 +86,10 @@ class SolicitudInversorForm extends Model
     public function scenarios()
     {
         $comunes = ['tipo', 'nombre', 'documento_tipo', 'documento_numero', 'documento', 'pais', 'ciudad', 'email', 'celular',
-            'razon_social', 'nit', 'cargo', 'sitio_web', 'intereses', 'monto_minimo', 'monto_maximo', 'plazo_preferido',
+            'razon_social', 'nit', 'cargo', 'sitio_web', 'intereses', 'monto_minimo', 'monto_maximo', 'idmoneda', 'plazo_preferido',
             'participacion_preferida', 'como_nos_conocio', 'mensaje'];
         return [
-            'web' => array_merge($comunes, ['contrasena', 'contrasena2', 'terminos', 'sitio_hp']),
+            'web' => array_merge($comunes, ['contrasena', 'contrasena2', 'terminos', 'sitio_hp', 'inicio']),
             'admin' => array_merge($comunes, ['aprobar_ahora']),
         ];
     }
@@ -68,8 +102,9 @@ class SolicitudInversorForm extends Model
             [['nombre', 'documento_numero', 'pais', 'ciudad', 'email', 'celular', 'razon_social', 'nit', 'cargo', 'sitio_web',
                 'como_nos_conocio', 'mensaje'], 'filter', 'filter' => fn($v) => trim(preg_replace('/[ \t]+/u', ' ', (string) $v))],
             [['email'], 'filter', 'filter' => 'mb_strtolower'],
-            [['tipo', 'nombre', 'documento_tipo', 'documento_numero', 'pais', 'ciudad', 'email', 'celular', 'monto_minimo', 'monto_maximo', 'plazo_preferido'], 'required'],
-            [['intereses'], 'required', 'message' => 'Elegí al menos un área de interés.'],
+            [['tipo', 'nombre', 'documento_tipo', 'documento_numero', 'pais', 'ciudad', 'email', 'celular', 'monto_minimo', 'monto_maximo', 'idmoneda', 'plazo_preferido'], 'required'],
+            [['idmoneda'], 'in', 'range' => fn() => array_map('strval', array_keys(Moneda::lista($this->idmonedaActual))), 'message' => 'Elija una moneda de la lista.'],
+            [['intereses'], 'required', 'message' => 'Elija al menos un área de interés.'],
             [['razon_social', 'nit', 'cargo'], 'required', 'when' => $esEmpresa, 'whenClient' => $esEmpresaJs],
             [['tipo'], 'in', 'range' => array_keys(Inversor::TIPOS)],
             [['documento_tipo'], 'in', 'range' => array_keys(Inversor::DOCUMENTOS)],
@@ -88,9 +123,9 @@ class SolicitudInversorForm extends Model
             [['email'], 'string', 'max' => 100],
             [['email'], 'unique', 'targetClass' => Usuarios::class, 'targetAttribute' => 'email',
                 'filter' => fn($q) => $this->idusuario ? $q->andWhere(['<>', 'idusuario', (int) $this->idusuario]) : $q,
-                'message' => 'Ese correo ya tiene una cuenta. Si es tuyo, ingresá o recuperá tu contraseña.'],
+                'message' => self::CORREO_REPETIDO],
             [['celular'], 'string', 'max' => 30],
-            [['celular'], 'match', 'pattern' => '/^\+?[0-9 ()\-]{7,25}$/', 'message' => 'Escribilo con el código de país. Ej.: +591 70000000'],
+            [['celular'], 'match', 'pattern' => '/^\+?[0-9 ()\-]{7,25}$/', 'message' => 'Escríbalo con el código de país. Ej.: +591 70000000'],
             [['razon_social'], 'string', 'max' => 200],
             [['cargo'], 'string', 'max' => 100],
             [['sitio_web'], 'url', 'defaultScheme' => 'https', 'validSchemes' => ['http', 'https']],
@@ -100,7 +135,7 @@ class SolicitudInversorForm extends Model
             [['mensaje'], 'string', 'max' => 1000],
             [['documento'], 'file', 'skipOnEmpty' => $this->scenario !== 'web', 'extensions' => array_keys(Inversor::FORMATOS_DOCUMENTO),
                 'checkExtensionByMimeType' => false, 'maxSize' => Inversor::MAX_DOCUMENTO_MB * 1024 * 1024,
-                'uploadRequired' => 'Subí una foto o PDF de tu documento de identidad.',
+                'uploadRequired' => 'Suba una foto o PDF de su documento de identidad.',
                 'tooBig' => 'El archivo pesa más de ' . Inversor::MAX_DOCUMENTO_MB . ' MB.',
                 'wrongExtension' => 'Formato no permitido: JPG, PNG, WEBP o PDF.'],
             // Solo web
@@ -109,8 +144,16 @@ class SolicitudInversorForm extends Model
             [['contrasena'], 'match', 'on' => 'web', 'pattern' => '/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/',
                 'message' => 'Mínimo 8 caracteres, con mayúscula, minúscula, número y símbolo.'],
             [['contrasena2'], 'compare', 'compareAttribute' => 'contrasena', 'on' => 'web', 'message' => 'Las contraseñas no coinciden.'],
-            [['terminos'], 'required', 'on' => 'web', 'requiredValue' => '1', 'message' => 'Tenés que aceptar los términos y la política de privacidad.'],
+            [['terminos'], 'required', 'on' => 'web', 'requiredValue' => '1', 'message' => 'Debe aceptar los términos y la política de privacidad.'],
             [['sitio_hp'], 'string', 'on' => 'web'],
+            [['inicio'], function ($atributo) {
+                $hora = is_string($this->inicio) ? \Yii::$app->security->validateData($this->inicio, \Yii::$app->request->cookieValidationKey) : false;
+                if ($hora === false || !ctype_digit($hora)) {
+                    $this->addError($atributo, 'El formulario venció o llegó incompleto. Vuelva a enviarlo.');
+                } elseif (time() - (int) $hora < self::SEGUNDOS_MINIMOS) {
+                    $this->addError($atributo, 'Se envió demasiado rápido. Espere unos segundos y vuelva a enviarlo.');
+                }
+            }, 'on' => 'web', 'skipOnEmpty' => false],
             [['aprobar_ahora'], 'boolean', 'on' => 'admin'],
         ];
     }
@@ -133,15 +176,17 @@ class SolicitudInversorForm extends Model
             'cargo' => 'Cargo en la empresa',
             'sitio_web' => 'Sitio web (opcional)',
             'intereses' => 'Áreas de interés',
-            'monto_minimo' => 'Monto mínimo a invertir (USD)',
-            'monto_maximo' => 'Monto máximo a invertir (USD)',
-            'plazo_preferido' => 'Plazo que preferís',
-            'participacion_preferida' => 'Tipo de participación que preferís',
-            'como_nos_conocio' => '¿Cómo nos conociste? (opcional)',
+            'idmoneda' => 'Moneda',
+            'monto_minimo' => 'Monto mínimo a invertir',
+            'monto_maximo' => 'Monto máximo a invertir',
+            'plazo_preferido' => 'Plazo que prefiere',
+            'participacion_preferida' => 'Tipo de participación que prefiere',
+            'como_nos_conocio' => '¿Cómo nos conoció? (opcional)',
             'mensaje' => 'Mensaje (opcional)',
             'contrasena' => 'Contraseña',
-            'contrasena2' => 'Repetí la contraseña',
+            'contrasena2' => 'Repita la contraseña',
             'terminos' => 'Acepto los términos de uso y la política de privacidad',
+            'inicio' => 'Envío',
             'aprobar_ahora' => 'Aprobar ahora (con las áreas de interés)',
         ];
     }
@@ -166,11 +211,12 @@ class SolicitudInversorForm extends Model
             'documento_numero' => $inv->documento_numero, 'pais' => $u->pais, 'ciudad' => $u->ciudad, 'email' => $u->email,
             'celular' => $u->movil, 'razon_social' => $inv->razon_social, 'nit' => $inv->nit, 'cargo' => $u->cargo,
             'sitio_web' => $inv->sitio_web, 'intereses' => array_map('strval', array_column($inv->intereses, 'idecosistema')),
-            'monto_minimo' => (string) (float) $inv->monto_minimo, 'monto_maximo' => (string) (float) $inv->monto_maximo, 'plazo_preferido' => $inv->plazo_preferido,
+            'monto_minimo' => (string) (float) $inv->monto_minimo, 'monto_maximo' => (string) (float) $inv->monto_maximo, 'idmoneda' => $inv->idmoneda ? (string) $inv->idmoneda : null, 'plazo_preferido' => $inv->plazo_preferido,
             'participacion_preferida' => $inv->participacion_preferida ?: 'indistinto', 'como_nos_conocio' => $inv->como_nos_conocio,
             'mensaje' => $inv->mensaje,
         ], false);
         $f->idusuario = $inv->idusuario;
+        $f->idmonedaActual = $inv->idmoneda; // aunque después se haya desactivado, sigue siendo válida para este inversor
         return $f;
     }
 }

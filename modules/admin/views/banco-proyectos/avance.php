@@ -56,7 +56,7 @@ $conObra = $p->tipo === 'financiamiento';
                         ])->hint('Etapa actual del proyecto: ' . ($p->etapaNombre() ?? 'sin definir') . '.') ?>
                         <?= $form->field($model, 'porcentaje', ['addon' => ['append' => ['content' => '%']]])
                             ->textInput(['type' => 'number', 'min' => 0, 'max' => 100, 'data-porcentaje-avance' => true])
-                            ->hint('Al elegir etapa se sugiere su %; ajustalo si hace falta (ej. 62 si la construcción va por la mitad). Vacío = el de la etapa.') ?>
+                            ->hint('Al elegir etapa se sugiere su %; ajústelo si hace falta (ej. 62 si la construcción va por la mitad). Vacío = el de la etapa.') ?>
                     </div>
                 </div>
             <?php endif; ?>

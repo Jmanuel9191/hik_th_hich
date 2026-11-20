@@ -94,7 +94,7 @@ $documentos = $model->documentos;
                     </div>
                     <div class="form-group">
                         <?= Html::activeLabel($nuevo, 'tipo', ['class' => 'control-label']) ?>
-                        <?= Html::activeDropDownList($nuevo, 'tipo', ProyectoDocumento::TIPOS, ['class' => 'form-control', 'required' => true, 'prompt' => 'Elegí…']) ?>
+                        <?= Html::activeDropDownList($nuevo, 'tipo', ProyectoDocumento::TIPOS, ['class' => 'form-control', 'required' => true, 'prompt' => 'Elija…']) ?>
                     </div>
                     <div class="form-group">
                         <label class="control-label" for="documento-archivo">Archivo</label>
@@ -104,7 +104,7 @@ $documentos = $model->documentos;
                     </div>
                     <div class="checkbox">
                         <label><?= Html::activeCheckbox($nuevo, 'visible_inversor', ['label' => null, 'uncheck' => '0']) ?> Lo pueden ver los inversores</label>
-                        <p class="help-block">Destildalo para documentos internos (solo el equipo de HUK).</p>
+                        <p class="help-block">Destíldelo para documentos internos (solo el equipo de HUK).</p>
                     </div>
                     <div class="huk-subida-progreso" data-subida-barra hidden>
                         <div class="progress"><div class="progress-bar progress-bar-striped active" role="progressbar">0%</div></div>

@@ -51,7 +51,7 @@ class DatosGeneralesController extends Controller
                 Yii::$app->session->setFlash('flash', ['type' => 'success', 'message' => 'Datos generales guardados.']);
                 return $this->redirect(['index']);
             }
-            Yii::$app->session->setFlash('flash', ['type' => 'error', 'message' => 'Revisá los campos marcados en rojo.']);
+            Yii::$app->session->setFlash('flash', ['type' => 'error', 'message' => 'Revise los campos marcados en rojo.']);
         }
         return $this->render('index', [
             'model' => $form,

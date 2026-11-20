@@ -9,6 +9,7 @@ use yii\helpers\Url;
  * Datos de la solicitud de un inversor (1 a 1 con usuarios, idrol 5).
  * La cuenta (nombre, email, contraseña, estado de bloqueo) sigue en `usuarios`.
  *
+ * @property int|null $idmoneda  moneda del monto (Moneda)
  * @property int $idusuario
  * @property string $tipo                 persona | empresa
  * @property string $documento_tipo
@@ -116,6 +117,14 @@ class Inversor extends ActiveRecord
         return $this->tipo === 'empresa' && $this->razon_social ? $this->razon_social . ' (' . $nombre . ')' : $nombre;
     }
 
+    /** "LP" para el avatar cuando no tiene foto. */
+    public function iniciales(): string
+    {
+        $partes = preg_split('/\s+/u', trim((string) ($this->usuario->nombrecompleto ?? '')), -1, PREG_SPLIT_NO_EMPTY);
+        $ini = mb_substr($partes[0] ?? '', 0, 1) . (count($partes) > 1 ? mb_substr(end($partes), 0, 1) : '');
+        return mb_strtoupper($ini) ?: '?';
+    }
+
     public static function carpetaDe($id)
     {
         return \Yii::getAlias('@app/' . self::CARPETA . '/' . (int) $id);
@@ -132,14 +141,33 @@ class Inversor extends ActiveRecord
         return array_map('intval', (new \yii\db\Query())->select('idecosistema')->from('inversor_area')->where(['idusuario' => (int) $idusuario])->column());
     }
 
-    /** "USD 50.000 – 250.000" (o un solo número si mínimo y máximo son iguales). */
+    /** Ids de las áreas que pidió desde Mi cuenta y todavía no se decidieron. */
+    public static function idsPedidos($idusuario)
+    {
+        return array_map('intval', (new \yii\db\Query())->select('idecosistema')->from('inversor_interes')
+            ->where(['idusuario' => (int) $idusuario])->andWhere(['not', ['pedido_fecha' => null]])->column());
+    }
+
+    /** Moneda del monto que piensa invertir (Configuración → Monedas). */
+    public function getMoneda()
+    {
+        return $this->hasOne(Moneda::class, ['idmoneda' => 'idmoneda']);
+    }
+
+    /** Código de la moneda del monto ("USD" si no tiene: los cargados antes de elegir moneda). */
+    public function codigoMoneda(): string
+    {
+        return $this->moneda->codigo ?? 'USD';
+    }
+
+    /** "USD 50.000 – 150.000" / "BOB 70.000". */
     public function montoTexto()
     {
         $f = fn($v) => number_format((float) $v, 0, ',', '.');
         if ($this->monto_minimo === null) {
             return '';
         }
-        return 'USD ' . ((float) $this->monto_minimo === (float) $this->monto_maximo
+        return $this->codigoMoneda() . ' ' . ((float) $this->monto_minimo === (float) $this->monto_maximo
             ? $f($this->monto_minimo) : $f($this->monto_minimo) . ' – ' . $f($this->monto_maximo));
     }
 }

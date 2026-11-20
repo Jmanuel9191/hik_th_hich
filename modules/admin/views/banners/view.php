@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Detalle del banner con vista previa (como se vería en la portada) e historial.
+ * Detalle del banner con vista previa (como se vería en su página) e historial.
  *
  * @var yii\web\View $this
  * @var app\models\Banners $model
@@ -25,20 +25,28 @@ $fecha = fn($v, $hora = false) => $v ? date($hora ? 'd/m/Y H:i' : 'd/m/Y', strto
 
 // Vista previa: misma estructura para computadora y celular
 $capa = function () use ($model) {
+    if (!$model->usa('texto')) { // páginas internas: breadcrumb y título
+        return Html::tag('div',
+            Html::tag('small', 'Inicio / ' . Html::encode($model->ubicacionNombre()), ['class' => 'huk-vista-ante'])
+            . Html::tag('h2', Html::encode($model->titulo ?: $model->ubicacionNombre())),
+            ['class' => 'huk-vista-capa']);
+    }
     $html = '';
-    if ($model->antetitulo) {
+    if ($model->usa('antetitulo') && $model->antetitulo) {
         $html .= Html::tag('small', Html::encode($model->antetitulo), ['class' => 'huk-vista-ante']);
     }
     if ($model->titulo) {
         $html .= Html::tag('h2', Html::encode($model->titulo));
     }
-    if ($model->texto) {
-        $html .= Html::tag('p', Html::encode($model->texto));
+    if ($model->texto) { // en el prefooter el texto es la segunda línea, en dorado
+        $html .= $model->esCarrusel()
+            ? Html::tag('p', Html::encode($model->texto))
+            : Html::tag('h2', Html::encode($model->texto), ['class' => 'huk-vista-dorado']);
     }
-    if ($model->boton_texto) {
+    if ($model->usa('boton') && $model->boton_texto) {
         $html .= Html::tag('span', Html::encode($model->boton_texto) . ' <i class="fa fa-angle-right"></i>', ['class' => 'huk-vista-boton']);
     }
-    return $html ? Html::tag('div', $html, ['class' => 'huk-vista-capa']) : '';
+    return $html ? Html::tag('div', $html, ['class' => 'huk-vista-capa' . ($model->esCarrusel() ? '' : ' huk-vista-centro')]) : '';
 };
 ?>
 
@@ -48,7 +56,7 @@ $capa = function () use ($model) {
 
 <section class="content">
     <div class="huk-barra-acciones">
-        <?= Html::a('<i class="fa fa-arrow-left"></i> Volver', ['index'], ['class' => 'btn btn-default']) ?>
+        <?= Html::a('<i class="fa fa-arrow-left"></i> Volver', ['index', 'tab' => $model->ubicacion], ['class' => 'btn btn-default']) ?>
         <?php if ($puede['editar']): ?>
             <?= Html::a('<i class="fa fa-pencil"></i> Editar', ['update', 'id' => $model->idbanner], ['class' => 'btn btn-info']) ?>
         <?php endif; ?>
@@ -65,7 +73,7 @@ $capa = function () use ($model) {
     <div class="row">
         <div class="col-md-8">
             <div class="box box-primary">
-                <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-desktop"></i> Así se vería en la portada</h3></div>
+                <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-desktop"></i> Así se vería en <?= Html::encode($model->ubicacionNombre()) ?></h3></div>
                 <div class="box-body">
                     <div class="huk-vista huk-vista-pc">
                         <?= Html::img(Banners::url($model->imagen), ['alt' => '']) ?>
@@ -101,11 +109,14 @@ $capa = function () use ($model) {
                         'options' => ['class' => 'table table-striped detail-view'],
                         'attributes' => [
                             ['label' => 'Estado', 'format' => 'raw', 'value' => Html::tag('span', $situaciones[$model->situacion()], ['class' => 'label ' . $etiquetas[$model->situacion()]])],
+                            ['attribute' => 'ubicacion', 'value' => $model->ubicacionNombre()],
+                            ['attribute' => 'antetitulo', 'value' => $model->antetitulo ?: '—', 'visible' => $model->usa('antetitulo')],
                             ['attribute' => 'titulo', 'value' => $model->titulo ?: '—'],
-                            ['attribute' => 'texto', 'format' => 'ntext', 'value' => $model->texto ?: '—'],
-                            ['attribute' => 'boton_texto', 'value' => $model->boton_texto ?: '—'],
+                            ['attribute' => 'texto', 'format' => 'ntext', 'value' => $model->texto ?: '—', 'visible' => $model->usa('texto')],
+                            ['attribute' => 'boton_texto', 'value' => $model->boton_texto ?: '—', 'visible' => $model->usa('boton')],
                             [
                                 'attribute' => 'boton_url',
+                                'visible' => $model->usa('boton'),
                                 'format' => 'raw',
                                 'value' => $model->boton_url
                                     ? Html::encode($model->boton_url) . ($model->enlaceExterno() ? ' <small class="text-muted">(se abre en otra pestaña)</small>' : '')
@@ -125,7 +136,7 @@ $capa = function () use ($model) {
                 <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-history"></i> Historial</h3></div>
                 <div class="box-body">
                     <?php if ($historial === null): ?>
-                        <p class="text-muted">No tenés permiso para ver el historial.</p>
+                        <p class="text-muted">No tiene permiso para ver el historial.</p>
                     <?php else: ?>
                         <?php Pjax::begin(['id' => 'banner-historial', 'timeout' => 5000]); ?>
                         <?= GridView::widget([

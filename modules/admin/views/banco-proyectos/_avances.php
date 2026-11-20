@@ -40,7 +40,7 @@ $leyenda = function (ProyectoAvanceArchivo $x) use ($puedeEditar) {
         <?php if (!$avances): ?>
             <div class="box box-primary"><div class="box-body">
                 <p class="text-muted">Todavía no hay avances. Cada vez que pase algo importante (un permiso aprobado, inicio de obra,
-                    una firma), cargá un avance: el inversor ve la evolución sin que se pierda lo anterior.</p>
+                    una firma), cargue un avance: el inversor ve la evolución sin que se pierda lo anterior.</p>
             </div></div>
         <?php endif; ?>
 
@@ -69,7 +69,7 @@ $leyenda = function (ProyectoAvanceArchivo $x) use ($puedeEditar) {
                                     'class' => 'btn btn-danger btn-xs', 'title' => 'Eliminar',
                                     'data-listado-eliminar' => Url::to(['avance-eliminar', 'id' => $a->idavance]),
                                     'data-nombre' => $a->titulo,
-                                    'data-aviso' => 'Se borran el texto y sus archivos. No se puede deshacer. Si solo querés que no se vea, usá Ocultar.',
+                                    'data-aviso' => 'Se borran el texto y sus archivos. No se puede deshacer. Si solo desea que no se vea, use Ocultar.',
                                 ]) ?>
                             </div>
                         <?php endif; ?>
@@ -143,12 +143,12 @@ $leyenda = function (ProyectoAvanceArchivo $x) use ($puedeEditar) {
                                 ]) ?>
                                 <?= Html::fileInput('archivos[]', null, ['class' => 'form-control', 'multiple' => true, 'data-subida-archivos' => true,
                                     'accept' => '.jpg,.jpeg,.png,.webp,.mp4,.mov,.m4v,.webm,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx']) ?>
-                                <p class="help-block">Podés elegir varios a la vez. Cada uno puede llevar su descripción.
+                                <p class="help-block">Puede elegir varios a la vez. Cada uno puede llevar su descripción.
                                     Máximo por avance: <?= ProyectoAvance::MAXIMOS['foto'] ?> fotos, <?= ProyectoAvance::MAXIMOS['video'] ?> videos
                                     (<?= Proyecto::MAX_VIDEO_MB ?> MB c/u) y <?= ProyectoAvance::MAXIMOS['documento'] ?> documentos.</p>
                                 <ul class="huk-subida-lista" data-subida-lista></ul>
                                 <div class="huk-avance-enlace">
-                                    <?= Html::textInput('url', '', ['class' => 'form-control', 'placeholder' => 'o pegá un enlace de YouTube / Vimeo', 'maxlength' => 500]) ?>
+                                    <?= Html::textInput('url', '', ['class' => 'form-control', 'placeholder' => 'o pegue un enlace de YouTube / Vimeo', 'maxlength' => 500]) ?>
                                     <?= Html::textInput('leyenda', '', ['class' => 'form-control', 'placeholder' => 'Descripción del enlace (opcional)',
                                         'maxlength' => ProyectoAvanceArchivo::MAX_LEYENDA]) ?>
                                 </div>

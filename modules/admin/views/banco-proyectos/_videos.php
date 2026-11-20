@@ -13,6 +13,7 @@
 use app\components\SubidaArchivo;
 use app\models\Proyecto;
 use app\models\ProyectoVideo;
+use app\components\VideoFormato;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -78,10 +79,11 @@ $nuevo = new ProyectoVideo();
                     </div>
                     <div class="form-group">
                         <label class="control-label" for="video-archivo">Archivo de video</label>
-                        <?= Html::activeFileInput($nuevo, 'archivo', ['id' => 'video-archivo', 'class' => 'form-control', 'accept' => '.mp4,.mov,.m4v,.webm,video/*',
+                        <?= Html::activeFileInput($nuevo, 'archivo', ['id' => 'video-archivo', 'class' => 'form-control', 'accept' => VideoFormato::accept(),
                             'data-subida-archivo' => true, 'disabled' => $subidos >= Proyecto::MAX_VIDEOS_ARCHIVO]) ?>
                         <p class="help-block">
-                            MP4, MOV (iPhone) o WEBM · recomendado hasta <?= Proyecto::MAX_VIDEO_MB ?> MB
+                            <?= Html::encode(VideoFormato::textoFormatos()) ?> · hasta <?= Proyecto::MAX_VIDEO_MB ?> MB
+                            <?php if (VideoFormato::ffmpeg()): ?>· los que no se ven en el navegador (AVI, MKV, cámaras…) se convierten solos a MP4<?php endif; ?>
                             <?php if ($limiteServidor && $limiteServidor < Proyecto::MAX_VIDEO_MB * 1048576): ?>
                                 · <span class="text-danger">hoy el servidor acepta hasta <?= round($limiteServidor / 1048576) ?> MB</span>
                             <?php endif; ?>
@@ -92,14 +94,14 @@ $nuevo = new ProyectoVideo();
                     <div class="form-group">
                         <?= Html::activeLabel($nuevo, 'url', ['class' => 'control-label']) ?>
                         <?= Html::activeTextInput($nuevo, 'url', ['class' => 'form-control', 'maxlength' => 500, 'placeholder' => 'https://vimeo.com/123456789']) ?>
-                        <p class="help-block">Para videos largos. En Vimeo podés dejarlo privado ("solo con el enlace").</p>
+                        <p class="help-block">Para videos largos. En Vimeo puede dejarlo privado ("solo con el enlace").</p>
                     </div>
                     <div class="huk-subida-progreso" data-subida-barra hidden>
                         <div class="progress"><div class="progress-bar progress-bar-striped active" role="progressbar">0%</div></div>
                         <p class="help-block">Subiendo… no cierres esta página.</p>
                     </div>
                     <p class="huk-aviso-contacto"><i class="fa fa-mobile"></i> <strong>iPhone:</strong> para que se vea en todos los navegadores,
-                        grabá en <em>Ajustes → Cámara → Formatos → Más compatible</em>.</p>
+                        grabe en <em>Ajustes → Cámara → Formatos → Más compatible</em>.</p>
                 </div>
                 <div class="box-footer text-center">
                     <?= Html::submitButton('<i class="fa fa-upload"></i> Agregar video', ['class' => 'btn btn-success', 'data-subida-boton' => true]) ?>

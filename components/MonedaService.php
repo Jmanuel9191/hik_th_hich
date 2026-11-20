@@ -38,7 +38,7 @@ class MonedaService implements InterfaceMonedas
         $antes = $m->getAttributes();
         $m->setAttributes(array_intersect_key($post['Moneda'] ?? [], array_flip(['codigo', 'simbolo', 'nombre'])), false);
         if (!$m->validate()) {
-            return ['exito' => false, 'mensaje' => 'Revisá los campos marcados.'];
+            return ['exito' => false, 'mensaje' => 'Revise los campos marcados.'];
         }
         if ($nueva) {
             $m->estado = '1';
@@ -75,7 +75,7 @@ class MonedaService implements InterfaceMonedas
         $m = $this->buscar($id);
         $n = Proyecto::find()->where(['idmoneda' => $m->idmoneda])->count();
         if ($n > 0) {
-            return ['exito' => false, 'mensaje' => "No se puede eliminar: la usan {$n} proyecto(s). Desactivala para que no se ofrezca más."];
+            return ['exito' => false, 'mensaje' => "No se puede eliminar: la usan {$n} proyecto(s). Desactívela para que no se ofrezca más."];
         }
         $codigo = $m->codigo;
         $m->delete();

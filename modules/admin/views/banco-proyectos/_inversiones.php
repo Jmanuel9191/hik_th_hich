@@ -25,7 +25,7 @@ $pct = $r['porcentaje'];
             <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-pie-chart"></i> La ronda</h3></div>
             <div class="box-body">
                 <?php if (!$moneda): ?>
-                    <p class="text-muted">El proyecto no tiene moneda definida. Editalo y elegí la moneda para poder registrar pagos.</p>
+                    <p class="text-muted">El proyecto no tiene moneda definida. Edítelo y elija la moneda para poder registrar pagos.</p>
                 <?php else: ?>
                     <p class="huk-ronda-dato"><span>Juntado</span><strong><?= Html::encode(InversionPago::dinero($r['recaudado'], $moneda)) ?></strong></p>
                     <?php if ($pct !== null): ?>
@@ -34,7 +34,7 @@ $pct = $r['porcentaje'];
                             <div class="progress-bar<?= $pct >= 100 ? ' progress-bar-success' : '' ?>" role="progressbar" data-ancho="<?= (int) min(100, $pct) ?>"><?= Yii::$app->formatter->asDecimal($pct, 1) ?> %</div>
                         </div>
                         <p class="huk-ayuda"><?= $pct >= 100
-                            ? 'La ronda está completa. Si corresponde, pasá el proyecto a "Inversión completa".'
+                            ? 'La ronda está completa. Si corresponde, pase el proyecto a "Inversión completa".'
                             : 'Falta ' . Html::encode(InversionPago::dinero(max(0, $objetivo - $r['recaudado']), $moneda)) . '.' ?></p>
                     <?php else: ?>
                         <p class="text-muted">Sin "<?= Html::encode($model->getAttributeLabel('monto_objetivo')) ?>" cargado: no se puede calcular el %.</p>

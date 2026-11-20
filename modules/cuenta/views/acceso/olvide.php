@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
         <div class="huk-cuenta-cab">
             <span class="huk-cuenta-eyebrow">Área privada</span>
             <h1>Recuperar contraseña</h1>
-            <p>Escribí el correo con el que te registraste y te enviamos un enlace para crear una contraseña nueva.</p>
+            <p>Escriba el correo con el que se registró y le enviamos un enlace para crear una contraseña nueva.</p>
         </div>
         <div class="huk-tarjeta-form is-angosta">
             <?php $form = ActiveForm::begin(['id' => 'olvide-form', 'options' => ['class' => 'huk-form'], 'fieldConfig' => [

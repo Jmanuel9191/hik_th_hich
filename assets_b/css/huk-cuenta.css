@@ -1,11 +1,14 @@
 /* ==========================================================================
    HUK · Cuenta del inversor (web /cuenta)
    1. Fondo y tarjeta   2. Formularios   3. Persona / Empresa y áreas   4. Avisos   5. Panel   6. Acuerdo (NDA)
+   7. Registro (bienvenida, secciones, documento con vista previa)   8. Solicitud enviada   9. Mi cuenta (perfil)
    Usa las variables --huk-* de huk.css.
    ========================================================================== */
 
 /* 1. FONDO Y TARJETA ----------------------------------------------------- */
 .huk-cuenta{background:var(--huk-dark-grad);padding:64px 0 80px;min-height:70vh}
+/* Sin banner arriba: el fondo oscuro se mete debajo de la franja del menú (no queda la tira blanca) */
+@media (min-width:992px){#contenido>.huk-cuenta:first-child{margin-top:calc(-1 * var(--huk-nav-overlap));padding-top:calc(64px + var(--huk-nav-overlap))}}
 .huk-cuenta-cab{text-align:center;color:#fff;margin-bottom:28px}
 .huk-cuenta-cab .huk-cuenta-eyebrow{display:inline-block;color:var(--huk-gold-light);font-size:13px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px}
 .huk-cuenta-cab h1{color:#fff;font-size:clamp(28px,4vw,40px);margin:0 0 10px}
@@ -68,6 +71,13 @@
 .huk-panel-area{border:1px solid var(--huk-line);border-radius:10px;padding:14px 16px;background:#faf8f3}
 .huk-panel-area strong{display:block;font-size:15px}
 .huk-panel-area span{color:var(--huk-muted);font-size:13px}
+/* Áreas como enlace a /proyectos (hover dorado, la flecha avanza) */
+a.huk-panel-area{display:block;color:var(--huk-text);text-decoration:none;transition:border-color .3s,background .3s,transform .3s,box-shadow .3s}
+a.huk-panel-area:hover,a.huk-panel-area:focus-visible{border-color:var(--huk-gold);background:#fff;transform:translateY(-3px);box-shadow:0 12px 24px rgba(0,0,0,.08)}
+a.huk-panel-area i{margin-left:.3rem;color:var(--huk-gold-dark);transition:transform .3s}
+a.huk-panel-area:hover i{transform:translateX(4px)}
+.huk-panel-ver{margin:4px 0 18px}
+@media (prefers-reduced-motion:reduce){a.huk-panel-area,a.huk-panel-area i{transition:none}a.huk-panel-area:hover{transform:none}}
 .huk-panel-salir{text-align:right;margin-top:20px}
 .huk-panel-salir button{background:none;border:0;color:var(--huk-muted);font-size:14px}
 .huk-panel-salir button:hover{color:var(--huk-gold-dark)}
@@ -82,3 +92,308 @@
   .huk-opciones{grid-template-columns:1fr}
   .huk-panel-estado{flex-direction:column}
 }
+
+/* 7. REGISTRO ---------------------------------------------------------------- */
+/* Debajo del banner: menos aire arriba (el banner ya hace de cabecera) */
+.huk-cuenta.is-con-banner{padding:48px 0 80px}
+.huk-tarjeta-form.is-registro{max-width:980px;margin:0 auto;padding:36px 40px}
+
+/* Bienvenida */
+.huk-bienvenida{display:flex;gap:18px;align-items:flex-start;margin:0 0 26px;padding:20px 22px;border-radius:12px;background:linear-gradient(135deg,#fbf6ea 0%,#f5ecd8 100%);border:1px solid #ecdcb8}
+.huk-bienvenida-icono{flex:none;display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:var(--huk-ink);color:var(--huk-gold-light);font-size:22px}
+.huk-bienvenida h2{margin:0 0 6px;font-size:19px;color:var(--huk-text)}
+.huk-bienvenida p{margin:0 0 12px;font-size:14.5px;line-height:1.6;color:#4a4436}
+
+/* Botones de contacto (WhatsApp, llamar, correo) */
+.huk-contacto-botones{display:flex;flex-wrap:wrap;gap:10px;margin:0;padding:0;list-style:none}
+.huk-contacto-botones a{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 10px;border-radius:40px;background:#fff;border:1px solid #e4d6b6;color:var(--huk-text);text-decoration:none;font-size:14px;font-weight:600;line-height:1.15;transition:border-color .25s,transform .25s,box-shadow .25s}
+.huk-contacto-botones a:hover,.huk-contacto-botones a:focus-visible{border-color:var(--huk-gold);transform:translateY(-2px);box-shadow:0 8px 18px rgba(0,0,0,.08);color:var(--huk-text)}
+.huk-contacto-botones i{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--huk-gold);color:#111;font-size:15px}
+.huk-contacto-botones a.is-wa i{background:#25d366;color:#fff}
+.huk-contacto-botones small{display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--huk-muted)}
+
+.huk-form-obligatorio{margin:0 0 6px;text-align:right;font-size:12.5px;color:var(--huk-muted)}
+.huk-form-obligatorio span{color:var(--huk-gold-dark);font-weight:700}
+
+/* Secciones numeradas con cabecera de color */
+.is-registro .huk-seccion-form{margin:0 0 22px;padding:0 0 4px;border:1px solid var(--huk-line);border-radius:12px;overflow:hidden;background:#fff;transition:border-color .3s,box-shadow .3s}
+.is-registro .huk-seccion-form:focus-within{border-color:var(--huk-gold);box-shadow:0 10px 30px rgba(var(--huk-gold-rgb),.12)}
+.is-registro .huk-seccion-form>:not(.huk-seccion-cab){margin-left:22px;margin-right:22px}
+.is-registro .huk-seccion-form>.row{margin-left:10px;margin-right:10px}
+.huk-seccion-cab{display:flex;align-items:center;gap:12px;margin:0 0 18px;padding:14px 22px;background:linear-gradient(90deg,#141210 0%,#2a2318 100%);color:#fff}
+.huk-seccion-cab .huk-paso{flex:none;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--huk-gold-grad);color:#111;font-weight:700;font-size:14px}
+.huk-seccion-cab>i{flex:none;color:var(--huk-gold-light);font-size:18px;width:22px;text-align:center}
+.huk-seccion-cab h2{margin:0;font-size:17px;color:#fff;line-height:1.25}
+.huk-seccion-cab p{margin:2px 0 0;font-size:13px;color:rgba(255,255,255,.65)}
+.is-registro .huk-seccion-form:focus-within .huk-seccion-cab>i{color:#fff}
+
+/* Campos: fondo suave, se iluminan al escribir */
+.is-registro .form-control,.is-registro .form-select{background-color:#fbfaf7}
+.is-registro .form-control:focus,.is-registro .form-select:focus{background-color:#fff}
+.is-registro .huk-opcion{flex-direction:row;padding:14px 16px}
+.is-registro .huk-opcion i{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:#f2ede2;color:var(--huk-gold-dark);font-size:16px;transition:background .25s,color .25s}
+.is-registro .huk-opcion.is-activo i{background:var(--huk-gold);color:#111}
+.is-registro .huk-opcion span{display:flex;flex-direction:column;line-height:1.25}
+.is-registro .huk-opcion small{font-weight:400;font-size:12.5px;color:var(--huk-muted)}
+.is-registro .huk-areas{grid-template-columns:repeat(3,minmax(0,1fr))}
+.is-registro .huk-areas label{padding:11px 12px;transition:border-color .2s,background .2s}
+.is-registro .huk-areas label:hover{border-color:var(--huk-gold)}
+.is-registro .huk-terminos{margin-bottom:18px}
+
+/* Documento: zona para arrastrar y vista previa */
+.huk-archivo{position:relative}
+.huk-archivo-input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.huk-archivo-zona{display:flex;flex-direction:column;align-items:center;gap:4px;margin:0;padding:22px 16px;border:2px dashed #d9c9a3;border-radius:12px;background:#fdfbf6;text-align:center;cursor:pointer;transition:border-color .25s,background .25s}
+.huk-archivo-zona i{font-size:30px;color:var(--huk-gold);margin-bottom:4px;transition:transform .3s}
+.huk-archivo-zona strong{font-size:15px;color:var(--huk-text)}
+.huk-archivo-zona span{font-size:12.5px;color:var(--huk-muted)}
+.huk-archivo-zona:hover,.huk-archivo-zona.is-encima,.huk-archivo-input:focus-visible+.huk-archivo-zona{border-color:var(--huk-gold);background:#fbf3e1}
+.huk-archivo-zona:hover i,.huk-archivo-zona.is-encima i{transform:translateY(-3px)}
+.huk-archivo-vista{display:flex;align-items:center;gap:14px;padding:12px;border:1px solid var(--huk-gold);border-radius:12px;background:#fbf6ea}
+.huk-archivo-vista[hidden]{display:none}
+.huk-archivo-mini{flex:none;display:grid;place-items:center;width:96px;height:72px;border-radius:8px;overflow:hidden;background:#fff;border:1px solid var(--huk-line)}
+.huk-archivo-mini img{width:100%;height:100%;object-fit:cover}
+.huk-archivo-mini .fa-file-pdf{font-size:34px;color:#c0392b}
+.huk-archivo-datos{flex:1;min-width:0}
+.huk-archivo-datos strong{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.huk-archivo-datos span{font-size:12.5px;color:var(--huk-muted)}
+.huk-archivo-acciones{display:flex;gap:6px}
+.huk-archivo-btn{display:inline-flex;align-items:center;gap:6px;margin:0;padding:7px 12px;border:1px solid var(--huk-line);border-radius:8px;background:#fff;color:var(--huk-text);font-size:13px;font-weight:600;cursor:pointer;transition:border-color .2s,color .2s}
+.huk-archivo-btn:hover{border-color:var(--huk-gold);color:var(--huk-gold-dark)}
+.huk-archivo-btn.is-quitar:hover{border-color:#b3261e;color:#b3261e}
+.has-error .huk-archivo-zona{border-color:#b3261e;background:#fdf3f2}
+
+.huk-form-enviar{text-align:center;padding-top:6px}
+.huk-form-enviar .huk-btn-oro{min-width:260px;padding:14px 32px;font-size:15px;box-shadow:0 10px 24px rgba(var(--huk-gold-rgb),.35);transition:transform .25s,box-shadow .25s,filter .25s}
+.huk-form-enviar .huk-btn-oro:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(var(--huk-gold-rgb),.45)}
+.huk-form-enviar .huk-btn-oro:disabled{opacity:.75;transform:none}
+
+/* Monto con la moneda adelante */
+.huk-monto{display:flex;align-items:stretch}
+.huk-monto-moneda{display:flex;align-items:center;padding:0 12px;border:1px solid var(--huk-line);border-right:0;border-radius:8px 0 0 8px;background:#f2ede2;color:var(--huk-gold-dark);font-weight:700;font-size:13px;letter-spacing:.06em;min-width:52px;justify-content:center}
+.huk-monto .form-control{border-radius:0 8px 8px 0}
+.huk-monto-moneda:empty{display:none}
+.huk-monto-moneda:empty+.form-control{border-radius:8px}
+
+/* Términos: casilla + botón que abre el modal */
+.huk-terminos .form-check-label,.huk-terminos label{font-weight:600}
+.huk-terminos-leer{display:inline-flex;align-items:center;gap:8px;margin-top:8px;padding:6px 12px;border:1px solid #e4d6b6;border-radius:20px;background:#fff;color:var(--huk-gold-dark);font-size:13px;font-weight:600;transition:border-color .2s,background .2s}
+.huk-terminos-leer:hover,.huk-terminos-leer:focus-visible{border-color:var(--huk-gold);background:#fbf6ea}
+.huk-modal-terminos .modal-content{border:0;border-top:4px solid var(--huk-gold);border-radius:14px;overflow:hidden}
+.huk-modal-terminos .modal-header{align-items:flex-start;padding:20px 26px;background:#141210;color:#fff;border-bottom:0}
+.huk-modal-terminos .modal-title{margin:4px 0 0;font-size:21px;color:#fff}
+.huk-modal-terminos .btn-close{filter:invert(1);opacity:.7}
+.huk-modal-ante{color:var(--huk-gold-light);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.huk-modal-terminos .modal-body{padding:24px 26px;font-size:15px;line-height:1.7;color:var(--huk-text)}
+.huk-modal-terminos .modal-body h2,.huk-modal-terminos .modal-body h3{font-size:17px;margin:18px 0 8px;color:var(--huk-text)}
+.huk-modal-terminos .modal-body>:first-child{margin-top:0}
+.huk-modal-terminos .modal-footer{padding:14px 26px;background:#faf8f3;border-top:1px solid var(--huk-line)}
+.huk-btn-linea{border:1px solid var(--huk-line);border-radius:8px;background:#fff;padding:11px 20px;font-weight:600}
+.huk-btn-linea:hover{border-color:var(--huk-gold)}
+
+/* Resumen de errores al enviar (la página baja sola hasta acá) */
+.huk-errores{margin:0 0 22px;padding:18px 20px;border-radius:12px;border:1px solid #f0c9c4;border-left:5px solid #b3261e;background:#fdf3f2;outline:0;scroll-margin-top:140px}
+.huk-errores.is-atencion{animation:huk-sacudir .5s ease}
+@keyframes huk-sacudir{0%,100%{transform:none}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.huk-errores-cab{display:flex;gap:14px;align-items:flex-start}
+.huk-errores-cab+.huk-errores-cab{margin-top:14px;padding-top:14px;border-top:1px solid #f0c9c4}
+.huk-errores-cab>i{flex:none;font-size:22px;color:#b3261e;margin-top:2px}
+.huk-errores-cab .fa-user-check{color:var(--huk-gold-dark)}
+.huk-errores strong{display:block;font-size:15.5px;color:#5c1a14;margin-bottom:4px}
+.huk-errores p{margin:0 0 8px;font-size:14px;color:#5c4a46}
+.huk-errores ul{margin:6px 0 0;padding-left:18px;font-size:14px;color:#5c4a46}
+.huk-errores li{margin-bottom:4px}
+.huk-errores li a{color:#b3261e;font-weight:700;text-decoration:underline}
+.huk-errores-acciones{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px!important}
+.huk-errores-acciones .huk-btn-oro{padding:10px 20px;font-size:13.5px}
+.huk-errores-nota{margin:12px 0 0!important;font-size:12.5px!important;color:#8a6d68!important}
+.is-registro .mb-3.is-atencion .form-control,.is-registro .mb-3.is-atencion .form-select{box-shadow:0 0 0 4px rgba(179,38,30,.18)}
+@media (prefers-reduced-motion:reduce){.huk-errores.is-atencion{animation:none}}
+
+/* 8. SOLICITUD ENVIADA ------------------------------------------------------ */
+.huk-enviada{text-align:center;padding:40px 44px}
+.huk-enviada-check{display:grid;place-items:center;width:84px;height:84px;margin:0 auto 18px;border-radius:50%;background:var(--huk-gold-grad);color:#111;font-size:38px;box-shadow:0 0 0 10px rgba(var(--huk-gold-rgb),.15);animation:huk-check-pop .7s cubic-bezier(.2,.9,.3,1.3) both}
+@keyframes huk-check-pop{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
+.huk-enviada h1{font-size:clamp(24px,3vw,30px);margin:0 0 10px}
+.huk-enviada-lead{max-width:520px;margin:0 auto 26px;font-size:16px;line-height:1.6;color:var(--huk-text)}
+.huk-enviada-pasos{display:grid;gap:12px;margin:0 0 24px;padding:0;list-style:none;text-align:left}
+.huk-enviada-pasos li{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border:1px solid var(--huk-line);border-radius:12px;background:#fff;animation:huk-sube .6s ease both;animation-delay:calc(.25s + var(--i) * .12s)}
+@keyframes huk-sube{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.huk-enviada-pasos li.is-actual{border-color:var(--huk-gold);background:#fbf6ea}
+.huk-enviada-paso-icono{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#f2ede2;color:var(--huk-gold-dark);font-size:17px}
+.is-actual .huk-enviada-paso-icono{background:var(--huk-ink);color:var(--huk-gold-light)}
+.huk-enviada-pasos li>div>strong{display:block;font-size:15px;margin-bottom:2px}
+.huk-enviada-pasos p{margin:0;font-size:14px;line-height:1.55;color:var(--huk-muted)}
+.huk-enviada-reenviar{padding:16px 0;border-top:1px solid var(--huk-line);border-bottom:1px solid var(--huk-line)}
+.huk-enviada-reenviar p,.huk-enviada-contacto p{margin:0 0 8px;font-size:14px;color:var(--huk-muted)}
+.huk-enviada-reenviar .huk-reenviar{margin-top:0}
+.huk-enviada-contacto{padding-top:18px}
+.huk-enviada-contacto .huk-contacto-botones{justify-content:center}
+.huk-enlace-volver{color:var(--huk-gold-dark);font-weight:600;font-size:14px}
+
+@media (max-width:991.98px){
+  .is-registro .huk-areas{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:767.98px){
+  .huk-tarjeta-form.is-registro,.huk-enviada{padding:22px 16px}
+  .huk-bienvenida{flex-direction:column;padding:16px}
+  .is-registro .huk-seccion-form>:not(.huk-seccion-cab){margin-left:14px;margin-right:14px}
+  .is-registro .huk-seccion-form>.row{margin-left:2px;margin-right:2px}
+  .huk-seccion-cab{padding:12px 14px}
+  .is-registro .huk-opciones,.is-registro .huk-areas{grid-template-columns:minmax(0,1fr)}
+  .huk-archivo-vista{flex-wrap:wrap}
+  .huk-archivo-acciones{width:100%}
+  .huk-archivo-btn{flex:1;justify-content:center}
+  .huk-contacto-botones li{flex:1 1 100%}
+  .huk-form-enviar .huk-btn-oro{width:100%;min-width:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .huk-enviada-check,.huk-enviada-pasos li{animation:none}
+  .huk-contacto-botones a:hover,.huk-form-enviar .huk-btn-oro:hover,.huk-archivo-zona:hover i{transform:none}
+}
+
+/* 9. MI CUENTA (PERFIL) ----------------------------------------------------
+   Dos columnas: tarjeta de perfil fija a la izquierda y pestañas a la derecha. En celular, una debajo de otra. */
+.huk-perfil{padding:48px 0 72px}
+@media (min-width:992px){#contenido>.huk-perfil:first-child{padding-top:calc(48px + var(--huk-nav-overlap))}}
+.huk-perfil-grid{display:grid;grid-template-columns:300px minmax(0,1fr);gap:28px;align-items:start}
+.huk-perfil-lateral{position:sticky;top:calc(var(--huk-header-h,96px) + 16px)}
+.huk-perfil-card{background:var(--huk-card);border-radius:14px;border-top:4px solid var(--huk-gold);box-shadow:0 18px 50px rgba(0,0,0,.35);padding:28px 24px 22px;text-align:center}
+.huk-perfil-avatar{position:relative;display:inline-block;width:132px;height:132px;border-radius:50%;padding:4px;background:var(--huk-gold-grad);cursor:pointer;margin:0}
+.huk-perfil-avatar img,.huk-perfil-iniciales{display:flex;align-items:center;justify-content:center;width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid #fff;background:var(--huk-ink)}
+.huk-perfil-iniciales{color:var(--huk-gold-light);font-family:var(--huk-font-head);font-size:44px;font-weight:700;letter-spacing:.04em}
+.huk-perfil-avatar-btn{position:absolute;right:4px;bottom:6px;width:38px;height:38px;border-radius:50%;background:var(--huk-ink);color:var(--huk-gold-light);display:flex;align-items:center;justify-content:center;border:2px solid #fff;transition:transform var(--huk-speed) var(--huk-ease),background var(--huk-speed)}
+.huk-perfil-avatar:hover .huk-perfil-avatar-btn,.huk-perfil-avatar:focus-within .huk-perfil-avatar-btn{transform:scale(1.1);background:var(--huk-gold-dark);color:#fff}
+.huk-perfil-avatar:focus-within{outline:3px solid rgba(var(--huk-gold-rgb),.45);outline-offset:3px}
+.huk-perfil-avatar.is-subiendo{opacity:.6;pointer-events:none}
+.huk-perfil-foto-form{margin:0}
+.huk-perfil-foto-ayuda{font-size:12px;color:var(--huk-muted);margin:8px 0 0}
+.huk-perfil-foto-ayuda.is-error{color:var(--huk-danger);font-weight:600}
+.huk-perfil-foto-quitar .btn-link{font-size:12.5px;color:var(--huk-muted);padding:0;text-decoration:underline}
+.huk-perfil-nombre{font-size:21px;margin:14px 0 4px;line-height:1.25;color:var(--huk-text)}
+.huk-perfil-tipo{color:var(--huk-muted);font-size:14px;margin:0 0 10px}
+.huk-perfil-estado{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:99px;background:var(--huk-warn-bg);color:var(--huk-warn)}
+.huk-perfil-estado i{font-size:7px}
+.huk-perfil-estado.is-aprobado{background:var(--huk-ok-bg);color:var(--huk-ok)}
+.huk-perfil-estado.is-rechazado{background:var(--huk-danger-bg);color:var(--huk-danger)}
+.huk-perfil-datos{list-style:none;padding:18px 0 0;margin:18px 0 18px;border-top:1px solid var(--huk-line);text-align:left;display:grid;gap:10px}
+.huk-perfil-datos li{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--huk-text);word-break:break-word}
+.huk-perfil-datos i{color:var(--huk-gold-dark);width:16px;margin-top:3px;text-align:center;flex:0 0 auto}
+.huk-perfil-salir{margin:0}
+.huk-perfil-salir .huk-btn-linea{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+
+/* Pestañas: fondo negro, la activa en dorado */
+.huk-perfil-tabs{display:flex;gap:6px;background:var(--huk-ink);border:1px solid var(--huk-ink-3);border-radius:12px;padding:6px;margin-bottom:18px;overflow-x:auto;scrollbar-width:none}
+.huk-perfil-tabs::-webkit-scrollbar{display:none}
+.huk-perfil-tab{flex:1 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:8px;background:transparent;color:var(--huk-sand);font-weight:600;font-size:14.5px;padding:11px 16px;white-space:nowrap;transition:background var(--huk-speed),color var(--huk-speed)}
+.huk-perfil-tab:hover{color:#fff;background:var(--huk-ink-2)}
+.huk-perfil-tab.active{background:var(--huk-gold-grad);color:#111}
+.huk-perfil-tab:focus-visible{outline:2px solid var(--huk-gold-light);outline-offset:2px}
+
+/* Bloques blancos de cada pestaña */
+.huk-perfil-bloque{background:var(--huk-card);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.25);padding:24px 26px;margin-bottom:18px}
+.huk-perfil-bloque-cab{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--huk-line)}
+.huk-perfil-bloque-cab h2{font-size:18px;margin:0;display:flex;align-items:center;gap:10px;color:var(--huk-text)}
+.huk-perfil-bloque-cab h2 i{color:var(--huk-gold-dark)}
+.huk-perfil-bloque .huk-panel-areas{margin:0}
+.huk-btn-chico{padding:9px 18px;font-size:13px}
+.huk-btn-mini{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;font-size:13px;text-decoration:none;color:var(--huk-text)}
+.huk-perfil-estado-bloque{display:flex;gap:18px;align-items:flex-start}
+.huk-perfil-estado-bloque .huk-mensaje-icono{margin:0}
+.huk-perfil-estado-bloque h2{font-size:20px;margin:4px 0 8px}
+.huk-perfil-estado-bloque p{margin:0 0 6px;color:var(--huk-text)}
+.huk-perfil-pendientes{margin:16px 0 0;font-size:14px;color:var(--huk-warn);display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.huk-perfil-pendientes .huk-chip{background:var(--huk-warn-bg);color:var(--huk-warn)}
+.huk-perfil-pedir{margin-top:16px;border:1px dashed var(--huk-line);border-radius:10px;padding:12px 16px;background:#fcfaf5}
+.huk-perfil-pedir summary{cursor:pointer;font-weight:700;color:var(--huk-gold-dark);list-style:none;display:flex;align-items:center;gap:8px}
+.huk-perfil-pedir summary::-webkit-details-marker{display:none}
+.huk-perfil-pedir[open] summary{margin-bottom:10px}
+.huk-perfil-firmas{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.huk-perfil-firma{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--huk-line);border-radius:10px;padding:14px 16px;background:#faf8f3}
+.huk-perfil-firma>i{font-size:22px;color:var(--huk-muted);margin-top:2px}
+.huk-perfil-firma.is-ok>i{color:var(--huk-ok)}
+.huk-perfil-firma strong{display:block;font-size:15px;margin-bottom:2px}
+.huk-perfil-firma span{display:block;font-size:13px;color:var(--huk-muted)}
+.huk-perfil-leer{border:0;background:none;padding:0;margin-top:6px;color:var(--huk-gold-dark);font-weight:700;font-size:13px;text-decoration:underline}
+
+/* Mis datos: con candado (fijos) y editables */
+.huk-datos-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.huk-dato{border:1px solid var(--huk-line);border-radius:8px;padding:10px 14px;background:#faf8f3;min-width:0}
+.huk-dato-rotulo{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--huk-muted);margin-bottom:3px}
+.huk-dato-rotulo i{font-size:10px;margin-right:2px}
+.huk-dato-valor{display:block;font-size:15px;color:var(--huk-text);overflow-wrap:anywhere}
+.huk-perfil-guardar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:6px}
+.huk-perfil-bloque .huk-perfil-guardar{margin-top:18px}
+.huk-perfil-guardar p{margin:0;font-size:13.5px;color:var(--huk-sand);max-width:460px}
+.huk-perfil-bloque .huk-perfil-guardar p{color:var(--huk-muted)}
+.huk-perfil-nota{font-size:13.5px;color:var(--huk-sand);margin:4px 0 0}
+.huk-perfil-bloque .huk-perfil-nota{color:var(--huk-muted);margin-top:14px}
+
+/* Mis inversiones */
+.huk-inversion-cab{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;padding-bottom:14px;margin-bottom:6px;border-bottom:1px solid var(--huk-line)}
+.huk-inversion-ante{display:block;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--huk-gold-dark);margin-bottom:4px}
+.huk-inversion-cab h2{font-size:19px;margin:0}
+.huk-inversion-cab h2 a{color:var(--huk-text);text-decoration:none}
+.huk-inversion-cab h2 a:hover{color:var(--huk-gold-dark)}
+.huk-inversion-total{text-align:right;background:var(--huk-ink);color:#fff;border-radius:10px;padding:10px 16px;min-width:170px}
+.huk-inversion-total span,.huk-inversion-total small{display:block;font-size:11.5px;color:var(--huk-sand);letter-spacing:.06em;text-transform:uppercase}
+.huk-inversion-total strong{display:block;font-size:19px;color:var(--huk-gold-light);font-family:var(--huk-font-head)}
+.huk-inversion-tabla{margin:0;font-size:14px}
+.huk-inversion-tabla th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--huk-muted);border-bottom-color:var(--huk-line);font-weight:700}
+.huk-inversion-tabla td{vertical-align:middle;border-color:#efeadf}
+.huk-inversion-tabla small{color:var(--huk-muted)}
+.huk-perfil-vacio{text-align:center;padding:40px 26px}
+.huk-perfil-vacio>i{font-size:40px;color:var(--huk-gold);margin-bottom:12px}
+.huk-perfil-vacio h2{font-size:20px}
+.huk-perfil-vacio p{color:var(--huk-muted);max-width:440px;margin:0 auto 16px}
+
+@media (max-width:991.98px){
+  .huk-perfil-grid{grid-template-columns:1fr}
+  .huk-perfil-lateral{position:static}
+  .huk-perfil-card{display:grid;grid-template-columns:auto 1fr;column-gap:20px;text-align:left;align-items:center}
+  .huk-perfil-card>.huk-perfil-foto-form,.huk-perfil-card>.huk-perfil-foto-ayuda,.huk-perfil-card>.huk-perfil-foto-quitar{grid-column:1;text-align:center}
+  .huk-perfil-card>.huk-perfil-nombre{grid-column:2;grid-row:1;align-self:end}
+  .huk-perfil-card>.huk-perfil-tipo,.huk-perfil-card>.huk-perfil-estado{grid-column:2}
+  .huk-perfil-card>.huk-perfil-tipo{grid-row:2}
+  .huk-perfil-card>.huk-perfil-estado{grid-row:3;justify-self:start;align-self:start}
+  .huk-perfil-datos,.huk-perfil-salir{grid-column:1 / -1}
+  .huk-perfil-datos{grid-template-columns:1fr 1fr}
+}
+@media (max-width:575.98px){
+  .huk-perfil{padding:28px 0 56px}
+  .huk-perfil-card{display:block;text-align:center}
+  .huk-perfil-datos,.huk-datos-grid,.huk-perfil-firmas{grid-template-columns:1fr}
+  .huk-perfil-bloque{padding:18px 16px}
+  .huk-perfil-tab span{display:none}
+  .huk-perfil-tab.active span{display:inline}
+  .huk-inversion-total{text-align:left;width:100%}
+  .huk-inversion-tabla thead{display:none}
+  .huk-inversion-tabla tr{display:block;border-bottom:1px solid var(--huk-line);padding:8px 0}
+  .huk-inversion-tabla td{display:flex;justify-content:space-between;gap:12px;border:0;padding:4px 0;text-align:right}
+  .huk-inversion-tabla td::before{content:attr(data-rotulo);font-weight:600;color:var(--huk-muted);text-align:left}
+  .huk-perfil-guardar .huk-btn-oro{width:100%}
+}
+@media (prefers-reduced-motion:reduce){.huk-perfil-avatar-btn,.huk-perfil-tab{transition:none}.huk-perfil-avatar:hover .huk-perfil-avatar-btn{transform:none}}
+
+/* 10. ESTADO AL INGRESAR (en revisión / rechazado) ---------------------------- */
+.huk-estado-etiqueta{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 12px;border-radius:99px;background:var(--huk-warn-bg);color:var(--huk-warn);margin-bottom:12px}
+.huk-estado.is-rechazado .huk-estado-etiqueta{background:var(--huk-danger-bg);color:var(--huk-danger)}
+.huk-estado.is-rechazado .huk-mensaje-icono{color:var(--huk-danger)}
+.huk-estado-motivo{background:#faf8f3;border:1px solid var(--huk-line);border-radius:8px;padding:12px 14px;text-align:left}
+.huk-estado-consulta{margin:18px 0 10px;color:var(--huk-muted)}
+.huk-estado .huk-contacto-botones{justify-content:center}
+.huk-estado .huk-btn-linea{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--huk-text)}
+
+/* 11. MIS SOLICITUDES DE INVERSIÓN ("Quiero invertir") ------------------------- */
+.huk-solicitudes{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.huk-solicitudes li{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--huk-line);border-radius:10px;padding:12px 16px;background:#faf8f3}
+.huk-solicitudes strong{display:block;font-size:15px}
+.huk-solicitudes strong a{color:var(--huk-text);text-decoration:none}
+.huk-solicitudes strong a:hover{color:var(--huk-gold-dark)}
+.huk-solicitudes span{font-size:13px;color:var(--huk-muted)}
+.huk-solicitud-estado{flex:0 0 auto;font-size:11.5px!important;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:5px 11px;border-radius:99px;background:var(--huk-warn-bg);color:var(--huk-warn)!important}
+.huk-solicitud-estado.is-contacto{background:var(--huk-info-bg);color:var(--huk-info)!important}
+.huk-solicitud-estado.is-negociacion{background:#efe6d3;color:var(--huk-gold-dark)!important}
+.huk-solicitud-estado.is-concretado{background:var(--huk-ok-bg);color:var(--huk-ok)!important}
+.huk-solicitud-estado.is-descartado{background:#ecebe8;color:var(--huk-muted)!important}
+@media (max-width:575.98px){.huk-solicitudes li{flex-direction:column;align-items:flex-start}}

@@ -60,7 +60,7 @@ class NdaService implements InterfaceNda
         $plano = trim(preg_replace('/[\s\x{00A0}]+/u', ' ', html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
         $v->texto = $plano === '' ? '' : $html;
         if (!$v->validate()) {
-            return ['exito' => false, 'mensaje' => 'Revisá los campos marcados.'];
+            return ['exito' => false, 'mensaje' => 'Revise los campos marcados.'];
         }
         $vigente = $this->vigente();
         if ($vigente && $vigente->texto === $v->texto && $vigente->titulo === $v->titulo) {
@@ -86,10 +86,10 @@ class NdaService implements InterfaceNda
         }
         $firma = trim(preg_replace('/\s+/u', ' ', (string) $firma));
         if (!$acepto) {
-            return ['exito' => false, 'mensaje' => 'Marcá la casilla "Leí y acepto" para continuar.'];
+            return ['exito' => false, 'mensaje' => 'Marque la casilla "Leí y acepto" para continuar.'];
         }
         if (mb_strlen($firma) < 5 || mb_strlen($firma) > 150) {
-            return ['exito' => false, 'mensaje' => 'Escribí tu nombre completo como firma.'];
+            return ['exito' => false, 'mensaje' => 'Escriba su nombre completo como firma.'];
         }
         if (NdaAceptacion::find()->where(['idusuario' => (int) $idusuario, 'idversion' => $vigente->idversion])->exists()) {
             return ['exito' => true, 'mensaje' => 'Ya lo habías aceptado.'];
@@ -105,7 +105,7 @@ class NdaService implements InterfaceNda
         $a->save(false);
         InversorHistorial::registrar((int) $idusuario, 'NDA', 'Aceptó el acuerdo de confidencialidad, versión ' . $vigente->numero
             . "\nFirma: " . $firma . "\nIP: " . $a->ip);
-        return ['exito' => true, 'mensaje' => 'Gracias. Ya podés ver los proyectos de tus áreas.'];
+        return ['exito' => true, 'mensaje' => 'Gracias. Ya puede ver los proyectos de sus áreas.'];
     }
 
     public function aceptacionesDe($idusuario): array

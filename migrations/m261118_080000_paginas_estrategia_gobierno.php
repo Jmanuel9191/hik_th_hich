@@ -47,7 +47,7 @@ class m261118_080000_paginas_estrategia_gobierno extends Migration
                 ['titulo' => '¿En qué sectores trabajan?',
                     'texto' => '<p>Recursos naturales, energía, salud, infraestructura, agroindustria, industria, finanzas, comercio global, digital e innovación y desarrollo territorial.</p>'],
                 ['titulo' => '¿Cómo puedo ser socio o inversionista?',
-                    'texto' => '<p>Registrate como inversor desde la web. Después de verificar tu correo, nuestro equipo revisa tu solicitud y, una vez aprobada, accedés a la información de los proyectos de tus áreas de interés.</p>'],
+                    'texto' => '<p>Regístrese como inversor desde la web. Después de verificar su correo, nuestro equipo revisa su solicitud y, una vez aprobada, accede a la información de los proyectos de sus áreas de interés.</p>'],
             ]],
             ['inicio', 'cifras', ['titulo' => 'HUK en cifras'], [
                 ['cifra' => '10', 'titulo' => 'Ecosistemas empresariales'],

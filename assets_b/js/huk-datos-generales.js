@@ -29,7 +29,7 @@
       $marco.prop("hidden", true).removeAttr("src");
       $aviso.prop("hidden", false).text($.trim(texto) === ""
         ? "Todavía no hay mapa."
-        : "Así no se puede mostrar: copiá el HTML de Compartir → Insertar un mapa.");
+        : "Así no se puede mostrar: copie el HTML de Compartir → Insertar un mapa.");
     }
   }
 

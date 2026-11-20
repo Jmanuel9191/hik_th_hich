@@ -19,9 +19,10 @@ class BannersSearch extends Model
         ];
     }
 
-    public function search($params)
+    /** @param string $ubicacion pestaña del listado (página de la web) */
+    public function search($params, $ubicacion = 'inicio')
     {
-        $query = Banners::find()->orderBy(['orden' => SORT_ASC, 'idbanner' => SORT_ASC]);
+        $query = Banners::find()->where(['ubicacion' => $ubicacion])->orderBy(['orden' => SORT_ASC, 'idbanner' => SORT_ASC]);
         $dp = new ActiveDataProvider(['query' => $query, 'sort' => false, 'pagination' => ['pageSize' => 20]]);
         if (!$this->load($params) || !$this->validate()) {
             return $dp;

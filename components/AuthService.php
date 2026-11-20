@@ -36,13 +36,13 @@ class AuthService implements InterfaceAuth
 
 
         if ($user->estado === '2') {
-            $model->addError('password', 'Tu cuenta está inactiva. Contacta con el soporte.');
+            $model->addError('password', 'Su cuenta está inactiva. Comuníquese con el soporte.');
             return false;
         }
 
 
         if (empty($user->estado)) {
-            $model->addError('password', 'Tu cuenta ha sido bloqueada. Contacta con el administrador.');
+            $model->addError('password', 'Su cuenta ha sido bloqueada. Comuníquese con el administrador.');
             return false;
         }
         if ($user->bloqueado_hasta !== null) {
@@ -89,11 +89,11 @@ class AuthService implements InterfaceAuth
                 } catch (\Throwable $e) {
                     Yii::error('No se pudo enviar el aviso de bloqueo: ' . $e->getMessage(), __METHOD__);
                 }
-                $model->addError('password', 'Tu usuario ha sido bloqueado por ' . self::MINUTOS_BLOQUEO . ' minutos por superar los ' . self::MAX_INTENTOS . ' intentos fallidos.');
+                $model->addError('password', 'Su usuario ha sido bloqueado por ' . self::MINUTOS_BLOQUEO . ' minutos por superar los ' . self::MAX_INTENTOS . ' intentos fallidos.');
             } else {
                 $intentosRestantes = self::MAX_INTENTOS - $user->intentos_fallidos;
                 $user->save(false);
-                $model->addError('password', "Usuario o contraseña incorrecta. Te quedan $intentosRestantes intento(s).");
+                $model->addError('password', "Usuario o contraseña incorrecta. Le quedan $intentosRestantes intento(s).");
             }
 
             return false;
@@ -129,6 +129,7 @@ class AuthService implements InterfaceAuth
             '1' => ['default/index'],
             '2' => ['default/index'],
             '3' => ['default/index'],
+            '4' => ['default/index'], // Editor de contenido (antes caía en una página inexistente)
         ];
 
         // Fallback por defecto si no encuentra un rol

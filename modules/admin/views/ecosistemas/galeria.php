@@ -38,8 +38,8 @@ foreach ($model->imagenes as $img) {
     <div class="box box-primary">
         <div class="box-body huk-galeria">
             <p class="text-muted">
-                <i class="fa fa-info-circle"></i> Arrastrá las fotos o tocá <b>Examinar</b>. JPG, PNG o WEBP de hasta <b>8 MB</b> cada una.
-                Esperá a que diga <b>"Hecho"</b> antes de salir. Para borrar una foto usá el tachito de cada imagen.
+                <i class="fa fa-info-circle"></i> Arrastre las fotos o toque <b>Examinar</b>. JPG, PNG o WEBP de hasta <b>8 MB</b> cada una.
+                Espere a que diga <b>"Hecho"</b> antes de salir. Para borrar una foto use el tachito de cada imagen.
             </p>
             <?= FileInput::widget([
                 'name' => 'imagenes[]',
@@ -63,7 +63,7 @@ foreach ($model->imagenes as $img) {
                     'uploadClass' => 'btn btn-success',
                     'browseLabel' => 'Examinar …',
                     'uploadLabel' => 'Subir',
-                    'dropZoneTitle' => 'Arrastrá y soltá aquí las fotos …',
+                    'dropZoneTitle' => 'Arrastre y suelte aquí las fotos …',
                 ],
             ]) ?>
         </div>

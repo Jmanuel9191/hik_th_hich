@@ -25,7 +25,7 @@ $m = $model;
             <div class="box-body">
                 <p class="huk-proyecto-resumen"><?= Html::encode($m->resumen) ?></p>
                 <div class="huk-rich">
-                    <?= $m->descripcion ?: '<p class="text-muted">Sin descripción (obligatoria para publicar).</p>' /* HTML limpio (HtmlEditor) */ ?>
+                    <?= $m->descripcion ?: '<p class="text-muted">Sin descripción (es ficha interna: lo que ve el inversor está en «Página web»).</p>' /* HTML limpio (HtmlEditor) */ ?>
                 </div>
             </div>
         </div>

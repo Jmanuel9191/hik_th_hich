@@ -68,4 +68,26 @@ class ConfiguracionService implements InterfaceConfiguracion
             'pagination' => ['pageSize' => 10, 'pageParam' => 'hpage'],
         ]);
     }
+
+    /** Íconos de Font Awesome de cada red => columna de la tabla configuracion. */
+    const REDES = [
+        'fa-facebook-f'  => 'facebook',
+        'fa-instagram'   => 'instagram',
+        'fa-linkedin-in' => 'LinkedIn',
+        'fa-x-twitter'   => 'twitter',
+        'fa-tiktok'      => 'tiktok',
+    ];
+
+    public function paraWeb(): array
+    {
+        $fila = Configuracion::find()->orderBy('idconfig')->asArray()->one() ?? [];
+        $datos = array_map(static fn ($v) => trim((string) $v), $fila);
+        $redes = [];
+        foreach (self::REDES as $icono => $columna) {
+            if (($datos[$columna] ?? '') !== '') {
+                $redes[$icono] = $datos[$columna];
+            }
+        }
+        return ['datos' => $datos, 'redes' => $redes];
+    }
 }

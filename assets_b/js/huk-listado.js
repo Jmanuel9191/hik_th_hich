@@ -33,7 +33,7 @@
           Swal.fire({ icon: "error", titleText: (r && r.mensaje) || "No se pudo completar." });
         }
       })
-      .fail(function () { Swal.fire({ icon: "error", titleText: "Error de conexión. Intentá de nuevo." }); });
+      .fail(function () { Swal.fire({ icon: "error", titleText: "Error de conexión. Intente de nuevo." }); });
   }
 
   /* 1. Orden */
@@ -78,7 +78,7 @@
     Swal.fire({
       icon: "warning",
       titleText: "¿Eliminar «" + $b.data("nombre") + "»?",
-      text: $b.data("aviso") || "No se puede deshacer. Si solo querés ocultarlo, usá Desactivar.",
+      text: $b.data("aviso") || "No se puede deshacer. Si solo desea ocultarlo, use Desactivar.",
       showCancelButton: true,
       confirmButtonText: "Eliminar",
       cancelButtonText: "Cancelar",

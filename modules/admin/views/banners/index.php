@@ -1,12 +1,16 @@
 <?php
 
 /**
- * Banners de la portada. Orden con ↑ ↓, estado y eliminar: assets_b/js/huk-listado.js (data-listado-*).
+ * Banners por página: una pestaña por cada una (Banners::UBICACIONES).
+ * Orden con ↑ ↓, estado y eliminar: assets_b/js/huk-listado.js (data-listado-*).
  *
  * @var yii\web\View $this
  * @var app\models\BannersSearch $searchModel
  * @var yii\data\ActiveDataProvider $dataProvider
- * @var array $extremos [orden mínimo, orden máximo]
+ * @var array $extremos [orden mínimo, orden máximo] de esta página
+ * @var array $conteos ubicacion => cantidad de banners
+ * @var int|null $enUso banner que hoy se ve como encabezado (páginas internas)
+ * @var string $tab página de la pestaña abierta
  * @var array $puede ['crear','editar','estado','eliminar' => bool]
  */
 
@@ -19,30 +23,41 @@ use yii\widgets\Pjax;
 \app\assets_b\BannersAdminAsset::register($this);
 
 $this->title = 'Banners';
-$situaciones = ['activo' => 'Se muestra', 'programado' => 'Programado', 'vencido' => 'Vencido', 'inactivo' => 'Inactivo'];
-$etiquetas = ['activo' => 'label-success', 'programado' => 'label-info', 'vencido' => 'label-warning', 'inactivo' => 'label-default'];
+$u = Banners::UBICACIONES[$tab];
+$carrusel = !empty($u['carrusel']);
+$situaciones = ['activo' => 'Se muestra', 'espera' => 'En espera', 'programado' => 'Programado', 'vencido' => 'Vencido', 'inactivo' => 'Inactivo'];
+$etiquetas = ['activo' => 'label-success', 'espera' => 'label-default', 'programado' => 'label-info', 'vencido' => 'label-warning', 'inactivo' => 'label-default'];
+// Fuera del carrusel se ve solo el primero vigente; los otros activos quedan "En espera"
+$situacion = fn($m) => (!$carrusel && $m->situacion() === 'activo' && (int) $m->idbanner !== $enUso) ? 'espera' : $m->situacion();
 $fecha = fn($v) => $v ? date('d/m/Y', strtotime($v)) : null;
 ?>
 
 <section class="content-header">
     <h1><i class="fa fa-picture-o"></i> Banners</h1>
-    <p class="huk-inicio-sub">Las imágenes grandes de la portada. Se muestran en el orden de esta lista.</p>
+    <p class="huk-inicio-sub">Las imágenes grandes de cada página. Inicio: carrusel en el orden de la lista. Las demás (y el Prefooter): se ve el primero de la lista que esté vigente.</p>
 </section>
 
 <section class="content">
+    <ul class="nav nav-tabs huk-tabs">
+        <?php foreach (Banners::UBICACIONES as $id => $pestana): ?>
+            <li class="<?= $id === $tab ? 'active' : '' ?>">
+                <?= Html::a(Html::encode($pestana['pestana']) . ' <span class="badge">' . (int) ($conteos[$id] ?? 0) . '</span>', ['index', 'tab' => $id], ['title' => $pestana['nombre']]) ?>
+            </li>
+        <?php endforeach; ?>
+    </ul>
     <div class="box">
         <div class="box-body">
             <?php Pjax::begin(['id' => 'banners-grid', 'timeout' => 5000]); ?>
             <?php if ($puede['crear']): ?>
                 <div class="huk-barra-acciones">
-                    <?= Html::a('<i class="fa fa-plus"></i> Nuevo banner', ['create'], ['class' => 'btn btn-success', 'data-pjax' => '0']) ?>
+                    <?= Html::a('<i class="fa fa-plus"></i> Nuevo banner de ' . Html::encode($u['pestana']), ['create', 'ubicacion' => $tab], ['class' => 'btn btn-success', 'data-pjax' => '0']) ?>
                 </div>
             <?php endif; ?>
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 'filterModel' => $searchModel,
                 'tableOptions' => ['class' => 'table table-striped table-hover huk-con-orden'],
-                'emptyText' => 'Todavía no hay banners.',
+                'emptyText' => 'Todavía no hay banners en esta página.',
                 'columns' => [
                     [
                         'label' => 'Orden',
@@ -77,6 +92,7 @@ $fecha = fn($v) => $v ? date('d/m/Y', strtotime($v)) : null;
                     ],
                     [
                         'label' => 'Botón',
+                        'visible' => in_array('boton', $u['campos'], true),
                         'format' => 'raw',
                         'value' => fn($m) => $m->boton_texto
                             ? Html::tag('span', Html::encode($m->boton_texto), ['class' => 'huk-banner-boton']) . Html::tag('div', Html::encode($m->boton_url), ['class' => 'huk-eco-resumen'])
@@ -97,9 +113,9 @@ $fecha = fn($v) => $v ? date('d/m/Y', strtotime($v)) : null;
                         'attribute' => 'situacion',
                         'label' => 'Estado',
                         'format' => 'raw',
-                        'filter' => $situaciones,
+                        'filter' => array_diff_key($situaciones, ['espera' => 1]), // "En espera" no es un filtro: depende del orden
                         'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
-                        'value' => fn($m) => Html::tag('span', $situaciones[$m->situacion()], ['class' => 'label ' . $etiquetas[$m->situacion()]]),
+                        'value' => fn($m) => Html::tag('span', $situaciones[$situacion($m)], ['class' => 'label ' . $etiquetas[$situacion($m)]]),
                     ],
                     [
                         'class' => 'yii\grid\ActionColumn',
@@ -116,13 +132,13 @@ $fecha = fn($v) => $v ? date('d/m/Y', strtotime($v)) : null;
                                     'data-listado-estado' => $url,
                                     'data-accion' => $m->estado === '1' ? 'desactivar' : 'activar',
                                     'data-nombre' => $m->nombre(),
-                                    'data-aviso' => $m->estado === '1' ? 'Deja de mostrarse en la portada. No se borra nada.' : 'Se va a mostrar en la portada (si está dentro de sus fechas).',
+                                    'data-aviso' => $m->estado === '1' ? 'Deja de mostrarse en la web. No se borra nada.' : 'Se va a mostrar en la web (si está dentro de sus fechas).',
                                 ]) : '',
                             'delete' => fn($url, $m) => $puede['eliminar']
                                 ? Html::a('<i class="fa fa-trash"></i>', '#', [
                                     'class' => 'btn btn-danger', 'title' => 'Eliminar',
                                     'data-listado-eliminar' => $url, 'data-nombre' => $m->nombre(),
-                                    'data-aviso' => 'Se borran el banner y sus imágenes. No se puede deshacer. Si solo querés ocultarlo, usá Desactivar.',
+                                    'data-aviso' => 'Se borran el banner y sus imágenes. No se puede deshacer. Si solo desea ocultarlo, use Desactivar.',
                                 ]) : '',
                         ],
                         'urlCreator' => fn($action, $m) => Url::to([$action, 'id' => $m->idbanner]),

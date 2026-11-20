@@ -5,6 +5,7 @@ namespace app\components;
 use app\models\Ecosistema;
 use app\models\EcosistemaHistorial;
 use app\models\EcosistemaImagen;
+use app\widgets\MapaPaises;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\ForbiddenHttpException;
@@ -57,7 +58,7 @@ class EcosistemaService implements InterfaceEcosistemas
             throw new NotFoundHttpException('El ecosistema no existe.');
         }
         if ($this->esGerente() && !in_array((string) $model->idecosistema, array_map('strval', $this->idsAsignados()), true)) {
-            throw new ForbiddenHttpException('Este ecosistema no está asignado a tu usuario.');
+            throw new ForbiddenHttpException('Este ecosistema no está asignado a su usuario.');
         }
         return $model;
     }
@@ -106,7 +107,7 @@ class EcosistemaService implements InterfaceEcosistemas
         $nuevo = $model->isNewRecord;
         $this->permisos->verificarPermiso($nuevo ? 'ecosistemas_crear' : 'ecosistemas_editar');
         if (!$nuevo && !$this->puedeGestionar($model)) {
-            throw new ForbiddenHttpException('Este ecosistema no está asignado a tu usuario.');
+            throw new ForbiddenHttpException('Este ecosistema no está asignado a su usuario.');
         }
 
         $antes = $model->getAttributes();
@@ -114,9 +115,19 @@ class EcosistemaService implements InterfaceEcosistemas
         $model->setAttributes([
             'numero' => $datos['numero'] ?? $model->numero,
             'nombre' => trim((string) ($datos['nombre'] ?? $model->nombre)),
+            'subtitulo' => $datos['subtitulo'] ?? $model->subtitulo,
             'resumen' => trim((string) ($datos['resumen'] ?? $model->resumen)),
             'descripcion' => self::limpiarHtml($datos['descripcion'] ?? $model->descripcion),
+            'enfoque' => $datos['enfoque'] ?? $model->enfoque,
+            'oportunidades' => $datos['oportunidades'] ?? $model->oportunidades,
+            'mostrar_oportunidades' => array_key_exists('mostrar_oportunidades', $datos) ? (empty($datos['mostrar_oportunidades']) ? '0' : '1') : $model->mostrar_oportunidades,
         ], false);
+        if (array_key_exists('etiquetas', $datos)) {
+            $model->etiquetas = self::listaJson(self::etiquetasLimpias((array) $datos['etiquetas']));
+        }
+        if (array_key_exists('paises', $datos)) {
+            $model->paises = self::listaJson(array_values(array_intersect(array_keys(MapaPaises::PAISES), (array) $datos['paises'])));
+        }
 
         // Archivos: validar antes de tocar nada
         $archivos = [];
@@ -128,7 +139,7 @@ class EcosistemaService implements InterfaceEcosistemas
         }
 
         if (!$model->validate()) {
-            return ['exito' => false, 'mensaje' => 'Revisá los campos marcados.'];
+            return ['exito' => false, 'mensaje' => 'Revise los campos marcados.'];
         }
 
         if ($nuevo) {
@@ -168,13 +179,30 @@ class EcosistemaService implements InterfaceEcosistemas
                 'Ecosistema creado: ' . $model->nombre . ($cambiosImg ? "\n" . implode("\n", $cambiosImg) : ''));
         } else {
             $cambios = [];
-            foreach (['numero', 'nombre', 'resumen'] as $campo) {
+            foreach (['numero', 'nombre', 'subtitulo', 'resumen'] as $campo) {
                 if ((string) $antes[$campo] !== (string) $model->$campo) {
                     $cambios[] = $model->getAttributeLabel($campo) . ': ' . $antes[$campo] . ' → ' . $model->$campo;
                 }
             }
             if ((string) $antes['descripcion'] !== (string) $model->descripcion) {
                 $cambios[] = 'Descripción: modificada';
+            }
+            $lista = fn($json) => implode(', ', json_decode((string) $json, true) ?: []) ?: '(ninguna)';
+            if ((string) $antes['etiquetas'] !== (string) $model->etiquetas) {
+                $cambios[] = 'Etiquetas: ' . $lista($antes['etiquetas']) . ' → ' . $lista($model->etiquetas);
+            }
+            if ((string) $antes['paises'] !== (string) $model->paises) {
+                $nombres = fn($json) => implode(', ', array_map([MapaPaises::class, 'nombre'], json_decode((string) $json, true) ?: [])) ?: '(ninguno)';
+                $cambios[] = 'Presencia en la expansión: ' . $nombres($antes['paises']) . ' → ' . $nombres($model->paises);
+            }
+            if ((string) $antes['enfoque'] !== (string) $model->enfoque) {
+                $cambios[] = 'Enfoque del grupo: modificado';
+            }
+            if ((string) $antes['mostrar_oportunidades'] !== (string) $model->mostrar_oportunidades) {
+                $cambios[] = 'Bloque "Oportunidades": ' . ($model->mostrar_oportunidades === '1' ? 'se muestra' : 'oculto');
+            }
+            if ((string) $antes['oportunidades'] !== (string) $model->oportunidades) {
+                $cambios[] = 'Texto de "Oportunidades": modificado';
             }
             $cambios = array_merge($cambios, $cambiosImg);
             if ($cambios) {
@@ -183,9 +211,27 @@ class EcosistemaService implements InterfaceEcosistemas
         }
 
         if ($model->hasErrors()) {
-            return ['exito' => false, 'mensaje' => 'Se guardaron los datos, pero alguna imagen no se pudo subir. Revisá los avisos.'];
+            return ['exito' => false, 'mensaje' => 'Se guardaron los datos, pero alguna imagen no se pudo subir. Revise los avisos.'];
         }
         return ['exito' => true, 'mensaje' => $nuevo ? 'Ecosistema creado.' : 'Cambios guardados.'];
+    }
+
+    /** Etiquetas sin vacías ni repetidas, recortadas y con el máximo permitido. */
+    private static function etiquetasLimpias(array $etiquetas): array
+    {
+        $limpias = [];
+        foreach ($etiquetas as $e) {
+            $e = mb_substr(trim(preg_replace('/\s+/u', ' ', (string) $e)), 0, Ecosistema::ETIQUETA_LARGO);
+            if ($e !== '' && !in_array(mb_strtolower($e), array_map('mb_strtolower', $limpias), true)) {
+                $limpias[] = $e;
+            }
+        }
+        return array_slice($limpias, 0, Ecosistema::ETIQUETAS_MAX);
+    }
+
+    private static function listaJson(array $lista): ?string
+    {
+        return $lista ? json_encode($lista, JSON_UNESCAPED_UNICODE) : null;
     }
 
     /* ---------------- Estado ---------------- */
@@ -250,7 +296,7 @@ class EcosistemaService implements InterfaceEcosistemas
         $model = $this->buscar($id, 'ecosistemas_eliminar');
         $n = $this->proyectosAsignados($model->idecosistema);
         if ($n > 0) {
-            return ['exito' => false, 'mensaje' => "No se puede eliminar: tiene {$n} proyecto(s) asignado(s). Desactivalo para ocultarlo de la web."];
+            return ['exito' => false, 'mensaje' => "No se puede eliminar: tiene {$n} proyecto(s) asignado(s). Desactívelo para ocultarlo de la web."];
         }
         $gerentes = (new \yii\db\Query())->from('usuario_ecosistema')->where(['idecosistema' => $model->idecosistema])->count();
         $tx = Yii::$app->db->beginTransaction();
@@ -292,5 +338,26 @@ class EcosistemaService implements InterfaceEcosistemas
             'pagination' => ['pageSize' => 15, 'pageParam' => 'hpage'],
             'sort' => false,
         ]);
+    }
+
+    /* ---------------- Web pública ---------------- */
+
+    public function paraMenu(): array
+    {
+        return Ecosistema::find()->where(['estado' => '1'])->orderBy(['numero' => SORT_ASC])->all();
+    }
+
+    public function destacadosWeb(): array
+    {
+        return Ecosistema::destacados()->all();
+    }
+
+    public function porSlug(string $slug): Ecosistema
+    {
+        $model = Ecosistema::find()->with('imagenes')->where(['slug' => $slug, 'estado' => '1'])->one();
+        if ($model === null) {
+            throw new NotFoundHttpException('Ecosistema no encontrado.');
+        }
+        return $model;
     }
 }

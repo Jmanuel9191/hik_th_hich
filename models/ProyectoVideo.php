@@ -65,6 +65,30 @@ class ProyectoVideo extends ActiveRecord
         return null;
     }
 
+    /** Miniatura .jpg que se genera al subir el archivo (VideoFormato), o null si no hay. Va en la misma carpeta. */
+    public function miniatura(): ?string
+    {
+        if ($this->tipo !== 'archivo' || !$this->archivo) {
+            return null;
+        }
+        $jpg = pathinfo($this->archivo, PATHINFO_FILENAME) . '.jpg';
+        return is_file(Proyecto::carpetaDe($this->idproyecto, 'videos') . '/' . $jpg) ? $jpg : null;
+    }
+
+    /** Miniatura de YouTube (la de Vimeo necesita su API: se muestra un ícono). */
+    public function miniaturaEnlace(): ?string
+    {
+        $embed = $this->tipo === 'enlace' ? self::embed($this->url) : null;
+        return $embed && preg_match('~youtube-nocookie\.com/embed/([A-Za-z0-9_-]{11})~', $embed, $m)
+            ? 'https://i.ytimg.com/vi/' . $m[1] . '/hqdefault.jpg' : null;
+    }
+
+    /** Tipo con el que se manda al navegador: un MOV con H.264 se reproduce como MP4. */
+    public static function mimeReproduccion(?string $mime): string
+    {
+        return in_array($mime, ['video/quicktime', 'video/x-m4v', 'application/mp4', null, ''], true) ? 'video/mp4' : $mime;
+    }
+
     public function src()
     {
         return $this->tipo === 'archivo'

@@ -2,510 +2,157 @@
 
 namespace app\controllers;
 
-use app\components\InterfaceAsignacion;
-use app\components\InterfaceCuenta;
-use app\components\InterfaceGestionProyecto;
-use app\components\InterfacePermisosService;
-use app\components\InterfaceProyectos;
-use app\models\Asignacion;
-use app\models\ChangePasswordForm;
-use app\models\Configuracion;
-use app\models\Forget;
-use app\models\Proyectos;
-use app\models\ProyectosSearch;
-use app\models\Usuarios;
-use app\models\Usuariosperfil;
-use app\models\UsuariosSearch;
+use app\components\InterfaceBanners;
+use app\components\InterfaceInteresInversion;
+use app\components\InterfaceProyectosWeb;
+use app\components\MediosProyecto;
+use app\models\QuieroInvertirForm;
 use Yii;
-use yii\data\ActiveDataProvider;
-use yii\db\StaleObjectException;
-use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
-use yii\web\UploadedFile;
 
+/**
+ * Web pública · Proyectos (solo inversores habilitados): /proyectos (listado), /proyectos/<slug> (página de cada uno),
+ * y las fotos, videos y documentos protegidos. Quién puede ver qué: ProyectoWebService. Reglas de URL en config/web.php.
+ *  - Sin sesión → al ingreso de inversores (y vuelve acá después).
+ *  - Aprobado sin NDA → a aceptar el NDA. En revisión o bloqueado → a Mi cuenta.
+ */
 class ProyectosController extends Controller
 {
+    private InterfaceProyectosWeb $proyectos;
+    private InterfaceBanners $banners;
+    private InterfaceInteresInversion $interes;
 
-    private $gestionProyectAService;
-    private $permisosService;
-    /**
-     * @inheritdoc
-     */
-    public function actions()
+    public function __construct($id, $module, InterfaceProyectosWeb $proyectos, InterfaceBanners $banners, InterfaceInteresInversion $interes, $config = [])
     {
-        return [
-            'error' => [
-                'class' => 'yii\web\ErrorAction',
-            ],
-
-        ];
-    }
-    public function __construct($id, $module, InterfaceGestionProyecto $gestionProyectAService, InterfacePermisosService $permisosService, $config = [])
-    {
-        $this->gestionProyectAService = $gestionProyectAService;
-        $this->permisosService = $permisosService;
+        $this->interes = $interes;
+        $this->proyectos = $proyectos;
+        $this->banners = $banners;
         parent::__construct($id, $module, $config);
     }
 
-
-    public function actionIndex()
+    /** Listado: barra lateral (buscar y ecosistemas de sus áreas) y tarjetas de a 3. */
+    public function actionIndex($ecosistema = null)
     {
-        $this->permisosService->verificarAcceso(['administrador', 'gestor'], 'proyectos_listar');
-        $resultadoBusqueda = $this->gestionProyectAService->listarProyectos(Yii::$app->request->queryParams);
-        $proyectos = $resultadoBusqueda['dataProvider']->getModels();
-        $proyectosFinalizables = [];
-        foreach ($proyectos as $proyecto) {
-            if ($this->gestionProyectAService->puedeFinalizarProyecto($proyecto->idproyecto)) {
-                $proyectosFinalizables[$proyecto->idproyecto] = true;
-            }
+        $acceso = $this->exigirAcceso();
+        if ($acceso instanceof Response) {
+            return $acceso;
         }
-        return $this->render('index', [
-            'searchModel' => $resultadoBusqueda['searchModel'],
-            'dataProvider' => $resultadoBusqueda['dataProvider'],
-            'proyectosFinalizables' => $proyectosFinalizables,
-            'render' => 'listap',
+        $this->noIndexar();
+        return $this->render('index', $this->proyectos->listado($acceso, Yii::$app->request->get('q'), $ecosistema) + [
+            'encabezado' => $this->banners->encabezado('proyectos'),
+            'lateral' => $this->proyectos->barraLateral($acceso),
+            'inversor' => $acceso['inversor'],
         ]);
     }
-    public function actionListproyectos()
+
+    /** Página de un proyecto: banner, menú de anclas y secciones. */
+    public function actionVer($slug)
     {
-        $this->permisosService->verificarAcceso(['administrador', 'gestor'], 'proyectos_listar');
-        $resultadoBusqueda = $this->gestionProyectAService->listarProyectos(Yii::$app->request->queryParams);
-        return $this->render('index', [
-            'searchModel' => $resultadoBusqueda['searchModel'],
-            'dataProvider' => $resultadoBusqueda['dataProvider'],
-            'render' => 'listapr',
+        $acceso = $this->exigirAcceso();
+        if ($acceso instanceof Response) {
+            return $acceso;
+        }
+        $this->noIndexar();
+        $p = $this->proyectos->porSlug($acceso, (string) $slug);
+        $previo = $this->interes->dePara((int) $acceso['inversor']->idusuario, (int) $p->idproyecto);
+        return $this->render('ver', $this->proyectos->armarPagina($p) + [
+            'proyecto' => $p,
+            'medios' => MediosProyecto::web((int) $p->idproyecto),
+            'vistaPrevia' => false,
+            'interes' => [ // "Quiero invertir"
+                'previo' => $previo,
+                'puede' => $this->interes->puedeEnviar($p, $previo),
+                'form' => QuieroInvertirForm::para($acceso['inversor'], $previo),
+            ],
         ]);
     }
 
-
-    public function actionHistorial($id)
+    /** Foto protegida, achicada al ancho pedido. El navegador la guarda 30 días (privada: no la guardan proxies). */
+    public function actionImagen($id, $carpeta, $archivo, $w = 960)
     {
-        $this->permisosService->verificarRol(['administrador', 'gestor']);
-        $model = $this->gestionProyectAService->findModel($id);
-        $resultadoBusqueda = $this->gestionProyectAService->listHistorial(
-            Yii::$app->request->queryParams,
-            $id // <-- Aquí se envía el ID de la tarea
-        );
-        return $this->render('index', [
-            'searchModel' => $resultadoBusqueda['searchModel'],
-            'dataProvider' => $resultadoBusqueda['dataProvider'],
-            'model' => $model,
-            'render' => 'historial',
-        ]);
+        $acceso = $this->proyectos->acceso();
+        if ($acceso['estado'] !== InterfaceProyectosWeb::OK) {
+            throw new NotFoundHttpException();
+        }
+        Yii::$app->session->close(); // libera la sesión: las fotos se bajan en paralelo
+        $f = $this->proyectos->archivoImagen($acceso, (int) $id, (string) $carpeta, (string) $archivo, (int) $w);
+        return $this->enviarImagen($f['ruta'], $f['mime']);
     }
 
-
-
+    public function actionDocumento($id)
+    {
+        $acceso = $this->proyectos->acceso();
+        if ($acceso['estado'] !== InterfaceProyectosWeb::OK) {
+            throw new NotFoundHttpException();
+        }
+        $d = $this->proyectos->archivoDocumento($acceso, (int) $id);
+        Yii::$app->response->headers->set('Cache-Control', 'private, no-store');
+        Yii::$app->response->headers->set('X-Content-Type-Options', 'nosniff');
+        Yii::$app->response->headers->set('X-Robots-Tag', 'noindex');
+        // PDF y fotos se abren en el navegador; Word, Excel y el resto se descargan
+        return Yii::$app->response->sendFile($d['ruta'], $d['nombre'], array_filter(['inline' => $d['inline'], 'mimeType' => $d['mime']]));
+    }
 
     /**
-     * @throws NotFoundHttpException
+     * Video subido, para verlo en la página (no tiene botón de descarga). Soporta "Range": se puede adelantar
+     * sin bajarlo entero, y el navegador pide de a partes.
      */
-    public function actionView($id)
+    public function actionVideo($id)
     {
-
-        $this->permisosService->verificarAcceso(['administrador', 'gestor'], 'proyectos_ver');
-        $model = $this->gestionProyectAService->obtenerProyecto($id);
-        $model->populateRelation('sucursales', $model->sucursales);
-        $model->populateRelation('sectores', $model->sectores);
-        $asignacionesFinalizables = $this->gestionProyectAService->obtenerAsignacionesFinalizables($id);
-        $porprgres = \app\models\Asignacion::obtenerEnProgresoPorProyecto($model->idproyecto); // <- NUEVO
-        $finalizadas = \app\models\Asignacion::obtenerFinalizadosPorProyecto($model->idproyecto); // <- NUEVO
-
-        return $this->render('index', [
-            'model' => $model,
-            'render' => 'view',
-            'asignacionesFinalizables' => $asignacionesFinalizables,
-            'porprgres' => $porprgres,
-            'finalizadas' => $finalizadas,
-        ]);
-    }
-
-
-
-
-    public function actionViewproyect($id)
-    {
-        $this->permisosService->verificarLogin();
-        $model = $this->gestionProyectAService->obtenerProyecto($id);
-        $asignacionesFinalizables = $this->gestionProyectAService->obtenerAsignacionesFinalizables($id);
-        $porprgres = \app\models\Asignacion::obtenerEnProgresoPorProyecto($model->idproyecto);
-        $finalizadas = \app\models\Asignacion::obtenerFinalizadosPorProyecto($model->idproyecto); // <- NUEVO
-
-        return $this->render('index', [
-            'model' => $model,
-            'render' => 'view',
-            'asignacionesFinalizables' => $asignacionesFinalizables,
-            'porprgres' => $porprgres,
-            'finalizadas' => $finalizadas,
-        ]);
-    }
-
-
-
-    public function actionCreate()
-    {
-        $this->permisosService->verificarAcceso(['administrador', 'gestor'], 'proyectos_crear');
-        $resultado = $this->gestionProyectAService->nuevoProyecto(Yii::$app->request->post());
-        if ($resultado && $resultado['exito']) {
-            return $this->redirect(['index', 'render' => 'listap']);
-
-
+        $acceso = $this->proyectos->acceso();
+        if ($acceso['estado'] !== InterfaceProyectosWeb::OK) {
+            throw new NotFoundHttpException();
         }
-
-        $this->gestionProyectAService->limpiarFlashes();
-        return $this->render('index', [
-            'model' => $resultado['model'],
-            'render' => 'create',
-
-        ]);
+        Yii::$app->session->close(); // el navegador pide el video de a partes, en paralelo con el resto
+        $v = $this->proyectos->archivoVideo($acceso, (int) $id);
+        $r = Yii::$app->response;
+        $r->headers->set('Cache-Control', 'private, max-age=86400');
+        $r->headers->set('X-Content-Type-Options', 'nosniff');
+        $r->headers->set('X-Robots-Tag', 'noindex');
+        $r->headers->set('Accept-Ranges', 'bytes');
+        return $r->sendFile($v['ruta'], basename($v['ruta']), ['inline' => true, 'mimeType' => $v['mime']]);
     }
 
-
-    public function actionAsignaciondetareas($idproyecto)
+    /** Acceso del inversor; si no puede ver proyectos, la redirección que corresponde. */
+    private function exigirAcceso()
     {
-
-        $this->permisosService->verificarAcceso(['administrador', 'gestor'], 'asignaciones_crear');
-        $model = $this->gestionProyectAService->prepararModeloAsignacion($idproyecto, true);
-        if (Yii::$app->request->isPost) {
-            $resultado = $this->gestionProyectAService->procesarAsignacionTarea($model, Yii::$app->request->post());
-            if ($resultado['exito']) {
-                return $this->redirect(['view', 'id' => $idproyecto]);
-            } else {
-                Yii::$app->session->setFlash('error', 'Error al asginar. Inténtelo más tarde.');
-            }
-        }
-        return $this->render('index', [
-            'model' => $model,
-            'render' => 'asignar',
-        ]);
-    }
-
-
-
-    public function actionEditasignaciondetareas($id)
-    {
-        $this->permisosService->verificarAcceso(['administrador', 'gestor'], 'asignaciones_editar');
-        $model = $this->gestionProyectAService->obtenerAsignacionPorId($id);
-        $model->scenario = 'update';
-        if (Yii::$app->request->isPost) {
-            $resultado = $this->gestionProyectAService->procesarEdicionAsignacion($id, Yii::$app->request->post());
-            if ($resultado['exito']) {
-                return $this->redirect(['view', 'id' => $model->idproyecto]);
-            } else {
-                Yii::$app->session->setFlash('error', 'Error al editar la asignacion');
-                // Aseguramos pasar el modelo con los errores
-                $model = $resultado['model'];
-            }
-        }
-
-        return $this->render('index', [
-            'model' => $model,
-            'render' => 'editasignar',
-        ]);
-    }
-
-    public function actionDeletasignaciondetareas($id)
-    {
-        $this->permisosService->verificarAcceso(['administrador', 'gestor'], 'asignaciones_eliminar');
-
-        $asignacion = Asignacion::findOne($id);
-        $resultado = $this->gestionProyectAService->eliminarAsignacionTarea($id);
-
-        if ($resultado['exito']) {
-            Yii::$app->session->setFlash('sucess', 'Asignación eliminada correctamente.');
-        } else {
-            Yii::$app->session->setFlash('error', 'No se pudo eliminar la asignación.');
-        }
-
-        if ($asignacion->idproyecto) {
-            return $this->redirect(['/proyectos/view', 'id' => $asignacion->idproyecto]);
-        } elseif ($asignacion->idcampania) {
-            return $this->redirect(['/campanias/view', 'id' => $asignacion->idcampania]);
-        } else {
-            return $this->goHome(); // o a algún otro lugar por defecto
+        $acceso = $this->proyectos->acceso();
+        switch ($acceso['estado']) {
+            case InterfaceProyectosWeb::OK:
+                return $acceso;
+            case InterfaceProyectosWeb::VISITANTE:
+                \app\modules\cuenta\Module::sesion()->setReturnUrl(Yii::$app->request->url);
+                Yii::$app->session->setFlash('cuenta', ['info', 'Ingrese con su cuenta de inversor para ver los proyectos.']);
+                return $this->redirect(['/cuenta/acceso/ingresar']);
+            case InterfaceProyectosWeb::NDA:
+                return $this->redirect(['/cuenta/panel/nda']);
+            default:
+                return $this->redirect(['/cuenta/panel/index']);
         }
     }
 
-
-
-    /**
-     */
-    public function actionUpdate($id)
+    /** Páginas confidenciales: que no las guarden los buscadores. */
+    private function noIndexar(): void
     {
-        $this->permisosService->verificarAcceso(['administrador', 'gestor'], 'proyectos_editar');
-        $resultado = $this->gestionProyectAService->actualizarProyecto(Yii::$app->request->post(), $id);
-        if ($resultado && $resultado['exito']) {
-            return $this->redirect(['index']);
+        $this->view->registerMetaTag(['name' => 'robots', 'content' => 'noindex, nofollow']);
+        Yii::$app->response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+        Yii::$app->response->headers->set('Cache-Control', 'private, no-cache');
+    }
+
+    private function enviarImagen(string $ruta, string $mime)
+    {
+        $etag = '"' . md5($ruta . filemtime($ruta) . filesize($ruta)) . '"';
+        $r = Yii::$app->response;
+        $r->headers->set('Cache-Control', 'private, max-age=2592000, immutable');
+        $r->headers->set('ETag', $etag);
+        $r->headers->set('X-Content-Type-Options', 'nosniff');
+        $r->headers->set('X-Robots-Tag', 'noindex');
+        if (trim((string) Yii::$app->request->headers->get('If-None-Match')) === $etag) {
+            $r->statusCode = 304;
+            return $r;
         }
-        $this->gestionProyectAService->limpiarFlashes();
-        $model = $resultado['model'];
-        $model->sucursales = $model->getSucursalesIds();
-        $model->sectores = $model->getSectoresIds();
-        return $this->render('index', [
-            'model' => $resultado['model'],
-            'render' => 'update',
-
-        ]);
+        return $r->sendFile($ruta, basename($ruta), ['inline' => true, 'mimeType' => $mime]);
     }
-
-
-
-
-    public function actionAceptarTarea($id)
-    {
-        $this->permisosService->verificarAcceso(['consultor'], 'asignaciones_aceptar');
-        $resultado = $this->gestionProyectAService->aceptarTarea($id);
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        return [
-            'exito' => $resultado['exito'],
-            'mensaje' => $resultado['mensaje'],
-        ];
-    }
-    public function actionEstado($id)
-    {
-        $this->permisosService->verificarAcceso(['administrador', 'gestor'], 'proyectos_estado');
-        $motivo = Yii::$app->request->post('motivo');
-        $resultado = $this->gestionProyectAService->cambiarEstadoproyecto($id, $motivo);
-
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        return [
-            'exito' => $resultado['exito'],
-            'mensaje' => $resultado['mensaje'],
-        ];
-    }
-
-
-
-
-    public function actionCrearRecurso($idasignartarea)
-    {
-
-        $this->permisosService->verificarAcceso(['administrador', 'gestor', 'consultor'], 'recursos_crear');
-        $resultado = $this->gestionProyectAService->nuevoRecurso(Yii::$app->request->post(), $idasignartarea);
-
-        if ($resultado['exito']) {
-            return $this->redirect(Yii::$app->request->referrer ?: ['index']);
-        }
-
-        Yii::$app->session->setFlash('error', 'Hubo un problema al crear el recurso. Verifique los campos.');
-        Yii::$app->session->setFlash('abrirModalRecurso', $idasignartarea); // para saber qué modal abrir
-        return $this->redirect(Yii::$app->request->referrer ?: ['index']);
-    }
-
-    public function actionValidarRecurso($idasignartarea)
-    {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $model = new \app\models\Recursos();
-        $model->idasignartarea = $idasignartarea;
-        if ($model->load(Yii::$app->request->post())) {
-            return \yii\widgets\ActiveForm::validate($model);
-        }
-
-        return [];
-    }
-    public function actionEliminarRecurso($id)
-    {
-        $this->permisosService->verificarAcceso(['administrador', 'gestor', 'consultor'], 'recursos_eliminar');
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $resultado = $this->gestionProyectAService->eliminarRecurso($id);
-
-        return [
-            'exito' => $resultado['exito'],
-            'mensaje' => $resultado['mensaje'],
-        ];
-    }
-
-    public function actionEditarRecurso($id)
-    {
-        $this->permisosService->verificarAcceso(['administrador', 'gestor', 'consultor'], 'recursos_editar');
-        $request = Yii::$app->request;
-        $resultado = $this->gestionProyectAService->editarRecurso($id, $request->post());
-        if ($resultado['exito']) {
-            return $this->redirect($request->referrer ?: ['index']);
-        }
-        Yii::$app->session->setFlash('error', 'Hubo un problema al editar el recurso.');
-        Yii::$app->session->setFlash('abrirModalRecurso', $id); // Para que si falla, se vuelva a abrir el modal
-        return $this->redirect($request->referrer ?: ['index']);
-    }
-
-
-
-
-    public function actionProgreso($id)
-    {
-        $this->gestionProyectAService->verificarAccesoAdmingestoryadmin();
-        $resultado = $this->gestionProyectAService->cambiarEstadoproyecto($id);
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        return [
-            'exito' => $resultado['exito'],
-            'mensaje' => $resultado['mensaje'],
-        ];
-    }
-    /**
-     * @throws StaleObjectException
-     * @throws NotFoundHttpException
-     */
-    public function actionDelete($id)
-    {
-        $modelu = $this->gestionProyectAService->verificarAccesoAdmingestoryadmin();
-        //$this->gestionProyectAService->eliminarProyecto($id);
-       // return $this->redirect(['index']);
-    }
-
-
-        public function actionMisproyectos()
-        {
-            $this->permisosService->verificarRol(['consultor', 'cliente']);
-            $resultadoBusqueda = $this->gestionProyectAService->listarmisProyectos(Yii::$app->request->queryParams);
-            return $this->render('index', [
-                'searchModel' => $resultadoBusqueda['searchModel'],
-                'dataProvider' => $resultadoBusqueda['dataProvider'],
-                'render' => 'milista',
-            ]);
-        }
-
-
-
-        //BLOQUE PARA HISTORIAL DE MATERIALES
-
-    public function actionHistorialmaterial($idrecurso)
-    {
-        $this->permisosService->verificarLogin();
-        $this->gestionProyectAService->verificarAccesoCompletoAlHistorial($idrecurso);
-        $resultado = $this->gestionProyectAService->listarHistorial(Yii::$app->request->queryParams, $idrecurso);
-        $recurso = $this->gestionProyectAService->obtenerRecurso($idrecurso);
-        $ultimoId = $this->gestionProyectAService->obtenerUltimoIdMensaje($idrecurso);
-        $esCliente = $this->gestionProyectAService->esClienteDelRecurso($recurso);
-
-        return $this->render('index', [
-            'searchModel' => $resultado['searchModel'],
-            'dataProvider' => $resultado['dataProvider'],
-            'recurso' => $resultado['recurso'], // modelo completo del recurso
-            'ultimoId' => $ultimoId, // modelo completo del recurso
-            'esCliente' => $esCliente, // modelo completo del recurso
-            'render' => 'historialmaterial',     // indica qué vista parcial cargar
-        ]);
-    }
-
-
-
-
-    public function actionHistorialasignaciones($idproyecto)
-    {
-        $this->permisosService->verificarRol(['administrador', 'gestor']);
-
-        // Carga el proyecto actual para mostrar su título
-        $model = $this->gestionProyectAService->obtenerProyecto($idproyecto);
-
-        // Llama al servicio para filtrar por proyecto
-        $resultadoBusqueda = $this->gestionProyectAService->listHistorialAsignacion(
-            Yii::$app->request->queryParams,
-            $idproyecto
-        );
-
-        return $this->render('index', [
-            'searchModel' => $resultadoBusqueda['searchModel'],
-            'dataProvider' => $resultadoBusqueda['dataProvider'],
-            'model' => $model, // Este es el modelo del proyecto
-            'render' => 'historialasignaciones',
-        ]);
-    }
-
-
-
-    public function actionEnviarMensaje()
-    {
-
-        $this->permisosService->verificarLogin();
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $resultado = $this->gestionProyectAService->procesarMensajeConArchivo(Yii::$app->request->post(), $_FILES);
-
-        return $resultado;
-    }
-
-    public function actionFinalizartarea()
-    {
-
-        $this->permisosService->verificarAcceso(['administrador', 'consultor', 'gestor'], 'finalizar_tarea');
-
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $post = Yii::$app->request->post();
-        $resultado = $this->gestionProyectAService->finalizarTarea($post);
-        return $resultado;
-    }
-    public function actionVolvarahacer()    {
-        $this->permisosService->verificarRol(['administrador', 'consultor', 'gestor']);//Seguridad
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $post = Yii::$app->request->post();
-        $resultado = $this->gestionProyectAService->revertirFinalizacionTarea($post); // <- lo manejás desde el Service
-        return $resultado;
-    }
-
-    public function actionFinalizarproyecto()
-    {
-        $this->permisosService->verificarAcceso(['administrador', 'gestor'], 'proyectos_finalizar');
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $post = Yii::$app->request->post();
-        $resultado = $this->gestionProyectAService->finalizarProyecto($post);
-        return $resultado;
-    }
-
-    public function actionCargarNuevos($idrecurso, $ultimoId)
-    {
-
-        $this->permisosService->verificarLogin();
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        try {
-            return $this->gestionProyectAService->obtenerMensajesNuevos($idrecurso, $ultimoId);
-
-        } catch (\Throwable $e) {
-            return [
-                'exito' => false,
-                'error' => $e->getMessage(),
-                'linea' => $e->getLine(),
-                'archivo' => $e->getFile(),
-                'traza' => $e->getTraceAsString()
-            ];
-        }
-
-    }
-
-
-
-
-    public function actionRechazarRecurso()
-    {
-
-        $this->permisosService->verificarAcceso(['cliente'], 'recursos_rechazar');
-
-
-        $post = Yii::$app->request->post();
-        $resultado = $this->gestionProyectAService->rechazarRecursoConComentario($post);
-
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        return [
-            'exito' => $resultado['exito'],
-            'mensaje' => $resultado['mensaje'],
-        ];
-    }
-
-
-    public function actionAprobarRecurso()
-    {
-        $this->permisosService->verificarAcceso(['cliente'], 'recursos_aprobar');
-
-        $post = Yii::$app->request->post();
-        $resultado = $this->gestionProyectAService->aprobarRecursoConComentario($post);
-
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        return [
-            'exito' => $resultado['exito'],
-            'mensaje' => $resultado['mensaje'],
-        ];
-    }
-
 }

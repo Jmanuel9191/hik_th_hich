@@ -48,7 +48,7 @@ class PaginaItem extends ActiveRecord
             [['titulo'], 'string', 'max' => 255],
             [['texto'], 'string', 'max' => $this->conEditor() ? 60000 : 600],
             [['cifra'], 'string', 'max' => 60],
-            [['codigo'], 'in', 'range' => array_keys(MapaPaises::PAISES), 'message' => 'Elegí un país de la lista.'],
+            [['codigo'], 'in', 'range' => array_keys(MapaPaises::PAISES), 'message' => 'Elija un país de la lista.'],
             [['codigo'], 'unique', 'targetAttribute' => ['idseccion', 'codigo'], 'message' => 'Ese país ya está en la lista.'],
         ];
         $obligatorios = array_values(array_intersect($this->config()['obligatorios'] ?? [], array_keys($this->campos())));

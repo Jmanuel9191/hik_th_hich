@@ -29,8 +29,8 @@ $ojo = '<button type="button" class="huk-adm-eye" data-ver-clave aria-label="Mos
         <div class="huk-adm-login-logo"><?= $logo ?></div>
         <div class="huk-adm-login-claim">
             <small>Panel de administración</small>
-            <h2>Creá tu nueva contraseña</h2>
-            <p>Usá al menos 8 caracteres con una mayúscula, una minúscula, un número y un símbolo.</p>
+            <h2>Cree su nueva contraseña</h2>
+            <p>Use al menos 8 caracteres con una mayúscula, una minúscula, un número y un símbolo.</p>
         </div>
     </aside>
 
@@ -43,7 +43,7 @@ $ojo = '<button type="button" class="huk-adm-eye" data-ver-clave aria-label="Mos
                 <h1>Enlace no válido</h1>
                 <div class="huk-adm-alert is-error" role="alert">
                     <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-                    <span>El enlace venció o ya fue usado. Pedí uno nuevo.</span>
+                    <span>El enlace venció o ya fue usado. Pida uno nuevo.</span>
                 </div>
                 <?= Html::a('Pedir un enlace nuevo', ['cuenta/forget'], ['class' => 'huk-adm-btn']) ?>
                 <?= Html::a('<i class="fa fa-arrow-left" aria-hidden="true"></i> Volver al login', ['default/login'], ['class' => 'huk-adm-forgot']) ?>
@@ -53,14 +53,14 @@ $ojo = '<button type="button" class="huk-adm-eye" data-ver-clave aria-label="Mos
                 <h1>¡Listo!</h1>
                 <div class="huk-adm-alert is-ok" role="alert">
                     <i class="fa fa-check-circle" aria-hidden="true"></i>
-                    <span>Tu contraseña se cambió correctamente. Ya podés ingresar con la nueva.</span>
+                    <span>Su contraseña se cambió correctamente. Ya puede ingresar con la nueva.</span>
                 </div>
                 <?= Html::a('Ir al login', ['default/login'], ['class' => 'huk-adm-btn']) ?>
 
             <?php else: ?>
 
                 <h1>Nueva contraseña</h1>
-                <p class="huk-adm-sub">Escribila dos veces para confirmar.</p>
+                <p class="huk-adm-sub">Escríbala dos veces para confirmar.</p>
 
                 <?php $form = ActiveForm::begin(['id' => 'restablecer-form']); ?>
 
@@ -71,7 +71,7 @@ $ojo = '<button type="button" class="huk-adm-eye" data-ver-clave aria-label="Mos
 
                 <?= $form->field($model, 'confirmar_contrasena', [
                     'template' => "{label}\n<div class=\"huk-adm-field\"><i class=\"fa fa-lock\" aria-hidden=\"true\"></i>{input}{$ojo}</div>\n{error}",
-                    'inputOptions' => ['class' => 'form-control', 'placeholder' => 'Repetí la contraseña', 'autocomplete' => 'new-password'],
+                    'inputOptions' => ['class' => 'form-control', 'placeholder' => 'Repita la contraseña', 'autocomplete' => 'new-password'],
                 ])->passwordInput()->label('Confirmar contraseña') ?>
 
                 <?= Html::submitButton('Guardar contraseña', ['class' => 'huk-adm-btn', 'name' => 'restablecer-button']) ?>

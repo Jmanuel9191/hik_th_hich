@@ -115,7 +115,7 @@ $fecha = fn($v) => $v ? date('d/m/Y H:i', strtotime($v)) : '—';
                 </div>
                 <div class="box-body">
                     <?php if ($historial === null): ?>
-                        <p class="text-muted">No tenés permiso para ver el historial.</p>
+                        <p class="text-muted">No tiene permiso para ver el historial.</p>
                     <?php else: ?>
                         <?php Pjax::begin(['id' => 'historial-grid', 'timeout' => 5000]); ?>
                         <?= GridView::widget([

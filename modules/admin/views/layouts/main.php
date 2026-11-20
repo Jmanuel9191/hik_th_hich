@@ -46,6 +46,18 @@ if ($usuario && $permisos->tienePermiso('ecosistemas_listar')) {
 if ($usuario && $permisos->tienePermiso('banners_listar')) {
     $items[] = ['label' => 'BANNERS', 'url' => ['/admin/banners/index'], 'icon' => 'picture-o', 'active' => $ctrl === 'banners'];
 }
+// Blog: noticias, nueva entrada y categorías (según permisos)
+if ($usuario && $permisos->tienePermiso('noticias_listar')) {
+    $accion = Yii::$app->controller->action->id ?? '';
+    $blog = [['label' => 'NOTICIAS', 'url' => ['/admin/noticias/index'], 'icon' => 'newspaper-o', 'active' => $ctrl === 'noticias' && $accion !== 'create']];
+    if ($permisos->tienePermiso('noticias_crear')) {
+        $blog[] = ['label' => 'NUEVA ENTRADA', 'url' => ['/admin/noticias/create'], 'icon' => 'plus', 'active' => $ctrl === 'noticias' && $accion === 'create'];
+    }
+    if ($permisos->tienePermiso('noticias_categorias')) {
+        $blog[] = ['label' => 'CATEGORÍAS', 'url' => ['/admin/noticias-categorias/index'], 'icon' => 'tags', 'active' => $ctrl === 'noticias-categorias'];
+    }
+    $items[] = ['label' => 'BLOG', 'icon' => 'newspaper-o', 'url' => '#', 'options' => ['class' => 'treeview'], 'items' => $blog];
+}
 if ($usuario && $permisos->tienePermiso('equipo_listar')) {
     $items[] = ['label' => 'EQUIPO', 'url' => ['/admin/equipo/index'], 'icon' => 'id-badge', 'active' => $ctrl === 'equipo'];
 }
@@ -55,14 +67,29 @@ if ($usuario && $permisos->tienePermiso('inversores_listar')) {
 if ($usuario && $permisos->tienePermiso('inversiones_listar')) {
     $items[] = ['label' => 'INVERSIONES', 'url' => ['/admin/inversiones/index'], 'icon' => 'money', 'active' => $ctrl === 'inversiones'];
 }
-if ($usuario && $permisos->tienePermiso('proyectos_listar')) {
+// Proyectos: banco de proyectos y, si tiene el permiso, las plantillas de la página web
+if ($usuario && $permisos->tienePermiso('plantillas_editar')) {
+    $proyectos = [];
+    if ($permisos->tienePermiso('proyectos_listar')) {
+        $proyectos[] = ['label' => 'BANCO DE PROYECTOS', 'url' => ['/admin/banco-proyectos/index'], 'icon' => 'briefcase', 'active' => $ctrl === 'banco-proyectos'];
+    }
+    $proyectos[] = ['label' => 'PLANTILLAS', 'url' => ['/admin/plantillas-proyecto/index'], 'icon' => 'clone', 'active' => $ctrl === 'plantillas-proyecto'];
+    $items[] = ['label' => 'PROYECTOS', 'icon' => 'briefcase', 'url' => '#', 'options' => ['class' => 'treeview'], 'items' => $proyectos];
+} elseif ($usuario && $permisos->tienePermiso('proyectos_listar')) {
     $items[] = ['label' => 'PROYECTOS', 'url' => ['/admin/banco-proyectos/index'], 'icon' => 'briefcase', 'active' => $ctrl === 'banco-proyectos'];
 }
-// Páginas institucionales: un ítem por página de app\models\PaginaSeccion::PAGINAS.
+// Páginas institucionales: un ítem por página de app\models\PaginaSeccion::PAGINAS, en el orden del submenú Nosotros de la web.
+// Las de "enlace" (Liderazgo) llevan a su módulo, si el usuario tiene el permiso.
 if ($usuario && $permisos->tienePermiso('paginas_ver')) {
     $paginaActual = $ctrl === 'paginas' ? ($this->params['pagina'] ?? null) : null; // lo ponen las vistas de paginas/
     $paginas = [];
     foreach (\app\models\PaginaSeccion::PAGINAS as $idPagina => $p) {
+        if (isset($p['enlace'])) {
+            if ($permisos->tienePermiso($p['permiso'])) {
+                $paginas[] = ['label' => mb_strtoupper($p['nombre']), 'url' => $p['enlace'], 'icon' => $p['icono'], 'active' => false];
+            }
+            continue;
+        }
         $paginas[] = ['label' => mb_strtoupper($p['nombre']), 'url' => ['/admin/paginas/index', 'pagina' => $idPagina], 'icon' => $p['icono'], 'active' => $paginaActual === $idPagina];
     }
     $items[] = ['label' => 'PÁGINAS', 'icon' => 'files-o', 'url' => '#', 'options' => ['class' => 'treeview'], 'items' => $paginas];
@@ -80,6 +107,9 @@ if ($usuario && $permisos->tienePermiso('configuracion_editar')) {
 }
 if ($usuario && ($permisos->tienePermiso('nda_editar') || $permisos->tienePermiso('inversores_aprobar'))) {
     $configuracion[] = ['label' => 'ACUERDO DE CONFIDENCIALIDAD', 'url' => ['/admin/nda/index'], 'icon' => 'file-text-o', 'active' => $ctrl === 'nda'];
+}
+if ($usuario && ($permisos->tienePermiso('terminos_editar') || $permisos->tienePermiso('inversores_aprobar'))) {
+    $configuracion[] = ['label' => 'TÉRMINOS Y PRIVACIDAD', 'url' => ['/admin/terminos/index'], 'icon' => 'balance-scale', 'active' => $ctrl === 'terminos'];
 }
 if ($usuario && $permisos->tienePermiso('monedas_editar')) {
     $configuracion[] = ['label' => 'MONEDAS', 'url' => ['/admin/monedas/index'], 'icon' => 'money', 'active' => $ctrl === 'monedas'];

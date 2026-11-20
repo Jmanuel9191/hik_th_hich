@@ -43,6 +43,7 @@ $gerentes = array_map(fn($u) => $u->nombrecompleto, $model->usuarios);
                                 : Html::tag('span', 'Inactivo', ['class' => 'label label-default'])],
                             ['label' => 'Destacado', 'format' => 'raw', 'value' => $model->destacado === '1'
                                 ? '<i class="fa fa-star huk-estrella is-activa"></i> Sí (Inicio, Estrategia y primero en la web)' : 'No'],
+                            ['attribute' => 'subtitulo', 'value' => $model->subtitulo ?: '—'],
                             'resumen',
                             ['label' => 'URL', 'value' => '/ecosistemas/' . $model->slug],
                             ['label' => 'Gerentes asignados', 'value' => $gerentes ? implode(', ', $gerentes) : 'Ninguno'],
@@ -98,7 +99,7 @@ $gerentes = array_map(fn($u) => $u->nombrecompleto, $model->usuarios);
                 <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-history"></i> Historial</h3></div>
                 <div class="box-body">
                     <?php if ($historial === null): ?>
-                        <p class="text-muted">No tenés permiso para ver el historial.</p>
+                        <p class="text-muted">No tiene permiso para ver el historial.</p>
                     <?php else: ?>
                         <?php Pjax::begin(['id' => 'eco-historial', 'timeout' => 5000]); ?>
                         <?= GridView::widget([

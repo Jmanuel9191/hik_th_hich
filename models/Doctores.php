@@ -121,7 +121,7 @@ class Doctores extends \yii\db\ActiveRecord
     {
         return [
             '1' => 'Activo',
-            '0'  => 'Bloqueado', // clave vacía como usás en tu BD
+            '0'  => 'Bloqueado', // clave vacía como usa en su BD
         ];
     }
     public static function obtenerTextoEstado($estado)

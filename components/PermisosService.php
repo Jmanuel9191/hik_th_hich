@@ -161,7 +161,7 @@ class PermisosService implements InterfacePermisosService
     /* ================= Pantalla "Roles y permisos" (solo Superadmin) ================= */
 
     /** Nombre visible de cada módulo (prefijo del alias del permiso: "ecosistemas_editar" → ecosistemas). */
-    const NOMBRES_MODULO = ['usuarios' => 'Usuarios', 'ecosistemas' => 'Ecosistemas', 'configuracion' => 'Datos generales', 'banners' => 'Banners', 'equipo' => 'Equipo', 'paginas' => 'Páginas', 'proyectos' => 'Proyectos', 'monedas' => 'Monedas', 'inversores' => 'Inversores', 'nda' => 'Acuerdo de confidencialidad', 'inversiones' => 'Inversiones'];
+    const NOMBRES_MODULO = ['usuarios' => 'Usuarios', 'ecosistemas' => 'Ecosistemas', 'configuracion' => 'Datos generales', 'banners' => 'Banners', 'equipo' => 'Equipo', 'paginas' => 'Páginas', 'proyectos' => 'Proyectos', 'plantillas' => 'Plantillas de proyecto', 'monedas' => 'Monedas', 'inversores' => 'Inversores', 'nda' => 'Acuerdo de confidencialidad', 'terminos' => 'Términos y privacidad', 'inversiones' => 'Inversiones', 'noticias' => 'Blog'];
 
     /** Módulos cuyas pantallas exigen ser Superadmin: sus permisos no se reparten a otros roles. */
     const MODULOS_SOLO_SUPERADMIN = ['usuarios'];

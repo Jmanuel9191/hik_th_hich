@@ -149,7 +149,7 @@ $this->title = 'Equipo';
                                 ? Html::a('<i class="fa fa-trash"></i>', '#', [
                                     'class' => 'btn btn-danger', 'title' => 'Eliminar',
                                     'data-listado-eliminar' => $url, 'data-nombre' => $m->nombre,
-                                    'data-aviso' => 'Se borran sus datos y su foto. No se puede deshacer. Si solo querés que no aparezca en la web, usá Desactivar.',
+                                    'data-aviso' => 'Se borran sus datos y su foto. No se puede deshacer. Si solo desea que no aparezca en la web, use Desactivar.',
                                 ]) : '',
                         ],
                         'urlCreator' => fn($action, $m) => Url::to([$action, 'id' => $m->idmiembro]),

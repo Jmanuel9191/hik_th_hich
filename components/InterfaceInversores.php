@@ -38,6 +38,9 @@ interface InterfaceInversores
     /** Reenvía el correo que corresponda (confirmar correo o activar cuenta). */
     public function reenviarCorreo($id);
 
+    /** Quita el bloqueo por intentos fallidos de ingreso (permiso inversores_desbloquear). @return array ['exito', 'mensaje'] */
+    public function desbloquearIntentos($id);
+
     public function subirDocumento($id);
 
     /** ['ruta', 'nombre', 'mime'] del documento de identidad. */
@@ -53,6 +56,9 @@ interface InterfaceInversores
     /** Confirma el correo con el token del enlace. @return Usuarios|null */
     public function verificarCorreo($token);
 
+    /** ¿Ese correo ya confirmó su solicitud? (para no seguir mostrando "Solicitud enviada"). */
+    public function correoConfirmado($email): bool;
+
     /** Vuelve a mandar el correo de confirmación (respuesta siempre igual). */
     public function reenviarVerificacion($email);
 
@@ -65,8 +71,11 @@ interface InterfaceInversores
     /** Guarda la contraseña nueva y anula el token (si era activación, también confirma el correo). */
     public function guardarContrasena(Usuarios $u, $contrasena);
 
-    /** ¿Puede entrar? null = sí; si no, el motivo (correo sin confirmar). */
+    /** ¿Puede entrar? null = sí; si no, el motivo (correo sin confirmar, solicitud en revisión o rechazada). */
     public function motivoSinAcceso(Usuarios $u);
+
+    /** Correo confirmado pero no aprobado: ['estado' => revision|rechazado, 'nombre', 'motivo'] para la pantalla de estado; si no, null. */
+    public function estadoSinAcceso(Usuarios $u): ?array;
 
     /** Datos del inversor logueado. */
     public function perfil($idusuario): ?Inversor;

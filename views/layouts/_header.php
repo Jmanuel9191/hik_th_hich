@@ -14,7 +14,7 @@
  * @var string   $ubicacion  ciudad y país de la barra superior
  * @var ?string  $logoUrl
  * @var array    $menu     [['label'=>..., 'url'=>[...], 'items'=>[...]?], ...]
- * @var string   $ruta     controlador/acción actual
+ * @var string   $ruta     ruta actual, absoluta (ej. /site/index)
  * @var array    $redes    ['fa-facebook-f' => 'https://...']
  * @var callable $red      dibuja un ícono de red social
  * @var bool     $esPanel
@@ -26,6 +26,12 @@ use yii\helpers\Url;
 // ¿El ítem (o alguno de sus hijos) es la página actual?
 $esActivo = static function (array $item) use ($ruta): bool {
     if (($item['url'][0] ?? null) === $ruta) {
+        return true;
+    }
+    // Páginas internas de una sección (ej. /proyectos/ver o /noticias/ver) marcan su ítem (salvo las de /site).
+    $controlador = static fn($r) => strtok(ltrim((string) $r, '/'), '/');
+    $propio = $controlador($item['url'][0] ?? '');
+    if ($propio !== 'site' && $propio !== false && $propio === $controlador($ruta)) {
         return true;
     }
     foreach ($item['items'] ?? [] as $hijo) {

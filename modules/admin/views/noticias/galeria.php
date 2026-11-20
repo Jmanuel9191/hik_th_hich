@@ -1,66 +1,70 @@
 <?php
 
+/**
+ * Galería de fotos de la noticia: arrastrar y soltar varias; cada una se puede borrar.
+ * En la web, si hay fotos acá, reemplazan a la imagen de la noticia por un carrusel de fotos.
+ * Kartik FileInput; al terminar de subir recarga la página (huk-noticias.js).
+ *
+ * @var yii\web\View $this
+ * @var app\models\Noticia $model
+ */
+
 use kartik\widgets\FileInput;
-use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
-/* @var $this yii\web\View */
-/* @var $model app\models\Productos */
+\app\assets_b\NoticiasAdminAsset::register($this);
 
-$this->title = 'Galeria';
-$this->params['breadcrumbs'][] = ['label' => 'Productos', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'Galería: ' . $model->titulo;
+$csrf = [Yii::$app->request->csrfParam => Yii::$app->request->csrfToken];
+$preview = [];
+$previewConfig = [];
+foreach ($model->imagenes as $img) {
+    $preview[] = $model->url('galeria/' . $img->archivo);
+    $previewConfig[] = ['caption' => $img->nombre_original, 'key' => $img->idimagen, 'url' => Url::to(['galeria-borrar']), 'extra' => $csrf];
+}
 ?>
-<section class="content-header">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+<section class="content-header">
+    <h1><i class="fa fa-picture-o"></i> <?= Html::encode($this->title) ?></h1>
 </section>
 
-<!-- Main content -->
 <section class="content">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="box">
-                <div class="box-body ">
-                    <?php
-                    $initial = [];
-                    $config = [];
-                    foreach ($galeria as $item) {
-                        array_push($initial, Html::img(\yii\helpers\Url::to('@web/imagen/noticias/' . $item->archivo), ['class' => 'kv-preview-data krajee-init-preview file-preview-image', 'style' => 'max-height:160px']));
-                        array_push($config, ["previewAsData" => false, "caption" => $item->archivo, "url" => Url::to(['erase']), "key" => $item->idgaleria]);
-                    }
-                    $form = ActiveForm::begin([
-                        'options' => ['enctype' => 'multipart/form-data']]); // important
-                    echo $form->field($model, 'file')->widget(FileInput::classname(), [
-                        'options' => [
-                            'multiple' => true,
-                            'accept' => 'image/*',
-
-                        ],
-                        'pluginOptions' => [
-                            'uploadUrl' => Url::to(['noticias/upload']),
-                            'uploadExtraData' => [
-                                'id' => $id,
-                            ],
-                            'initialPreviewFileType' => 'image',
-                            //'maxFileCount' => 10,
-                            'allowedFileExtensions' => ['jpg', 'png', 'gif'],
-                            'initialPreview' => $initial,
-                            'initialPreviewConfig' => $config,
-                            "language" => "es"
-                        ]
-                    ]);
-                    ActiveForm::end();
-                    print_r(Url::to(['noticias/upload']));
-                    ?>
-
-
-                </div>
-            </div>
+    <div class="box box-primary">
+        <div class="box-body huk-galeria">
+            <p class="text-muted">
+                <i class="fa fa-info-circle"></i> Arrastre las fotos o toque <b>Examinar</b>. JPG, PNG o WEBP de hasta <b>8 MB</b> cada una.
+                En la web, las fotos de la galería <b>reemplazan a la imagen de la noticia</b> por un carrusel.
+                Espere a que diga <b>"Hecho"</b> antes de salir.
+            </p>
+            <?= FileInput::widget([
+                'name' => 'imagenes[]',
+                'id' => 'galeria-imagenes',
+                'language' => 'es',
+                'options' => ['multiple' => true, 'accept' => '.jpg,.jpeg,.png,.webp'],
+                'pluginOptions' => [
+                    'theme' => 'fa4',
+                    'uploadUrl' => Url::to(['galeria-subir', 'id' => $model->idnoticia]),
+                    'uploadExtraData' => $csrf,
+                    'deleteExtraData' => $csrf,
+                    'allowedFileExtensions' => ['jpg', 'jpeg', 'png', 'webp'],
+                    'maxFileSize' => 8192,
+                    'initialPreview' => $preview,
+                    'initialPreviewAsData' => true,
+                    'initialPreviewFileType' => 'image',
+                    'initialPreviewConfig' => $previewConfig,
+                    'overwriteInitial' => false,
+                    'showRemove' => false,
+                    'browseClass' => 'btn btn-primary',
+                    'uploadClass' => 'btn btn-success',
+                    'browseLabel' => 'Examinar …',
+                    'uploadLabel' => 'Subir',
+                    'dropZoneTitle' => 'Arrastre y suelte aquí las fotos …',
+                ],
+            ]) ?>
         </div>
-
+        <div class="box-footer">
+            <?= Html::a('<i class="fa fa-arrow-left"></i> Volver a la noticia', ['view', 'id' => $model->idnoticia], ['class' => 'btn btn-default']) ?>
+        </div>
     </div>
 </section>
-

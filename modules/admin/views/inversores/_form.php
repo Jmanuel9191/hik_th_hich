@@ -70,10 +70,11 @@ $nuevo = !$model->idusuario;
             <div class="box-body">
                 <?= $form->field($model, 'intereses')->checkboxList($ecosistemas, ['class' => 'huk-proyecto-checks huk-checks-columna']) ?>
                 <div class="row">
-                    <div class="col-sm-6"><?= $form->field($model, 'monto_minimo')->input('number', ['min' => 1, 'step' => 'any', 'placeholder' => 'Ej: 50000']) ?></div>
-                    <div class="col-sm-6"><?= $form->field($model, 'monto_maximo')->input('number', ['min' => 1, 'step' => 'any', 'placeholder' => 'Ej: 250000']) ?></div>
+                    <div class="col-sm-4"><?= $form->field($model, 'idmoneda')->dropDownList(\app\models\Moneda::lista($model->idmonedaActual)) ?></div>
+                    <div class="col-sm-4"><?= $form->field($model, 'monto_minimo')->input('number', ['min' => 1, 'step' => 'any', 'placeholder' => 'Ej: 50000']) ?></div>
+                    <div class="col-sm-4"><?= $form->field($model, 'monto_maximo')->input('number', ['min' => 1, 'step' => 'any', 'placeholder' => 'Ej: 250000']) ?></div>
                 </div>
-                <?= $form->field($model, 'plazo_preferido')->dropDownList(Inversor::PLAZOS, ['prompt' => 'Elegí…']) ?>
+                <?= $form->field($model, 'plazo_preferido')->dropDownList(Inversor::PLAZOS, ['prompt' => 'Elija…']) ?>
                 <?= $form->field($model, 'participacion_preferida')->dropDownList(Inversor::PARTICIPACIONES) ?>
                 <?= $form->field($model, 'como_nos_conocio')->textInput(['maxlength' => 150]) ?>
                 <?= $form->field($model, 'mensaje')->textarea(['rows' => 3, 'maxlength' => 1000]) ?>

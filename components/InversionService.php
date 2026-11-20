@@ -76,7 +76,7 @@ class InversionService implements InterfaceInversiones
             throw new NotFoundHttpException('El pago no existe.');
         }
         if (!$this->enAlcance($pago->proyecto->idecosistema)) {
-            throw new ForbiddenHttpException('Este pago es de un proyecto de un área que no tenés asignada.');
+            throw new ForbiddenHttpException('Este pago es de un proyecto de un área que no tiene asignada.');
         }
         return $pago;
     }
@@ -100,22 +100,22 @@ class InversionService implements InterfaceInversiones
         $this->permisos->verificarPermiso('inversiones_registrar');
         $pago->load($post);
         if (!$pago->validate()) {
-            return ['exito' => false, 'mensaje' => 'Revisá los datos marcados.'];
+            return ['exito' => false, 'mensaje' => 'Revise los datos marcados.'];
         }
         $p = Proyecto::findOne((int) $pago->idproyecto);
         if ($p === null || !isset($this->proyectosParaPagar()[$p->idproyecto])) {
-            $pago->addError('idproyecto', 'Elegí un proyecto publicado (o con la inversión completa) de tus áreas.');
-            return ['exito' => false, 'mensaje' => 'Revisá los datos marcados.'];
+            $pago->addError('idproyecto', 'Elija un proyecto publicado (o con la inversión completa) de sus áreas.');
+            return ['exito' => false, 'mensaje' => 'Revise los datos marcados.'];
         }
         $inv = Inversor::find()->with(['usuario', 'areas'])->where(['idusuario' => (int) $pago->idusuario])->one();
         if ($inv === null || $inv->estado_solicitud !== 'aprobado' || $inv->usuario->estado !== '1') {
-            $pago->addError('idusuario', 'Elegí un inversor aprobado y con la cuenta activa.');
-            return ['exito' => false, 'mensaje' => 'Revisá los datos marcados.'];
+            $pago->addError('idusuario', 'Elija un inversor aprobado y con la cuenta activa.');
+            return ['exito' => false, 'mensaje' => 'Revise los datos marcados.'];
         }
         if (!in_array((int) $p->idecosistema, array_map('intval', array_column($inv->areas, 'idecosistema')), true)) {
             $pago->addError('idusuario', $inv->nombreVisible() . ' no tiene habilitada el área ' . $p->ecosistema->nombre
-                . '. Habilitala desde su ficha de inversor y volvé a intentar.');
-            return ['exito' => false, 'mensaje' => 'Revisá los datos marcados.'];
+                . '. Habilítela desde su ficha de inversor y vuelva a intentar.');
+            return ['exito' => false, 'mensaje' => 'Revise los datos marcados.'];
         }
 
         $pago->idmoneda_proyecto = $p->idmoneda;
@@ -137,7 +137,7 @@ class InversionService implements InterfaceInversiones
                     $pago->addError('comprobante', $r['error']);
                     $pago->setIsNewRecord(true);
                     $pago->idpago = null;
-                    return ['exito' => false, 'mensaje' => 'Revisá los datos marcados.'];
+                    return ['exito' => false, 'mensaje' => 'Revise los datos marcados.'];
                 }
                 $pago->updateAttributes(['comprobante_archivo' => $r['archivo'], 'comprobante_nombre' => mb_substr($archivo->name, 0, 255)]);
             }
@@ -166,7 +166,7 @@ class InversionService implements InterfaceInversiones
         $pago = $this->buscar($id, 'inversiones_anular');
         $motivo = trim((string) $motivo);
         if (mb_strlen($motivo) < 5 || mb_strlen($motivo) > 500) {
-            return ['exito' => false, 'mensaje' => 'Escribí el motivo (entre 5 y 500 caracteres).'];
+            return ['exito' => false, 'mensaje' => 'Escriba el motivo (entre 5 y 500 caracteres).'];
         }
         if ($pago->esAnulado()) {
             return ['exito' => false, 'mensaje' => 'Este pago ya estaba anulado.'];
@@ -188,7 +188,7 @@ class InversionService implements InterfaceInversiones
         }
         $f = \yii\web\UploadedFile::getInstanceByName('comprobante');
         if ($f === null || $f->error === UPLOAD_ERR_NO_FILE) {
-            return ['exito' => false, 'mensaje' => 'Elegí el archivo.'];
+            return ['exito' => false, 'mensaje' => 'Elija el archivo.'];
         }
         $r = SubidaArchivo::guardar($f, InversionPago::carpetaDe($pago->idproyecto), InversionPago::FORMATOS_COMPROBANTE, InversionPago::MAX_COMPROBANTE_MB);
         if (!$r['ok']) {

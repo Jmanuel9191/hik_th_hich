@@ -37,8 +37,8 @@ foreach (Yii::$app->session->getAllFlashes() as $clave => $flash) {
         <div class="huk-adm-login-logo"><?= $logo ?></div>
         <div class="huk-adm-login-claim">
             <small>Panel de administración</small>
-            <h2>¿Olvidaste tu contraseña?</h2>
-            <p>Te enviamos un enlace a tu correo para que crees una contraseña nueva. Vence en 30 minutos.</p>
+            <h2>¿Olvidó su contraseña?</h2>
+            <p>Le enviamos un enlace a su correo para que cree una contraseña nueva. Vence en 30 minutos.</p>
         </div>
     </aside>
 
@@ -47,7 +47,7 @@ foreach (Yii::$app->session->getAllFlashes() as $clave => $flash) {
             <div class="huk-adm-mobile-logo"><?= $logo ?></div>
 
             <h1>Recuperar contraseña</h1>
-            <p class="huk-adm-sub">Ingresá el correo con el que estás registrado en el panel.</p>
+            <p class="huk-adm-sub">Ingrese el correo con el que está registrado en el panel.</p>
 
             <?php foreach ($avisos as $aviso): ?>
                 <div class="huk-adm-alert <?= $aviso['ok'] ? 'is-ok' : 'is-error' ?>" role="alert">

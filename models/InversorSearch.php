@@ -27,16 +27,16 @@ class InversorSearch extends Model
     }
 
     /**
-     * @param string $pestana pendiente | aprobado | rechazado | sin_verificar | bloqueado
+     * @param string $pestana todos | pendiente | aprobado | rechazado | sin_verificar | bloqueado
      * @param array|null $idsEcosistemas null = todos
      */
     public function search($params, $pestana, $idsEcosistemas = null, $idCreador = null)
     {
-        $q = Inversor::find()->alias('i')->innerJoinWith('usuario u')->with(['intereses', 'areas'])
+        $q = Inversor::find()->alias('i')->innerJoinWith('usuario u')->with(['intereses', 'areas', 'moneda'])
             ->orderBy(['i.fecha_registro' => SORT_DESC]);
         if ($pestana === 'bloqueado') {
             $q->andWhere(['<>', 'u.estado', '1']);
-        } else {
+        } elseif ($pestana !== 'todos') {
             $q->andWhere(['u.estado' => '1', 'i.estado_solicitud' => $pestana]);
         }
         if ($idsEcosistemas !== null) {

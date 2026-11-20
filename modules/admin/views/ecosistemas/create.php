@@ -10,5 +10,5 @@ $this->title = 'Nuevo ecosistema';
     <h1><i class="fa fa-th-large"></i> <?= Html::encode($this->title) ?></h1>
 </section>
 <section class="content">
-    <?= $this->render('_form', ['model' => $model]) ?>
+    <?= $this->render('_form', ['model' => $model, 'paises' => $paises]) ?>
 </section>

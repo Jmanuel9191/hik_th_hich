@@ -25,6 +25,7 @@ use sadovojav\cutter\behaviors\CutterBehavior;
  * @property string $estado
  * @property string $sexo
  * @property string $foto_sello
+ * @property string|null $foto_perfil   foto del inversor (privada, Mi cuenta)
  */
 class Usuarios extends \yii\db\ActiveRecord implements IdentityInterface
 {
@@ -81,11 +82,11 @@ class Usuarios extends \yii\db\ActiveRecord implements IdentityInterface
             [['contrasena'], 'string', 'min' => 8, 'message' => 'La contraseña debe tener al menos 8 caracteres.'],
             ['contrasena', 'match', 'pattern' => '/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/', 'message' => 'La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una letra minúscula, un número y un símbolo.'],[['estado'], 'string', 'max' => 1],
             [['sexo'], 'string', 'max' => 10],
-            [['pais_operacion'], 'in', 'range' => array_keys(self::PAISES), 'message' => 'Elegí un país de la lista.'],
+            [['pais_operacion'], 'in', 'range' => array_keys(self::PAISES), 'message' => 'Elija un país de la lista.'],
             [['ecosistemasIds'], 'each', 'rule' => ['integer']],
             [['ecosistemasIds'], 'required', 'enableClientValidation' => false,
                 'when' => fn($m) => (int) $m->idrol === \app\components\Rol::GERENTE,
-                'message' => 'Elegí al menos un ecosistema para el Gerente de área.'],
+                'message' => 'Elija al menos un ecosistema para el Gerente de área.'],
             [['email'], 'email'],
             // NUEVO: sello/firma — opcional (skipOnEmpty), por eso no
             // está en el bloque 'required' de arriba.
@@ -162,27 +163,6 @@ class Usuarios extends \yii\db\ActiveRecord implements IdentityInterface
         return $this->hasOne(Roles::class, ['idrol' => 'idrol']);
     }
 
-
-
-    public function getTodosLosProyectosRelacionados()
-    {
-        $cliente = $this->getProyectosComoCliente();
-        $gestor = $this->getProyectosComoGestor();
-        $consultor = $this->getProyectosComoConsultor();
-        $todos = array_merge($cliente, $gestor, $consultor);
-        return array_unique($todos, SORT_REGULAR);
-    }
-
-    public function getProyectosComoCliente()
-    {
-        return \app\models\Productos::find()->where(['idusuario' => $this->idusuario])->all();
-    }
-
-    public function getProyectosComoGestor()
-    {
-        return \app\models\Productos::find()->where(['idusuario' => $this->idusuario])->all();
-    }
-
  
 
 
@@ -197,43 +177,6 @@ class Usuarios extends \yii\db\ActiveRecord implements IdentityInterface
            
         ];
         $result = $prioridad;
-        return $result;
-    }
-
-
-    public static function getSelectCliente()
-    {
-        $idCliente = \app\models\Roles::getIdPorAlias('cliente');
-
-        $result = [];
-        $temp = self::find()->where(['idrol' => $idCliente, 'estado' => 1])->all();
-        foreach ($temp as $item) {
-            $result[$item->idusuario] = $item->nombrecompleto . " - " . $item->empresa;
-        }
-        return $result;
-    }
-
-    public static function getSelectGestor()
-    {
-        $idCliente = \app\models\Roles::getIdPorAlias('gestor');
-
-        $result = [];
-        $temp = self::find()->where(['idrol' => $idCliente, 'estado' => 1])->all();
-        foreach ($temp as $item) {
-            $result[$item->idusuario] = $item->nombrecompleto . " - " . $item->empresa;
-        }
-        return $result;
-    }
-
-    public static function getSelectConsultor()
-    {
-        $idCliente = \app\models\Roles::getIdPorAlias('consultor');
-
-        $result = [];
-        $temp = self::find()->where(['idrol' => $idCliente, 'estado' => 1])->all();
-        foreach ($temp as $item) {
-            $result[$item->idusuario] = $item->nombrecompleto . " - " . $item->empresa;
-        }
         return $result;
     }
 
@@ -338,7 +281,7 @@ class Usuarios extends \yii\db\ActiveRecord implements IdentityInterface
         return [
             '1' => 'Activo',
             '2' => 'Inactivo',
-            '0'  => 'Bloqueado', // clave vacía como usás en tu BD
+            '0'  => 'Bloqueado', // clave vacía como usa en su BD
         ];
     }
 
@@ -385,57 +328,6 @@ class Usuarios extends \yii\db\ActiveRecord implements IdentityInterface
     public function esAdminoGestor()
     {
         return in_array($this->idrol, ['1', '2']);
-    }
-
-
-    public function getElementosRelacionadosPorRol()
-    {
-        $resultados = [];
-        $rol = $this->rol->alias ?? null;
-
-        if (in_array($rol, ['gestor', 'cliente'])) {
-            $proyectos = \app\models\Proyectos::find()
-                ->where(['or', ['idcliente' => $this->idusuario], ['idgestor' => $this->idusuario]])
-                ->all();
-
-            $campanias = \app\models\Campanias::find()
-                ->where(['or', ['idcliente' => $this->idusuario], ['idgestor' => $this->idusuario]])
-                ->all();
-
-            foreach ($proyectos as $item) {
-                $resultados[] = [
-                    'tipo' => 'proyecto',
-                    'modelo' => $item,
-                    'tareas' => $item->tareas ?? []
-                ];
-            }
-
-            foreach ($campanias as $item) {
-                $resultados[] = [
-                    'tipo' => 'campania',
-                    'modelo' => $item,
-                    'tareas' => $item->tareas ?? []
-                ];
-            }
-
-        } elseif ($rol === 'consultor') {
-            $asignaciones = \app\models\Asignacion::find()
-                ->where(['idconsultor' => $this->idusuario])
-                ->all();
-
-            foreach ($asignaciones as $asig) {
-                $tipo = $asig->idproyecto ? 'proyecto' : 'campania';
-                $modelo = $asig->idproyecto ? $asig->proyecto : $asig->campania;
-
-                $resultados[] = [
-                    'tipo' => $tipo,
-                    'modelo' => $modelo,
-                    'tareas' => [$asig->tarea] // solo su tarea asignada
-                ];
-            }
-        }
-
-        return $resultados;
     }
 
     /** Ecosistemas asignados (Gerente de área). */

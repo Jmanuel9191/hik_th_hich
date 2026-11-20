@@ -28,12 +28,13 @@ class ProyectoDescarga extends ActiveRecord
         return $this->hasOne(Usuarios::class, ['idusuario' => 'idusuario']);
     }
 
-    public static function registrar(ProyectoDocumento $doc)
+    /** $idusuario: quien descarga (en la web, el inversor; si no se pasa, el usuario del panel). */
+    public static function registrar(ProyectoDocumento $doc, ?int $idusuario = null)
     {
         $d = new static([
             'iddocumento' => $doc->iddocumento,
             'idproyecto' => $doc->idproyecto,
-            'idusuario' => Yii::$app->user->id ?? null,
+            'idusuario' => $idusuario ?? (Yii::$app->user->id ?? null),
             'ip' => Yii::$app->request instanceof \yii\web\Request ? Yii::$app->request->userIP : null,
             'fecha' => date('Y-m-d H:i:s'),
         ]);

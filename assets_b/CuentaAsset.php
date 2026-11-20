@@ -20,6 +20,7 @@ class CuentaAsset extends AssetBundle
 
     public $js = [
         'js/huk-solicitud.js',
+        'js/huk-mi-cuenta.js',
     ];
 
     public $depends = [

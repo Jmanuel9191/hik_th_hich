@@ -65,7 +65,6 @@ $fecha = fn($v) => $v ? date('d/m/Y H:i', strtotime($v)) : '—';
                             <p class="huk-tarjeta-puesto"><?= Html::encode($model->puesto) ?></p>
                             <?php if ($model->telefono): ?><p><i class="fa fa-phone"></i> <?= Html::encode($model->telefono) ?></p><?php endif; ?>
                             <?php if ($model->email): ?><p><i class="fa fa-envelope"></i> <?= Html::encode($model->email) ?></p><?php endif; ?>
-                            <?php if ($model->biografia): ?><span class="huk-vista-boton">Ver más <i class="fa fa-angle-right"></i></span><?php endif; ?>
                         </div>
                     </div>
                     <p class="huk-ayuda">Vista aproximada: en la web usa la letra y los colores de la página.</p>
@@ -75,12 +74,12 @@ $fecha = fn($v) => $v ? date('d/m/Y H:i', strtotime($v)) : '—';
 
         <div class="col-lg-9 col-md-8">
             <div class="box box-primary">
-                <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-file-text-o"></i> Biografía</h3></div>
+                <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-file-text-o"></i> Resumen (biografía)</h3></div>
                 <div class="box-body huk-rich">
                     <?php if ($model->biografia): ?>
                         <?= $model->biografia /* HTML ya limpio (HtmlEditor) */ ?>
                     <?php else: ?>
-                        <p class="text-muted">Sin biografía: en la web no aparece el botón "Ver más".</p>
+                        <p class="text-danger">Falta el resumen: edite el miembro y escríbalo (es obligatorio).</p>
                     <?php endif; ?>
                 </div>
             </div>
@@ -115,7 +114,7 @@ $fecha = fn($v) => $v ? date('d/m/Y H:i', strtotime($v)) : '—';
                         <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-history"></i> Historial</h3></div>
                         <div class="box-body">
                             <?php if ($historial === null): ?>
-                                <p class="text-muted">No tenés permiso para ver el historial.</p>
+                                <p class="text-muted">No tiene permiso para ver el historial.</p>
                             <?php else: ?>
                                 <?php Pjax::begin(['id' => 'equipo-historial', 'timeout' => 5000]); ?>
                                 <?= GridView::widget([

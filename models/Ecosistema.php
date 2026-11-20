@@ -12,8 +12,14 @@ use yii\helpers\Inflector;
  * @property int $idecosistema
  * @property int $numero
  * @property string $nombre
+ * @property string|null $subtitulo   opcional (ej. el nombre en inglés): chico debajo del título en las tarjetas
  * @property string $slug
  * @property string $resumen
+ * @property string|null $etiquetas   JSON: etiquetas del banner de su página (listaEtiquetas())
+ * @property string|null $enfoque     recuadro negro "Enfoque del grupo" de su página
+ * @property string|null $paises      JSON: códigos de país de la visión de expansión (listaPaises())
+ * @property string $mostrar_oportunidades  '1' muestra el bloque "Oportunidades" en su página
+ * @property string|null $oportunidades  texto de ese bloque (vacío = texto general)
  * @property string|null $descripcion   HTML ya limpio (HtmlPurifier) al guardar
  * @property string|null $icono
  * @property string|null $foto_portada
@@ -59,10 +65,16 @@ class Ecosistema extends ActiveRecord
         return [
             [['nombre', 'resumen'], 'required'],
             [['nombre'], 'string', 'max' => 120],
+            [['subtitulo'], 'filter', 'filter' => fn($v) => trim((string) $v) === '' ? null : trim((string) $v)],
+            [['subtitulo'], 'string', 'max' => 120],
             [['resumen'], 'string', 'max' => 500],
             [['numero'], 'integer', 'min' => 0, 'max' => 999],
             [['numero'], 'default', 'value' => 0],
             [['descripcion'], 'string'],
+            [['enfoque', 'oportunidades'], 'filter', 'filter' => fn($v) => trim((string) $v) === '' ? null : trim((string) $v)],
+            [['enfoque'], 'string', 'max' => 1500],
+            [['oportunidades'], 'string', 'max' => 1000],
+            [['mostrar_oportunidades'], 'in', 'range' => ['0', '1']],
             [['nombre'], 'unique', 'message' => 'Ya existe un ecosistema con ese nombre.'],
         ];
     }
@@ -73,6 +85,12 @@ class Ecosistema extends ActiveRecord
             'idecosistema' => 'ID',
             'numero' => 'Número',
             'nombre' => 'Título',
+            'subtitulo' => 'Subtítulo',
+            'etiquetas' => 'Etiquetas',
+            'enfoque' => 'Enfoque del grupo',
+            'paises' => 'Presencia en la visión de expansión',
+            'mostrar_oportunidades' => 'Mostrar el bloque "Oportunidades"',
+            'oportunidades' => 'Texto de "Oportunidades"',
             'slug' => 'URL',
             'resumen' => 'Resumen',
             'descripcion' => 'Descripción',
@@ -125,6 +143,24 @@ class Ecosistema extends ActiveRecord
     public function url($archivo)
     {
         return $archivo ? Yii::getAlias('@web/' . self::CARPETA . '/' . (int) $this->idecosistema . '/' . $archivo) : null;
+    }
+
+    /** Máximo de etiquetas y largo de cada una (banner de su página). */
+    const ETIQUETAS_MAX = 12;
+    const ETIQUETA_LARGO = 40;
+
+    /** @return string[] etiquetas del banner, en el orden en que se cargaron */
+    public function listaEtiquetas(): array
+    {
+        $lista = json_decode((string) $this->etiquetas, true);
+        return is_array($lista) ? array_values(array_filter($lista, 'is_string')) : [];
+    }
+
+    /** @return string[] códigos de país (app\widgets\MapaPaises) */
+    public function listaPaises(): array
+    {
+        $lista = json_decode((string) $this->paises, true);
+        return is_array($lista) ? array_values(array_filter($lista, 'is_string')) : [];
     }
 
     /** Para la web: activos, primero los destacados y después por número. */

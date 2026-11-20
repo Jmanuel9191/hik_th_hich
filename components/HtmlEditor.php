@@ -29,4 +29,20 @@ class HtmlEditor
             $config->set('AutoFormat.RemoveEmpty', false);
         });
     }
+
+    /**
+     * Versión corta para los bloques de la página de proyecto: solo párrafos, subtítulos, negrita, cursiva,
+     * listas y enlaces (sin estilos ni tablas: el diseño lo pone la web). Un texto vacío devuelve ''.
+     */
+    public static function limpiarSimple($html)
+    {
+        $limpio = HtmlPurifier::process((string) $html, function ($config) {
+            $config->set('HTML.Allowed', 'p,br,strong,b,em,i,u,h3,h4,ul,ol,li,a[href|title|target]');
+            $config->set('Attr.AllowedFrameTargets', ['_blank']);
+            $config->set('URI.AllowedSchemes', ['http' => true, 'https' => true, 'mailto' => true]);
+            $config->set('AutoFormat.RemoveEmpty', true);
+        });
+        $plano = trim(html_entity_decode(strip_tags($limpio), ENT_QUOTES | ENT_HTML5, 'UTF-8'), " \t\n\r\0\x0B\xC2\xA0");
+        return $plano === '' ? '' : trim($limpio);
+    }
 }

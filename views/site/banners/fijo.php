@@ -11,10 +11,15 @@ use yii\helpers\Url;
 
 
 
-
-
-<div class="container-fluid banner_all ">
-    <div class="text-center" style="margin-top: 65px">
-        <h2 style="color: #fff;font-weight: bold;text-shadow: 2px 2px 2px #868686;"><?php echo $titulo?></h2>
-    </div>
-</div>
+ <!-- Header Start -->
+        <div class="container-fluid bg-breadcrumb">
+            <div class="container text-center py-5" style="max-width: 900px;">
+                <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s">About Us</h4>
+                <ol class="breadcrumb d-flex justify-content-center mb-0 wow fadeInDown" data-wow-delay="0.3s">
+                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a href="#">Pages</a></li>
+                    <li class="breadcrumb-item active text-primary">About</li>
+                </ol>    
+            </div>
+        </div>
+        <!-- Header End -->

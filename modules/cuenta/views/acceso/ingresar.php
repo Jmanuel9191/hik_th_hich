@@ -1,11 +1,12 @@
 <?php
 
 /**
- * Ingreso de inversores (con correo y contraseña).
+ * Ingreso de inversores (con correo y contraseña). Arriba, el banner de Panel → Banners → "Acceso inversores".
  *
  * @var yii\web\View $this
  * @var app\models\LoginForm $model
  * @var string|null $sinConfirmar email (si falta confirmar el correo: muestra "reenviar")
+ * @var app\models\Banners|null $encabezado
  */
 
 use yii\helpers\Html;
@@ -16,20 +17,20 @@ use yii\widgets\ActiveForm;
 $campo = ['options' => ['class' => 'mb-3'], 'labelOptions' => ['class' => 'form-label'], 'inputOptions' => ['class' => 'form-control'],
     'errorOptions' => ['class' => 'invalid-feedback d-block']];
 ?>
+<?= $this->render('//site/widgets/encabezado', [
+    'banner' => $encabezado, 'titulo' => 'Acceso inversores', 'antetitulo' => 'Área privada',
+    'migas' => [['label' => 'Inicio', 'url' => ['/site/index']], ['label' => 'Acceso inversores']],
+]) ?>
 
-<section class="huk-cuenta">
+<section class="huk-cuenta is-con-banner">
     <div class="container">
-        <div class="huk-cuenta-cab">
-            <span class="huk-cuenta-eyebrow">Área privada</span>
-            <h1>Acceso inversores</h1>
-        </div>
-        <div class="huk-tarjeta-form is-angosta">
+        <div class="huk-tarjeta-form is-angosta" data-reveal>
             <?= $this->render('../_aviso') ?>
             <?php $form = ActiveForm::begin(['id' => 'ingresar-form', 'options' => ['class' => 'huk-form'], 'fieldConfig' => $campo]); ?>
             <?= $form->field($model, 'username')->textInput(['type' => 'email', 'autocomplete' => 'username', 'autofocus' => true])->label('Correo electrónico') ?>
             <?= $form->field($model, 'password', ['template' => '{label}<div class="huk-clave">{input}<button type="button" data-ver-clave="#loginform-password" aria-label="Ver contraseña"><i class="fa-regular fa-eye" aria-hidden="true"></i></button></div>{error}'])
                 ->passwordInput(['autocomplete' => 'current-password'])->label('Contraseña') ?>
-            <p class="text-end"><?= Html::a('¿Olvidaste tu contraseña?', ['/cuenta/acceso/olvide'], ['class' => 'small']) ?></p>
+            <p class="text-end"><?= Html::a('¿Olvidó su contraseña?', ['/cuenta/acceso/olvide'], ['class' => 'small']) ?></p>
             <?= Html::submitButton('Ingresar', ['class' => 'huk-btn-oro w-100']) ?>
             <?php ActiveForm::end(); ?>
 
@@ -40,7 +41,7 @@ $campo = ['options' => ['class' => 'mb-3'], 'labelOptions' => ['class' => 'form-
                 <?= Html::endForm() ?>
             <?php endif; ?>
 
-            <p class="huk-form-pie">¿Todavía no sos socio? <?= Html::a('Enviá tu solicitud', ['/cuenta/acceso/registro']) ?></p>
+            <p class="huk-form-pie">¿Todavía no es socio? <?= Html::a('Envíe su solicitud', ['/cuenta/acceso/registro']) ?></p>
         </div>
     </div>
 </section>

@@ -42,9 +42,9 @@ $mapaActual = DatosGeneralesForm::extraerMapa($model->mapa);
                 <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-id-card-o"></i> La página</h3></div>
                 <div class="box-body">
                     <?= $form->field($model, 'titulo_pagina')->textInput(['maxlength' => 200])
-                        ->hint('Es el nombre que aparece en la pestaña del navegador y en Google.') ?>
-                    <?= $form->field($model, 'nombre_empresa')->textInput(['maxlength' => 200]) ?>
-                     <?= $form->field($model, 'nombre_empresa')->textInput(['maxlength' => 200]) ?>
+                        ->hint('Es el nombre que aparece en la pestaña del navegador, en Google, en el header y en los correos.') ?>
+                    <?= $form->field($model, 'nombre_empresa')->textInput(['maxlength' => 200])
+                        ->hint('Sale en el pie de la web, al lado del ©.') ?>
                    <?= $form->field($model, 'meta_descripcion', $icono('map-marker'))->textInput(['maxlength' => 500]) ?>
                     <?= $form->field($model, 'horarios', $icono('clock-o'))->textInput(['maxlength' => 500])
                         ->hint('Ej.: Lun a Vie: 09:00 a 18:00') ?>
@@ -55,7 +55,7 @@ $mapaActual = DatosGeneralesForm::extraerMapa($model->mapa);
                 <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-phone"></i> Contacto</h3></div>
                 <div class="box-body">
                     <?= $form->field($model, 'email_web', $icono('envelope-o'))->textInput(['maxlength' => 500, 'type' => 'email'])
-                        ->hint('El que se muestra en la página para que te escriban.') ?>
+                        ->hint('El que se muestra en la página para que le escriban.') ?>
                     <?= $form->field($model, 'telefono_empresa', $icono('phone'))->textInput(['maxlength' => 250])
                         ->hint('Ej.: (+591) 75055468') ?>
                     <?= $form->field($model, 'whatsapp', $icono('whatsapp'))->textInput(['maxlength' => 15, 'inputmode' => 'numeric'])
@@ -65,7 +65,7 @@ $mapaActual = DatosGeneralesForm::extraerMapa($model->mapa);
                     <div class="huk-aviso-remitente">
                         <?= $form->field($model, 'email', $icono('paper-plane'))->textInput(['maxlength' => 100, 'type' => 'email']) ?>
                         <p><i class="fa fa-exclamation-triangle"></i> Desde este email salen <strong>todos los correos del sistema</strong>
-                            (recuperar contraseña, bloqueos, bienvenida). Si lo cambiás, tiene que ser un email del dominio
+                            (recuperar contraseña, bloqueos, bienvenida). Si lo cambia, tiene que ser un email del dominio
                             que esté configurado en el servidor de correo; si no, los correos dejan de llegar.</p>
                     </div>
                 </div>
@@ -76,7 +76,7 @@ $mapaActual = DatosGeneralesForm::extraerMapa($model->mapa);
             <div class="box box-primary">
                 <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-share-alt"></i> Redes sociales</h3></div>
                 <div class="box-body">
-                    <p class="text-muted">Pegá el enlace completo de cada perfil. Las que dejes vacías no se muestran en la página.</p>
+                    <p class="text-muted">Pegue el enlace completo de cada perfil. Las que deje vacías no se muestran en la página.</p>
                     <?php foreach (DatosGeneralesForm::REDES as $red): ?>
                         <?= $form->field($model, $red, $icono($iconosRedes[$red]))->textInput(['maxlength' => 255, 'placeholder' => 'https://']) ?>
                     <?php endforeach; ?>
@@ -87,9 +87,9 @@ $mapaActual = DatosGeneralesForm::extraerMapa($model->mapa);
                 <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-map-o"></i> Ubicación</h3></div>
                 <div class="box-body">
                     <ol class="huk-pasos-mapa">
-                        <li>Buscá el lugar en <strong>Google Maps</strong>.</li>
-                        <li>Tocá <strong>Compartir</strong> → pestaña <strong>Insertar un mapa</strong> → <strong>Copiar HTML</strong>.</li>
-                        <li>Pegalo acá abajo. Se guarda solo el enlace del mapa; el tamaño lo pone la página.</li>
+                        <li>Busque el lugar en <strong>Google Maps</strong>.</li>
+                        <li>Toque <strong>Compartir</strong> → pestaña <strong>Insertar un mapa</strong> → <strong>Copiar HTML</strong>.</li>
+                        <li>Péguelo aquí abajo. Se guarda solo el enlace del mapa; el tamaño lo pone la página.</li>
                     </ol>
                     <?= $form->field($model, 'mapa')->textarea([
                         'rows' => 3,

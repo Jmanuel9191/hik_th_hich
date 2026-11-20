@@ -2,7 +2,8 @@
 
 /**
  * Editar un bloque fijo de una página. Los campos salen de PaginaSeccion::PAGINAS.
- * Imagen: app\widgets\CampoImagen. Texto con formato: editor (EditorAsset).
+ * Imágenes (foto, firma…; PaginaSeccion::IMAGENES): app\widgets\CampoImagen, una caja por imagen.
+ * Texto con formato: editor (EditorAsset).
  *
  * @var yii\web\View $this
  * @var app\models\PaginaSeccion $model
@@ -24,7 +25,8 @@ $pagina = PaginaSeccion::PAGINAS[$model->pagina];
 $this->title = 'Editar: ' . $cfg['nombre'];
 
 $hint = fn($campo) => $campos[$campo][1] ?? '';
-$textos = array_diff(array_keys($campos), ['imagen', 'texto']);
+$imagenes = array_values(array_intersect(PaginaSeccion::IMAGENES, array_keys($campos)));
+$textos = array_diff(array_keys($campos), array_merge($imagenes, ['texto']));
 ?>
 
 <section class="content-header">
@@ -43,7 +45,7 @@ $textos = array_diff(array_keys($campos), ['imagen', 'texto']);
     ]); ?>
 
     <div class="row">
-        <div class="<?= isset($campos['imagen']) ? 'col-md-8' : 'col-md-12' ?>">
+        <div class="<?= $imagenes ? 'col-md-8' : 'col-md-12' ?>">
             <div class="box box-primary">
                 <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-font"></i> Textos</h3></div>
                 <div class="box-body">
@@ -71,17 +73,19 @@ $textos = array_diff(array_keys($campos), ['imagen', 'texto']);
             </div>
         </div>
 
-        <?php if (isset($campos['imagen'])): ?>
+        <?php if ($imagenes): ?>
             <div class="col-md-4">
-                <div class="box box-primary">
-                    <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-picture-o"></i> <?= Html::encode($campos['imagen'][0]) ?></h3></div>
-                    <div class="box-body">
-                        <?= $form->field($model, 'imagen')->widget(CampoImagen::class, [
-                            'url' => PaginaSeccion::url($model->imagen),
-                            'medida' => $cfg['medida'] ?? '',
-                        ])->label(false)->hint($campos['imagen'][1] ?: ($campos['imagen'][2] ? '' : 'Opcional.')) ?>
+                <?php foreach ($imagenes as $campo): ?>
+                    <div class="box box-primary">
+                        <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-picture-o"></i> <?= Html::encode($campos[$campo][0]) ?></h3></div>
+                        <div class="box-body">
+                            <?= $form->field($model, $campo)->widget(CampoImagen::class, [
+                                'url' => PaginaSeccion::url($model->$campo),
+                                'medida' => $campo === 'imagen' ? ($cfg['medida'] ?? '') : ($cfg['medidas'][$campo] ?? ''),
+                            ])->label(false)->hint($campos[$campo][1] ?: ($campos[$campo][2] ? '' : 'Opcional.')) ?>
+                        </div>
                     </div>
-                </div>
+                <?php endforeach; ?>
             </div>
         <?php endif; ?>
     </div>

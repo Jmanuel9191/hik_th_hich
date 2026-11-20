@@ -35,9 +35,9 @@ $cancelar = $volver === 'proyecto' && $model->idproyecto ? ['banco-proyectos/vie
 
 <section class="content">
     <?php if (!$proyectos): ?>
-        <div class="callout callout-warning">No hay proyectos publicados (o con la inversión completa) con moneda definida<?= Yii::$app->user->identity->idrol == \app\components\Rol::GERENTE ? ' en tus áreas' : '' ?>.</div>
+        <div class="callout callout-warning">No hay proyectos publicados (o con la inversión completa) con moneda definida<?= Yii::$app->user->identity->idrol == \app\components\Rol::GERENTE ? ' en sus áreas' : '' ?>.</div>
     <?php elseif (!$inversores): ?>
-        <div class="callout callout-warning">No hay inversores aprobados<?= Yii::$app->user->identity->idrol == \app\components\Rol::GERENTE ? ' en tus áreas' : '' ?>.</div>
+        <div class="callout callout-warning">No hay inversores aprobados<?= Yii::$app->user->identity->idrol == \app\components\Rol::GERENTE ? ' en sus áreas' : '' ?>.</div>
     <?php endif; ?>
 
     <?php $form = ActiveForm::begin(['id' => 'pago-form', 'options' => ['enctype' => 'multipart/form-data', 'class' => 'huk-pago-form']]); ?>
@@ -48,12 +48,12 @@ $cancelar = $volver === 'proyecto' && $model->idproyecto ? ['banco-proyectos/vie
                 <div class="box-body">
                     <?= $form->field($model, 'idproyecto')->widget(Select2::class, [
                         'data' => $proyectos,
-                        'options' => ['placeholder' => 'Elegí el proyecto…', 'options' => $opcionesProyecto, 'data-pago-proyecto' => true],
+                        'options' => ['placeholder' => 'Elija el proyecto…', 'options' => $opcionesProyecto, 'data-pago-proyecto' => true],
                         'pluginOptions' => ['allowClear' => false],
                     ])->hint('Solo proyectos publicados o con la inversión completa.') ?>
                     <?= $form->field($model, 'idusuario')->widget(Select2::class, [
                         'data' => $inversores,
-                        'options' => ['placeholder' => 'Elegí el inversor…'],
+                        'options' => ['placeholder' => 'Elija el inversor…'],
                     ])->hint('Inversores aprobados. Entre paréntesis, las áreas que tiene habilitadas: el proyecto tiene que ser de una de ellas.') ?>
                 </div>
             </div>
@@ -63,7 +63,7 @@ $cancelar = $volver === 'proyecto' && $model->idproyecto ? ['banco-proyectos/vie
                     <div class="row">
                         <div class="col-sm-4"><?= $form->field($model, 'fecha_pago')->input('date', ['max' => date('Y-m-d')]) ?></div>
                         <div class="col-sm-4"><?= $form->field($model, 'monto')->input('number', ['min' => 0.01, 'step' => 'any', 'placeholder' => 'Ej: 5000']) ?></div>
-                        <div class="col-sm-4"><?= $form->field($model, 'idmoneda')->dropDownList(Moneda::lista($model->idmoneda), ['prompt' => 'Elegí…', 'data-pago-moneda' => true]) ?></div>
+                        <div class="col-sm-4"><?= $form->field($model, 'idmoneda')->dropDownList(Moneda::lista($model->idmoneda), ['prompt' => 'Elija…', 'data-pago-moneda' => true]) ?></div>
                     </div>
                     <div class="huk-pago-equivalente" data-pago-equivalente>
                         <?= $form->field($model, 'monto_equivalente')->input('number', ['min' => 0.01, 'step' => 'any'])
@@ -86,7 +86,7 @@ $cancelar = $volver === 'proyecto' && $model->idproyecto ? ['banco-proyectos/vie
                 <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-paperclip"></i> Comprobante y nota</h3></div>
                 <div class="box-body">
                     <?= $form->field($model, 'comprobante')->fileInput(['accept' => '.jpg,.jpeg,.png,.webp,.pdf'])
-                        ->hint('Foto o PDF del comprobante, hasta ' . InversionPago::MAX_COMPROBANTE_MB . ' MB. Si no lo tenés ahora, lo podés subir después desde la lista.') ?>
+                        ->hint('Foto o PDF del comprobante, hasta ' . InversionPago::MAX_COMPROBANTE_MB . ' MB. Si no lo tiene ahora, puede subirlo después desde la lista.') ?>
                     <?= $form->field($model, 'nota')->textarea(['rows' => 4, 'maxlength' => 500]) ?>
                 </div>
             </div>

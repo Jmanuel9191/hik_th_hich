@@ -27,7 +27,7 @@ $vigente = \app\models\NdaVersion::vigente();
 
 <section class="content-header">
     <h1><i class="fa fa-handshake-o"></i> Inversores</h1>
-    <p class="huk-inicio-sub">Solicitudes de la web y del panel. Aprobá con las áreas que puede ver; al entrar acepta el acuerdo de confidencialidad.</p>
+    <p class="huk-inicio-sub">Solicitudes de la web y del panel. Apruebe con las áreas que puede ver; al entrar acepta el acuerdo de confidencialidad.</p>
 </section>
 
 <section class="content">
@@ -76,11 +76,18 @@ $vigente = \app\models\NdaVersion::vigente();
                     ['label' => 'País', 'value' => fn(Inversor $m) => $m->usuario->pais],
                     [
                         'attribute' => 'interes',
-                        'label' => $tab === 'aprobado' ? 'Áreas aprobadas' : 'Áreas de interés',
+                        'label' => $tab === 'aprobado' ? 'Áreas aprobadas' : ($tab === 'todos' ? 'Áreas (aprobadas o de interés)' : 'Áreas de interés'),
                         'format' => 'raw',
                         'filter' => $ecosistemas,
                         'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todas'],
-                        'value' => fn(Inversor $m) => Html::tag('span', Html::encode(implode(', ', array_column($tab === 'aprobado' ? $m->areas : $m->intereses, 'nombre'))), ['class' => 'huk-eco-resumen']),
+                        'value' => fn(Inversor $m) => Html::tag('span', Html::encode(implode(', ', array_column($m->estado_solicitud === 'aprobado' ? $m->areas : $m->intereses, 'nombre'))), ['class' => 'huk-eco-resumen']),
+                    ],
+                    [
+                        'label' => 'Estado',
+                        'format' => 'raw',
+                        'visible' => $tab === 'todos',
+                        'value' => fn(Inversor $m) => Html::tag('span', Html::encode($m->estadoNombre()), ['class' => 'label ' . $m->estadoClase()])
+                            . ($m->usuario->estado !== '1' ? ' <span class="label label-danger">Cuenta bloqueada</span>' : ''),
                     ],
                     [
                         'label' => 'Monto (USD)',

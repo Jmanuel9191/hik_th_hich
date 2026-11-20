@@ -47,7 +47,7 @@ $roles = ArrayHelper::map(Roles::find()->where(['idrol' => Rol::PANEL])->orderBy
                             <?php $q = Yii::$app->request->getQueryParams(); unset($q['formato']); ?>
                             <div class="btn-group">
                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                        title="Exporta lo que ves en la tabla (con los filtros que tengas). Sin filtros = todos.">
+                                        title="Exporta lo que ve en la tabla (con los filtros que tenga). Sin filtros = todos.">
                                     <i class="fa fa-download"></i> Exportar <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu">

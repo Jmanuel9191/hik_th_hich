@@ -48,7 +48,7 @@ class PaginasController extends Controller
     }
 
     /** Una pestaña de la página: sus bloques con sus listas, e historial. */
-    public function actionIndex($pagina = 'nosotros', $tab = null)
+    public function actionIndex($pagina = 'quienes', $tab = null)
     {
         $this->permisos->verificarPermiso('paginas_ver');
         $config = $this->paginas->pagina($pagina);

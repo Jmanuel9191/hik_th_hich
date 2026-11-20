@@ -26,7 +26,7 @@ $this->title = 'Roles y permisos';
     <div class="box box-primary">
         <div class="box-body">
             <p class="text-muted">
-                <i class="fa fa-info-circle"></i> Tildá lo que puede hacer cada tipo de usuario y presioná <b>Guardar cambios</b>.
+                <i class="fa fa-info-circle"></i> Marque lo que puede hacer cada tipo de usuario y presione <b>Guardar cambios</b>.
                 El <b>Superadmin</b> siempre tiene todo. Los permisos de <b>Usuarios</b> son solo del Superadmin.
                 El Gerente de área, además, solo trabaja sobre los ecosistemas que tiene asignados.
             </p>

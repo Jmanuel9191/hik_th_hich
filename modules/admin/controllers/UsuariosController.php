@@ -1,7 +1,6 @@
 <?php
 
 namespace app\modules\admin\controllers;
-use app\modules\admin\controllers\BaseController;
 use app\components\InterfacePermisosService;
 use app\models\Usuarios;
 use app\components\InterfaceAdmin;
@@ -233,7 +232,7 @@ public function actionUpdatepassword($id)
             Yii::$app->session->set(Yii::$app->user->authKeyParam, $usuario->auth_key);
             HistorialUsuarios::registrar($usuario->idusuario, 'Cambio de contraseña',
                 'El usuario cambió su contraseña desde Mi perfil.', $usuario->idusuario);
-            Yii::$app->session->setFlash('flash', ['type' => 'success', 'message' => 'Tu contraseña fue actualizada.']);
+            Yii::$app->session->setFlash('flash', ['type' => 'success', 'message' => 'Su contraseña fue actualizada.']);
             return $this->redirect(['cuenta']);
         }
         $form->currentPassword = $form->newPassword = $form->confirmPassword = null;
@@ -301,18 +300,5 @@ public function actionUpdatepassword($id)
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
-    }
-
-
-    public function actionExport()
-    {
-
-        //\moonland\phpexcel\Excel::widget([
-        \moonland\phpexcel\Excel::export([
-            'models' => Usuarios::find()->all(),
-            //'mode' => 'export', //default value as 'export'
-            'columns' => ['idusuario', 'nombre', 'apellido', 'direccion', 'telefono', 'ciudad', 'email', 'fecha_nacimiento', 'movil', 'sexo'], //without header working, because the header will be get label from attribute label.
-            'headers' => ['Numero' => 'idusuario', 'Nombre' => 'nombre', 'Apellido' => 'apellido', 'Direccion' => 'direccion', 'Telefono' => 'telefono', 'Ciudad' => 'ciudad', 'Email' => 'email', 'Fecha Nacimiento' => 'fecha_nacimiento', 'Movil' => 'movil', 'Sexo' => 'sexo'],
-        ]);
     }
 }

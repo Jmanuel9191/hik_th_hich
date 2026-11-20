@@ -18,4 +18,10 @@ interface InterfaceEcosistemas
     public function proyectosAsignados($id);
     /** Elimina el ecosistema con sus imágenes y galería, si no tiene proyectos. */
     public function eliminar($id);
+    /** Ecosistemas activos por número, para el menú y el pie de la web. @return \app\models\Ecosistema[] */
+    public function paraMenu(): array;
+    /** Ecosistemas destacados activos por número (Nosotros → Ejes estratégicos). @return \app\models\Ecosistema[] */
+    public function destacadosWeb(): array;
+    /** Ecosistema activo por su dirección (/ecosistemas/<slug>), con su galería, o 404. */
+    public function porSlug(string $slug): \app\models\Ecosistema;
 }

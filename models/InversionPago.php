@@ -55,7 +55,7 @@ class InversionPago extends ActiveRecord
         'efectivo' => 'Quién lo recibió (opcional)',
         'cheque' => 'Banco y número de cheque',
         'qr' => 'Número de transacción',
-        'otro' => 'Explicá cómo pagó',
+        'otro' => 'Explique cómo pagó',
     ];
     const ESTADOS = ['vigente' => 'Vigente', 'anulado' => 'Anulado'];
     /** Proyectos en los que se pueden registrar pagos. */
@@ -92,9 +92,9 @@ class InversionPago extends ActiveRecord
             [['monto', 'monto_equivalente'], 'number', 'min' => 0.01, 'max' => 9999999999999, 'tooSmall' => 'Tiene que ser mayor a 0.'],
             [['monto_equivalente'], 'required', 'when' => fn() => $this->otraMoneda(),
                 'whenClient' => "function () { return !$('[data-pago-equivalente]').hasClass('hidden'); }",
-                'message' => 'El pago está en otra moneda: indicá cuánto equivale en la moneda del proyecto.'],
+                'message' => 'El pago está en otra moneda: indique cuánto equivale en la moneda del proyecto.'],
             [['tipo_pago'], 'in', 'range' => array_keys(self::TIPOS_PAGO)],
-            [['referencia'], 'required', 'when' => fn() => $this->tipo_pago === 'otro', 'message' => 'Explicá cómo pagó.',
+            [['referencia'], 'required', 'when' => fn() => $this->tipo_pago === 'otro', 'message' => 'Explique cómo pagó.',
                 'whenClient' => "function () { return $('[data-pago-tipo]:checked').val() === 'otro'; }"],
             [['referencia'], 'string', 'max' => 150],
             [['nota'], 'string', 'max' => 500],

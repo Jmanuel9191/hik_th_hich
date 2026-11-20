@@ -22,8 +22,8 @@ use yii\helpers\HtmlPurifier;
             <span class="huk-cuenta-eyebrow">Último paso</span>
             <h1><?= Html::encode($version->titulo) ?></h1>
             <p><?= $anterior
-                ? 'Actualizamos el acuerdo. Para seguir viendo los proyectos, leé y aceptá la nueva versión.'
-                : 'Tu cuenta está aprobada. Antes de ver los proyectos, leé y aceptá el acuerdo de confidencialidad.' ?></p>
+                ? 'Actualizamos el acuerdo. Para seguir viendo los proyectos, lea y acepte la nueva versión.'
+                : 'Su cuenta está aprobada. Antes de ver los proyectos, lea y acepte el acuerdo de confidencialidad.' ?></p>
         </div>
 
         <div class="huk-tarjeta-form">
@@ -37,10 +37,10 @@ use yii\helpers\HtmlPurifier;
                 <?= Html::label('Leí el acuerdo y lo acepto.', 'nda-acepto', ['class' => 'form-check-label']) ?>
             </div>
             <div class="mb-3">
-                <?= Html::label('Firmá con tu nombre completo', 'nda-firma', ['class' => 'form-label']) ?>
+                <?= Html::label('Firme con su nombre completo', 'nda-firma', ['class' => 'form-label']) ?>
                 <?= Html::textInput('firma', Yii::$app->request->post('firma', ''), ['id' => 'nda-firma', 'class' => 'form-control', 'maxlength' => 150, 'required' => true,
                     'placeholder' => $inversor->usuario->nombrecompleto, 'autocomplete' => 'name']) ?>
-                <div class="form-text">Queda registrado con la fecha, la hora y desde dónde aceptaste.</div>
+                <div class="form-text">Queda registrado con la fecha, la hora y desde dónde aceptó.</div>
             </div>
             <?= Html::submitButton('Aceptar y continuar', ['class' => 'huk-btn-oro w-100']) ?>
             <?= Html::endForm() ?>

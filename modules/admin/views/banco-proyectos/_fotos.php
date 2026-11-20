@@ -26,8 +26,8 @@ foreach ($model->imagenes as $img) {
     <div class="box-body huk-galeria">
         <?php if ($puedeEditar): ?>
             <p class="text-muted">
-                <i class="fa fa-info-circle"></i> Arrastrá las fotos o tocá <b>Examinar</b>. JPG, PNG o WEBP de hasta <b><?= Proyecto::MAX_IMAGEN_MB ?> MB</b> cada una.
-                Esperá a que diga <b>"Hecho"</b> antes de salir. Para borrar una foto usá el tachito.
+                <i class="fa fa-info-circle"></i> Arrastre las fotos o toque <b>Examinar</b>. JPG, PNG o WEBP de hasta <b><?= Proyecto::MAX_IMAGEN_MB ?> MB</b> cada una.
+                Espere a que diga <b>"Hecho"</b> antes de salir. Para borrar una foto use el tachito.
             </p>
             <?= FileInput::widget([
                 'name' => 'imagenes[]',
@@ -51,7 +51,7 @@ foreach ($model->imagenes as $img) {
                     'uploadClass' => 'btn btn-success',
                     'browseLabel' => 'Examinar …',
                     'uploadLabel' => 'Subir',
-                    'dropZoneTitle' => 'Arrastrá y soltá aquí las fotos …',
+                    'dropZoneTitle' => 'Arrastre y suelte aquí las fotos …',
                 ],
             ]) ?>
         <?php elseif ($preview): ?>

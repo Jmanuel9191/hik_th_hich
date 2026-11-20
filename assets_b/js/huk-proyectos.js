@@ -66,7 +66,7 @@
             error(r && r.mensaje);
           }
         })
-        .fail(function () { error("Error de conexión. Intentá de nuevo."); });
+        .fail(function () { error("Error de conexión. Intente de nuevo."); });
     });
   });
 
@@ -92,7 +92,7 @@
             error(r && r.mensaje);
           }
         })
-        .fail(function () { error("Error de conexión. Intentá de nuevo."); });
+        .fail(function () { error("Error de conexión. Intente de nuevo."); });
     });
   });
 
@@ -132,7 +132,7 @@
     xhr.upload.addEventListener("progress", function (ev) {
       if (!ev.lengthComputable) return;
       var p = Math.round((ev.loaded / ev.total) * 100);
-      $prog.css("width", p + "%").text(p < 100 ? p + "%" : "Procesando…");
+      $prog.css("width", p + "%").text(p < 100 ? p + "%" : "Procesando… (si hay que convertir el video puede tardar unos minutos)");
     });
     function terminar() {
       subiendo = false;
@@ -144,14 +144,16 @@
       try { r = JSON.parse(xhr.responseText); } catch (err) { r = null; }
       terminar();
       if (xhr.status === 200 && r && r.exito) {
-        Swal.fire({ icon: "success", titleText: r.mensaje }).then(function () { window.location.reload(); });
+        // con aviso (ej. video H.265 que no todos los navegadores ven): se muestra el texto completo
+        Swal.fire(r.aviso ? { icon: "warning", titleText: "Video agregado", text: r.mensaje } : { icon: "success", titleText: r.mensaje })
+          .then(function () { window.location.reload(); });
       } else if (xhr.status === 413 || xhr.status === 400) {
         error("El servidor rechazó el envío. Puede que el archivo sea más grande de lo que acepta el hosting.");
       } else {
         error(r && r.mensaje);
       }
     };
-    xhr.onerror = function () { terminar(); error("Error de conexión. Intentá de nuevo."); };
+    xhr.onerror = function () { terminar(); error("Error de conexión. Intente de nuevo."); };
     xhr.send(new FormData(form));
   });
 
@@ -237,7 +239,7 @@
       tareas.push({ nombre: "enlace", url: url, leyenda: $f.find("input[name=leyenda]").val() || "" });
     }
     if (!tareas.length) {
-      error("Elegí uno o varios archivos, o pegá un enlace de YouTube o Vimeo.");
+      error("Elija uno o varios archivos, o pegue un enlace de YouTube o Vimeo.");
       return;
     }
 
@@ -303,7 +305,7 @@
         .done(function (r) {
           if (r && r.exito) { window.location.reload(); } else { error(r && r.mensaje); }
         })
-        .fail(function () { error("Error de conexión. Intentá de nuevo."); });
+        .fail(function () { error("Error de conexión. Intente de nuevo."); });
     });
   });
 

@@ -5,6 +5,7 @@ namespace app\modules\admin\controllers;
 use app\components\InterfaceInversiones;
 use app\components\InterfaceInversores;
 use app\components\InterfaceNda;
+use app\components\InterfacePerfilInversor;
 use app\components\InterfacePermisosService;
 use app\models\Ecosistema;
 use app\models\SolicitudInversorForm;
@@ -22,6 +23,7 @@ use yii\web\Response;
 class InversoresController extends Controller
 {
     const PESTANAS = [
+        'todos' => 'Todos',
         'pendiente' => 'Pendientes',
         'aprobado' => 'Aprobados',
         'rechazado' => 'Rechazados',
@@ -33,10 +35,12 @@ class InversoresController extends Controller
     private $nda;
     private $permisos;
     private $inversiones;
+    private $perfil;
 
     public function __construct($id, $module, InterfaceInversores $inversores, InterfaceNda $nda, InterfacePermisosService $permisos,
-        InterfaceInversiones $inversiones, $config = [])
+        InterfaceInversiones $inversiones, InterfacePerfilInversor $perfil, $config = [])
     {
+        $this->perfil = $perfil;
         $this->inversores = $inversores;
         $this->nda = $nda;
         $this->permisos = $permisos;
@@ -50,14 +54,14 @@ class InversoresController extends Controller
             'access' => ['class' => AccessControl::class, 'rules' => [['allow' => true, 'roles' => ['@']]]],
             'verbs' => ['class' => VerbFilter::class, 'actions' => [
                 'aprobar' => ['POST'], 'areas' => ['POST'], 'rechazar' => ['POST'], 'estado' => ['POST'],
-                'reenviar' => ['POST'], 'documento-subir' => ['POST'],
+                'reenviar' => ['POST'], 'documento-subir' => ['POST'], 'desbloquear' => ['POST'],
             ]],
         ];
     }
 
-    public function actionIndex($tab = 'pendiente')
+    public function actionIndex($tab = 'todos')
     {
-        $tab = isset(self::PESTANAS[$tab]) ? $tab : 'pendiente';
+        $tab = isset(self::PESTANAS[$tab]) ? $tab : 'todos';
         return $this->render('index', $this->inversores->listar(Yii::$app->request->queryParams, $tab) + [
             'tab' => $tab,
             'pestanas' => self::PESTANAS,
@@ -75,12 +79,15 @@ class InversoresController extends Controller
             'vigente' => $this->nda->vigente(),
             'historial' => $this->permisos->tienePermiso('inversores_historial') ? $this->inversores->historial($inv->idusuario) : null,
             'ecosistemas' => Ecosistema::lista(false),
+            'tieneFoto' => $this->perfil->archivoFoto((int) $inv->idusuario) !== null,
+            'pedidas' => \app\models\Inversor::idsPedidos($inv->idusuario),
             'inversiones' => $this->permisos->tienePermiso('inversiones_listar') ? $this->inversiones->resumenInversor($inv->idusuario) : null,
             'puede' => [
                 'registrarPago' => $this->permisos->tienePermiso('inversiones_registrar'),
                 'editar' => $this->permisos->tienePermiso('inversores_editar'),
                 'aprobar' => $this->permisos->tienePermiso('inversores_aprobar'),
                 'estado' => $this->permisos->tienePermiso('inversores_estado'),
+                'desbloquear' => $this->permisos->tienePermiso('inversores_desbloquear'),
             ],
         ]);
     }
@@ -136,6 +143,13 @@ class InversoresController extends Controller
         return $this->inversores->cambiarEstadoCuenta($id, Yii::$app->request->post('motivo', ''));
     }
 
+    /** Quita el bloqueo por intentos fallidos (Superadmin / Gerente del área). */
+    public function actionDesbloquear($id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return $this->inversores->desbloquearIntentos($id);
+    }
+
     public function actionReenviar($id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -156,13 +170,26 @@ class InversoresController extends Controller
         return Yii::$app->response->sendFile($a['ruta'], $a['nombre'], array_filter(['inline' => true, 'mimeType' => $a['mime']]));
     }
 
+    /** Foto de perfil del inversor (privada): solo con permiso para ver a ese inversor. */
+    public function actionFoto($id)
+    {
+        $inv = $this->inversores->buscar($id);
+        $ruta = $this->perfil->archivoFoto((int) $inv->idusuario);
+        if ($ruta === null) {
+            throw new \yii\web\NotFoundHttpException('Sin foto.');
+        }
+        Yii::$app->response->headers->set('Cache-Control', 'private, max-age=3600');
+        Yii::$app->response->headers->set('X-Content-Type-Options', 'nosniff');
+        return Yii::$app->response->sendFile($ruta, 'foto.webp', ['inline' => true, 'mimeType' => 'image/webp']);
+    }
+
     /** Exporta el listado (con los filtros que tenga) a xlsx, csv o pdf. */
-    public function actionExportar($formato = 'xlsx', $tab = 'pendiente')
+    public function actionExportar($formato = 'xlsx', $tab = 'todos')
     {
         if (!isset(\app\components\Exportador::FORMATOS[$formato])) {
             throw new \yii\web\BadRequestHttpException('Formato no válido.');
         }
-        $d = $this->inversores->exportar(Yii::$app->request->queryParams, isset(self::PESTANAS[$tab]) ? $tab : 'pendiente');
+        $d = $this->inversores->exportar(Yii::$app->request->queryParams, isset(self::PESTANAS[$tab]) ? $tab : 'todos');
         Yii::info('Exportación de inversores (' . $formato . ', ' . count($d['modelos']) . ' registros) por #' . Yii::$app->user->id, 'exportar');
         return \app\components\Exportador::enviar($d['titulo'], $d['columnas'], $d['modelos'], $formato, $d['filtros']);
     }

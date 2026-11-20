@@ -7,7 +7,8 @@ namespace app\assets_b;
 use yii\web\AssetBundle;
 
 /**
- * Banners: orden (↑ ↓), activar/desactivar y eliminar con confirmación.
+ * Banners: orden (↑ ↓), activar/desactivar y eliminar con confirmación (huk-listado.js)
+ * y campos del formulario según la página elegida (huk-banners.js).
  * Lo registran modules/admin/views/banners/*.php.
  */
 class BannersAdminAsset extends AssetBundle
@@ -17,6 +18,7 @@ class BannersAdminAsset extends AssetBundle
 
     public $js = [
         'js/huk-listado.js',
+        'js/huk-banners.js',
     ];
 
     public $depends = [

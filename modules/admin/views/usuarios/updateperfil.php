@@ -52,9 +52,9 @@ $this->title = 'Editar mis datos';
                 <?= $form->field($model, 'ciudad')->widget(Select2::class, [
                     'data' => Ubicaciones::ciudadesDe($model->pais_operacion, $model->ciudad),
                     'language' => 'es',
-                    'options' => ['placeholder' => 'Primero elegí el país', 'data-ciudad-select' => true],
+                    'options' => ['placeholder' => 'Primero elija el país', 'data-ciudad-select' => true],
                     'pluginOptions' => ['allowClear' => true, 'tags' => true],
-                ])->hint('Si tu ciudad no aparece, escribila y presioná Enter.') ?>
+                ])->hint('Si su ciudad no aparece, escríbala y presione Enter.') ?>
                 <?= $form->field($model, 'direccion')->textInput(['maxlength' => 100]) ?>
                 <?= $form->field($model, 'fecha_nacimiento')->widget(DatePicker::class, [
                     'language' => 'es',

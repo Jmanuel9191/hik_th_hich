@@ -47,6 +47,15 @@ class ProyectoDocumento extends ActiveRecord
         'png' => ['image/png'],
     ];
 
+    /** Extensión => clase de archivo (para el ícono). */
+    const CLASES = [
+        'pdf' => 'pdf', 'doc' => 'word', 'docx' => 'word', 'xls' => 'excel', 'xlsx' => 'excel',
+        'ppt' => 'powerpoint', 'pptx' => 'powerpoint', 'jpg' => 'imagen', 'jpeg' => 'imagen', 'png' => 'imagen',
+    ];
+
+    /** Los que el navegador muestra solo (se abren en otra pestaña); el resto se descarga. */
+    const SE_VEN = ['pdf', 'jpg', 'jpeg', 'png'];
+
     public static function tableName()
     {
         return 'proyecto_documento';
@@ -71,6 +80,23 @@ class ProyectoDocumento extends ActiveRecord
     public function getUsuario()
     {
         return $this->hasOne(Usuarios::class, ['idusuario' => 'idusuario']);
+    }
+
+    public function extension(): string
+    {
+        return strtolower(pathinfo($this->nombre_original ?: $this->archivo, PATHINFO_EXTENSION));
+    }
+
+    /** pdf | word | excel | powerpoint | imagen | otro */
+    public function clase(): string
+    {
+        return self::CLASES[$this->extension()] ?? 'otro';
+    }
+
+    /** ¿Se abre en el navegador (PDF, fotos)? Si no, se descarga. */
+    public function seVe(): bool
+    {
+        return in_array($this->extension(), self::SE_VEN, true);
     }
 
     public function tipoNombre()

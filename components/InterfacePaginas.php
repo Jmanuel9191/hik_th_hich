@@ -17,6 +17,37 @@ interface InterfacePaginas
      *  @return array ['historia' => PaginaSeccion|null, 'destacados' => PaginaItem[], 'cifras' => PaginaItem[]] */
     public function quienesInicio(): array;
 
+    /**
+     * Página Nosotros de la web: solo bloques visibles, con sus ítems activos (si un bloque está oculto, viene null o vacío).
+     * @return array [
+     *   'quienes' => ['historia', 'destacados', 'cifras'] (mismo formato que quienesInicio()),
+     *   'tarjetas' => PaginaItem[], 'bloques' => PaginaItem[] (bloques adicionales),
+     *   'proposito', 'vision', 'mision', 'valores', 'principios', 'ceo' => PaginaSeccion|null,
+     * ]
+     */
+    public function nosotrosWeb(): array;
+
+    /**
+     * Nosotros → Ejes estratégicos: bloques visibles de Panel → Páginas → Ejes estratégicos (null si el bloque está oculto).
+     * @return array ['ejes', 'modelo', 'propuesta', 'expansion', 'fases' => PaginaSeccion|null] (con sus ítems activos)
+     */
+    public function estrategiaWeb(): array;
+
+    /**
+     * Nosotros → Gobierno y socios: bloques visibles de Panel → Páginas → Gobierno y socios (null si está oculto).
+     * @return array ['gobierno', 'impacto', 'socios', 'razones' => PaginaSeccion|null] (con sus ítems activos)
+     */
+    public function gobiernoWeb(): array;
+
+    /**
+     * Países de la visión de expansión (Panel → Páginas → Ejes estratégicos → Expansión), activos y en orden.
+     * Para elegir en qué países está cada ecosistema. @return array código => enfoque (ej. 'BO' => 'Resources & Development')
+     */
+    public function paisesExpansion(): array;
+
+    /** Pie de la web: Panel → Páginas → Pie de página (texto y lema). null si el bloque está oculto. */
+    public function pieWeb(): ?PaginaSeccion;
+
     /** Bloques de una pestaña, en el orden de la configuración. @return PaginaSeccion[] clave => bloque */
     public function bloques($pagina, $pestana): array;
 

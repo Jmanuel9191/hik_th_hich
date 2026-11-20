@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tarjetas del Inicio (Conectar · Transformar · Multiplicar): Panel → Páginas → Nosotros → Quiénes somos.
+ * Tarjetas del Inicio (Conectar · Transformar · Multiplicar): Panel → Páginas → Quiénes somos → Quiénes somos.
  * Carrusel: 3 por vista en computadora, 2 en tablet, 1 en celular (CSS --tarjetas-por-vista).
  * Flechas y cambio automático (cada 4 s) solo si no entran todas: huk.js punto 11.
  * Cada tarjeta aparece "de la nada" al entrar en pantalla (data-reveal="nada").

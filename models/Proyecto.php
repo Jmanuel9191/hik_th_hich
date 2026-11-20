@@ -48,6 +48,13 @@ use yii\helpers\Url;
  * @property string $fecha_registro
  * @property string|null $fecha_actualizacion
  * @property string|null $fecha_publicacion
+ * @property string|null $rubro      antetítulo de la tarjeta ("Proyecto minero"); si está vacío, el ecosistema
+ * @property string|null $bajada     texto del banner de la página web (si está vacío, el resumen)
+ * @property string|null $sello      etiqueta del banner (CONFIDENCIAL…)
+ * @property string|null $elementos  JSON [{numero, simbolo, nombre}] (chips del banner y de la tarjeta)
+ * @property string|null $cifras     JSON [{valor, texto, contar}] (hasta 4 cifras grandes del banner)
+ * @property string $destacado       '1' = va al carrusel de su ecosistema
+ * @property string $mostrar_ficha   '1' = la página empieza con la Ficha (datos de la inversión)
  *
  * @property Ecosistema $ecosistema
  * @property Usuarios|null $gerente
@@ -56,6 +63,7 @@ use yii\helpers\Url;
  * @property ProyectoVideo[] $videos
  * @property ProyectoDocumento[] $documentos
  * @property ProyectoAvance[] $avances
+ * @property ProyectoSeccion[] $secciones
  */
 class Proyecto extends ActiveRecord
 {
@@ -132,6 +140,9 @@ class Proyecto extends ActiveRecord
     const IMAGENES = ['imagen_banner' => 'Imagen de banner', 'foto_principal' => 'Foto principal'];
     const MEDIDAS = ['imagen_banner' => '1920 × 600 px (horizontal)', 'foto_principal' => '1200 × 800 px (horizontal)'];
 
+    /** Estados que ve el inversor en la web ("cerrado" se muestra como "Inversión completa"). */
+    const ESTADOS_WEB = ['publicado', 'cerrado'];
+
     const CARPETA = 'privado/proyectos';
     /** Límites de subida (MB). */
     const MAX_IMAGEN_MB = 8;
@@ -178,7 +189,7 @@ class Proyecto extends ActiveRecord
             }],
             [['idgerente'], 'integer'],
             [['monto_total', 'monto_objetivo', 'inversion_minima', 'inversion_maxima'], 'number', 'min' => 0, 'max' => 99999999999999,
-                'message' => 'Escribí solo el número, sin puntos de miles. Ej.: 1500000 o 1500000.50'],
+                'message' => 'Escriba solo el número, sin puntos de miles. Ej.: 1500000 o 1500000.50'],
             [['roi'], 'number', 'min' => 0, 'max' => 9999],
             [['plazo_meses'], 'integer', 'min' => 1, 'max' => 600],
             [['fecha_apertura', 'fecha_cierre'], 'date', 'format' => 'php:Y-m-d'],
@@ -290,6 +301,43 @@ class Proyecto extends ActiveRecord
         return $this->hasMany(ProyectoDocumento::class, ['idproyecto' => 'idproyecto'])->orderBy(['iddocumento' => SORT_DESC]);
     }
 
+    public function getSecciones()
+    {
+        return $this->hasMany(ProyectoSeccion::class, ['idproyecto' => 'idproyecto'])->orderBy(['orden' => SORT_ASC, 'idseccion' => SORT_ASC]);
+    }
+
+    /* ---------- Página web ---------- */
+
+    /** Chips del banner: [['numero' => '79', 'simbolo' => 'Au', 'nombre' => 'Oro'], …] */
+    public function listaElementos(): array
+    {
+        return array_values(array_filter((array) json_decode((string) $this->elementos, true), 'is_array'));
+    }
+
+    /** Cifras grandes del banner: [['valor' => '7', 'texto' => '…', 'contar' => true], …] */
+    public function listaCifras(): array
+    {
+        return array_values(array_filter((array) json_decode((string) $this->cifras, true), 'is_array'));
+    }
+
+    /** "Proyecto minero · La Paz, Bolivia" (antetítulo de la tarjeta). */
+    public function antetituloTarjeta(): string
+    {
+        $lugar = implode(', ', array_filter([$this->ciudad, $this->pais]));
+        return implode(' · ', array_filter([$this->rubro ?: ($this->ecosistema->nombre ?? null), $lugar]));
+    }
+
+    /** Texto del banner: la bajada o, si no hay, el resumen. */
+    public function textoBanner(): string
+    {
+        return (string) ($this->bajada ?: $this->resumen);
+    }
+
+    public function esVisibleEnWeb(): bool
+    {
+        return in_array($this->estado, self::ESTADOS_WEB, true);
+    }
+
     /* ---------- Ayudas ---------- */
 
     public static function carpetaDe($id, $sub = '')
@@ -334,6 +382,43 @@ class Proyecto extends ActiveRecord
         return trim(($this->moneda->simbolo ?? '') . ' ' . $texto);
     }
 
+    /**
+     * Ficha automática del principio de la página web (views/proyectos/_ficha.php), con lo cargado en la pestaña Ficha.
+     * Solo lo que tiene valor y aplica al tipo de proyecto. No incluye montos recaudados (solo el % de la ronda).
+     * @return array ['datos' => [rótulo => valor], 'avance' => ?int %, 'ronda' => ?float %, 'completa' => bool, 'estado' => texto]
+     */
+    public function datosFicha(): array
+    {
+        $fecha = static fn($f) => $f ? Yii::$app->formatter->asDate($f, 'php:d/m/Y') : null;
+        $rotulo = fn($campo) => preg_replace('/\s*\([^)]*\)$/', '', $this->getAttributeLabel($campo)); // sin "(meses)", "(opcional)"…
+        $lugar = implode(', ', array_filter([$this->ubicacion, $this->ciudad, $this->pais]));
+        $datos = array_filter([
+            'Código' => $this->codigo,
+            'Ecosistema' => $this->ecosistema->nombre ?? null,
+            'Ubicación' => $lugar ?: null,
+            $rotulo('etapa') => $this->aplica('etapa') ? (self::ETAPAS[$this->etapa] ?? null) : null,
+            $rotulo('tipo_participacion') => self::PARTICIPACIONES[$this->tipo_participacion] ?? null,
+            $rotulo('monto_total') => $this->aplica('monto_total') ? $this->monto('monto_total') : null,
+            $rotulo('monto_objetivo') => $this->monto('monto_objetivo'),
+            $rotulo('inversion_minima') => $this->monto('inversion_minima'),
+            $rotulo('inversion_maxima') => $this->monto('inversion_maxima'),
+            $rotulo('roi') => $this->roi !== null && $this->roi !== '' ? rtrim(rtrim(number_format((float) $this->roi, 2, ',', '.'), '0'), ',') . ' % anual' : null,
+            $rotulo('plazo_meses') => $this->plazo_meses ? $this->plazo_meses . ' meses' : null,
+            $rotulo('frecuencia_retorno') => $this->aplica('frecuencia_retorno') ? (self::FRECUENCIAS[$this->frecuencia_retorno] ?? null) : null,
+            $rotulo('fecha_apertura') => $fecha($this->fecha_apertura),
+            $rotulo('fecha_cierre') => $fecha($this->fecha_cierre),
+        ], fn($v) => $v !== null && $v !== '');
+        $completa = $this->estado === 'cerrado';
+        $ronda = $this->porcentajeRonda();
+        return [
+            'datos' => $datos,
+            'avance' => $this->porcentaje_avance !== null ? max(0, min(100, (int) $this->porcentaje_avance)) : null,
+            // la ronda se muestra recién cuando entró la primera inversión (un 0 % no le dice nada al inversor)
+            'ronda' => $completa ? 100.0 : ($ronda ? min(100.0, $ronda) : null),
+            'completa' => $completa,
+        ];
+    }
+
     /** ¿El campo aplica a este tipo? */
     public function aplica($campo)
     {
@@ -345,10 +430,10 @@ class Proyecto extends ActiveRecord
         return true;
     }
 
-    /** Para la web (más adelante): publicados de los ecosistemas indicados. */
+    /** Para la web: los que ve el inversor (publicados e inversión completa) de los ecosistemas indicados. */
     public static function publicados(array $idsEcosistemas)
     {
-        return static::find()->where(['estado' => 'publicado', 'idecosistema' => $idsEcosistemas ?: [0]])
-            ->orderBy(['fecha_publicacion' => SORT_DESC]);
+        return static::find()->where(['estado' => self::ESTADOS_WEB, 'idecosistema' => $idsEcosistemas ?: [0]])
+            ->orderBy(['fecha_publicacion' => SORT_DESC, 'idproyecto' => SORT_DESC]);
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Proyecto: cabecera con estado y acciones + pestañas (ficha, fotos, videos, documentos, historial).
+ * Proyecto: cabecera con estado y acciones + pestañas (ficha, página web, fotos, videos, documentos, historial).
  * Estado y eliminar: huk-proyectos.js (data-proyecto-estado / data-proyecto-eliminar).
  *
  * @var yii\web\View $this
@@ -16,6 +16,10 @@
  * @var array $descargas iddocumento => cantidad
  * @var app\models\ProyectoAvance[] $avances
  * @var int $limiteServidor bytes
+ * @var array|null $editor datos del editor de la página web (pestaña pagina)
+ * @var app\models\InteresInversion[] $interesados  "Quiero invertir" (pestaña Interesados)
+ * @var bool $gestionarInteres
+ * @var bool $registrarPago
  */
 
 use yii\helpers\Html;
@@ -49,6 +53,8 @@ $cantidad = [
         <?php if ($puedeEditar): ?>
             <?= Html::a('<i class="fa fa-pencil"></i> Editar ficha', ['update', 'id' => $model->idproyecto], ['class' => 'btn btn-info']) ?>
         <?php endif; ?>
+        <?= Html::a('<i class="fa fa-eye"></i> Vista previa', ['/admin/paginas-proyecto/vista-previa', 'id' => $model->idproyecto],
+            ['class' => 'btn btn-default', 'target' => '_blank', 'rel' => 'noopener', 'title' => 'La página web como la va a ver el inversor']) ?>
         <?php foreach ($transiciones as $estado => [$texto, $icono, $clase, $aviso]): ?>
             <?= Html::button('<i class="fa fa-' . $icono . '"></i> ' . Html::encode($texto), [
                 'class' => 'btn ' . $clase,
@@ -83,6 +89,10 @@ $cantidad = [
         'descargas' => $descargas,
         'avances' => $avances,
         'inversiones' => $inversiones,
+        'interesados' => $interesados,
+        'gestionarInteres' => $gestionarInteres,
+        'registrarPago' => $registrarPago,
         'limiteServidor' => $limiteServidor,
+        'editor' => $editor,
     ]) ?>
 </section>

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Página institucional (Inicio, Nosotros, Estrategia, Gobierno y ESG). Pestañas = pestañas de la web.
+ * Página institucional (una por subpágina de Nosotros, el pie y Gobierno y ESG). Pestañas = secciones de esa página.
  * Cada bloque muestra cómo está cargado + su lista (orden ↑ ↓, estado y eliminar: huk-listado.js).
  *
  * @var yii\web\View $this
@@ -30,7 +30,6 @@ $this->params['pagina'] = $pagina; // menú lateral
 $this->title = $config['nombre'];
 $vacio = Html::tag('span', '—', ['class' => 'text-muted']);
 $resumen = fn($html) => StringHelper::truncate(trim(html_entity_decode(strip_tags((string) $html), ENT_QUOTES | ENT_HTML5, 'UTF-8')), 110);
-$verEquipo = Yii::$container->get(\app\components\InterfacePermisosService::class)->tienePermiso('equipo_listar');
 ?>
 
 <section class="content-header">
@@ -45,11 +44,9 @@ $verEquipo = Yii::$container->get(\app\components\InterfacePermisosService::clas
                 <?= Html::a(Html::encode($p['nombre']), ['index', 'pagina' => $pagina, 'tab' => $id]) ?>
             </li>
         <?php endforeach; ?>
-        <?php if ($pagina === 'nosotros'): ?>
+        <?php if (!empty($config['web'])): ?>
             <li class="huk-tab-externa">
-                <?= $verEquipo
-                    ? Html::a('Liderazgo <i class="fa fa-external-link"></i>', ['/admin/equipo/index'], ['title' => 'La pestaña Liderazgo de la web se arma con el módulo Equipo'])
-                    : Html::tag('span', 'Liderazgo: sale de Equipo') ?>
+                <?= Html::a('Ver en la web <i class="fa fa-external-link"></i>', $config['web'], ['target' => '_blank', 'rel' => 'noopener']) ?>
             </li>
         <?php endif; ?>
     </ul>
@@ -101,6 +98,8 @@ $verEquipo = Yii::$container->get(\app\components\InterfacePermisosService::clas
                                         <?= $bloque->textoHtml() /* HTML limpio o texto escapado */ ?>
                                     <?php elseif ($campo === 'frase'): ?>
                                         <blockquote class="huk-bloque-frase"><?= Html::encode($bloque->frase) ?></blockquote>
+                                    <?php elseif ($campo === 'imagen_firma'): ?>
+                                        <?= Html::img(PaginaSeccion::url($bloque->imagen_firma), ['alt' => 'Firma', 'width' => 160, 'loading' => 'lazy']) ?>
                                     <?php elseif ($campo === 'titulo'): ?>
                                         <strong class="huk-bloque-titulo"><?= Html::encode($bloque->titulo) ?></strong>
                                     <?php else: ?>
@@ -235,7 +234,7 @@ $verEquipo = Yii::$container->get(\app\components\InterfacePermisosService::clas
         <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-history"></i> Historial de cambios (<?= Html::encode($config['nombre']) ?>)</h3></div>
         <div class="box-body">
             <?php if ($historial === null): ?>
-                <p class="text-muted">No tenés permiso para ver el historial.</p>
+                <p class="text-muted">No tiene permiso para ver el historial.</p>
             <?php else: ?>
                 <?php Pjax::begin(['id' => 'paginas-historial', 'timeout' => 5000]); ?>
                 <?= GridView::widget([

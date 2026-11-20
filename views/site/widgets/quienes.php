@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Inicio · resumen de Quiénes somos (Panel → Páginas → Nosotros → Quiénes somos, Destacados y Cifras).
+ * Inicio · resumen de Quiénes somos (Panel → Páginas → Quiénes somos → Quiénes somos, Destacados y Cifras).
  * Formato de la plantilla: palabra de fondo, etiqueta, título, texto, frase con línea dorada, destacados y
  * "Leer más" a la izquierda; a la derecha las cifras (todas en una fila, con contador) y abajo la foto con su pie. Lo que esté vacío (o el bloque oculto) no sale.
  * Efectos: el texto entra desde la izquierda; la foto aparece con zoom y hace zoom al pasar el mouse;
@@ -11,6 +11,7 @@
  * @var app\models\PaginaSeccion|null $historia
  * @var app\models\PaginaItem[] $destacados
  * @var app\models\PaginaItem[] $cifras
+ * @var bool $conBoton  botón "Leer más" a Nosotros (en la propia página Nosotros va false)
  */
 
 use app\models\PaginaItem;
@@ -26,6 +27,7 @@ $texto = $h->textoHtml();
 /** Cifra con contador: cada número del texto sube desde 0 ("10", "+1.000", "USD 5-10 mil M") — huk.js punto 2b. */
 $cifra = static fn (string $valor): string => Html::tag('b', Html::encode($valor), preg_match('/\d/', $valor) ? ['data-count-texto' => ''] : []);
 $conLado = $h->imagen || $cifras;
+$conBoton = $conBoton ?? true;
 ?>
 <section class="huk-quienes<?= $conLado ? '' : ' sin-foto' ?>" aria-labelledby="quienes-titulo">
     <div class="container huk-quienes-grid">
@@ -62,9 +64,11 @@ $conLado = $h->imagen || $cifras;
                 </ul>
             <?php endif; ?>
 
-            <div class="huk-quienes-pie">
-                <?= Html::a('Leer más <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>', ['site/nosotros'], ['class' => 'btn btn-primary huk-quienes-btn']) ?>
-            </div>
+            <?php if ($conBoton): ?>
+                <div class="huk-quienes-pie">
+                    <?= Html::a('Leer más <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>', ['/nosotros/index'], ['class' => 'btn btn-primary huk-quienes-btn']) ?>
+                </div>
+            <?php endif; ?>
         </div>
 
         <?php if ($conLado): ?>

@@ -48,9 +48,9 @@ $config = [
 
             'user' => [
             'class' => 'yii\web\User',
-            'identityClass' => 'app\models\Organizadoras',
+            'identityClass' => 'app\models\Usuarios',
             'enableAutoLogin' => false,
-            'loginUrl' => ['site/login'],
+             'loginUrl' => ['/cuenta/acceso/ingresar'],
             'idParam' => '__id_organizadora',
             'authKeyParam' => '__authKey_organizadora',
             'returnUrlParam' => '__returnUrl_organizadora',
@@ -58,17 +58,7 @@ $config = [
             'authTimeoutParam' => '__expire_organizadora',
         ],
 
-        'user2' => [
-            'class' => 'yii\web\User',
-            'identityClass' => 'app\models\Reservas',
-            'enableAutoLogin' => false,
-            'loginUrl' => ['site/logueo'],
-            'idParam' => '__id_cliente',
-            'authKeyParam' => '__authKey_cliente',
-            'returnUrlParam' => '__returnUrl_cliente',
-            'authTimeout' => 36000,                          // cliente: 60 min sin actividad
-            'authTimeoutParam' => '__expire_cliente',
-        ],
+      
 
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -114,12 +104,28 @@ $config = [
             'showScriptName' => false,
             'rules' => [
                 '' => 'site/index',
+                'nosotros' => 'nosotros/index',
+                'noticias/categoria/<categoria:[a-z0-9-]+>/pagina/<page:\d+>' => 'noticias/index',
+                'noticias/categoria/<categoria:[a-z0-9-]+>' => 'noticias/index',
+                'noticias/pagina/<page:\d+>' => 'noticias/index',
+                'noticias' => 'noticias/index',
+                'ecosistemas' => 'ecosistemas/index',
+                'ecosistemas/<slug:[a-z0-9-]+>' => 'ecosistemas/ver',
+                'noticias/<slug:[a-z0-9-]+>' => 'noticias/ver',
+                'proyectos' => 'proyectos/index',
+                'proyectos/pagina/<page:\d+>' => 'proyectos/index',
+                'proyectos/ecosistema/<ecosistema:[a-z0-9-]+>/pagina/<page:\d+>' => 'proyectos/index',
+                'proyectos/ecosistema/<ecosistema:[a-z0-9-]+>' => 'proyectos/index',
+                'proyectos/imagen/<id:\d+>/<carpeta:imagenes|bloques|galeria|videos>/<archivo:[A-Za-z0-9_-]+\.(?:jpe?g|png|webp)>' => 'proyectos/imagen',
+                'proyectos/documento/<id:\d+>' => 'proyectos/documento',
+                'proyectos/<slug:[a-z0-9-]+>' => 'proyectos/ver',
+                'proyectos/video/<id:\d+>' => 'proyectos/video',
+
                 '<action>'=>'site/<action>',
                 '<action>/<id:\d+>'=>'site/<action>',
 
 
-                // Regla para eliminar archivos
-                'reservas/delete-file/<id:\d+>/<fileType:\w+>' => 'reservas/delete-file',
+          
             ],
         ],
 
@@ -181,21 +187,16 @@ Yii::$container->set(\app\components\InterfaceAvances::class, \app\components\Av
 Yii::$container->set(\app\components\InterfaceInversores::class, \app\components\InversorService::class);
 Yii::$container->set(\app\components\InterfaceNda::class, \app\components\NdaService::class);
 Yii::$container->set(\app\components\InterfaceInversiones::class, \app\components\InversionService::class);
+Yii::$container->set(\app\components\InterfaceSitio::class, \app\components\SitioService::class);
+Yii::$container->set(\app\components\InterfaceContacto::class, \app\components\ContactoService::class);
+  Yii::$container->set(\app\components\InterfaceNoticias::class, \app\components\NoticiaService::class);
+        Yii::$container->set(\app\components\InterfaceNoticiaCategorias::class, \app\components\NoticiaCategoriaService::class);
+Yii::$container->set(\app\components\InterfacePaginaProyecto::class, \app\components\PaginaProyectoService::class);
+Yii::$container->set(\app\components\InterfacePlantillas::class, \app\components\PlantillaService::class);
+Yii::$container->set(\app\components\InterfaceProyectosWeb::class, \app\components\ProyectoWebService::class);
+Yii::$container->set(\app\components\InterfaceTerminos::class, \app\components\TerminosService::class);
+Yii::$container->set(\app\components\InterfacePerfilInversor::class, \app\components\PerfilInversorService::class);
+Yii::$container->set(\app\components\InterfaceInteresInversion::class, \app\components\InteresInversionService::class);
+        // --- Sistema anterior: los usa la web pública vieja (controllers/). Se sacan al limpiar la web. ---
 
-// --- Sistema anterior: los usa la web pública vieja (controllers/). Se sacan al limpiar la web. ---
-Yii::$container->set('app\components\InterfaceTarea', 'app\components\TareasService');
-Yii::$container->set('app\components\InterfaceConsultor', 'app\components\ConsultorService');
-Yii::$container->set('app\components\InterfaceGestor', 'app\components\GestorService');
-Yii::$container->set('app\components\InterfaceProyectos', 'app\components\ProyectosService');
-Yii::$container->set('app\components\InterfaceAsignacion', 'app\components\AsignacionService');
-Yii::$container->set('app\components\InterfaceGestionProyecto', 'app\components\GestionProyectoAService');
-Yii::$container->set('app\components\InterfaceLib', 'app\components\LibService');
-Yii::$container->set('app\components\InterfaceCliente', 'app\components\ClienteService');
-Yii::$container->set('app\components\InterfaceRecursos', 'app\components\RecursosService');
-Yii::$container->set('app\components\InterfaceMaterial', 'app\components\MaterialService');
-Yii::$container->set('app\components\InterfaceGoogle', 'app\components\GoogleCalendarService');
-Yii::$container->set('app\components\InterfaceCampanias', 'app\components\CampaniasService');
-Yii::$container->set('app\components\InterfaceGestionCampania', 'app\components\GestionCampaniaAService');
-Yii::$container->set('app\components\InterfaceCalendario', 'app\components\CalendarioService');
-Yii::$container->set('app\components\InterfaceCatalogoService', 'app\components\CatalogoService');
 return $config; 

@@ -11,27 +11,36 @@ use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 
 /**
- * Banners de la portada. Los permisos los revisa BannersController.
- * Imágenes en imagenes/banners/ con nombre aleatorio (SubidaImagen).
+ * Banners de la web, por página (Banners::UBICACIONES). Los permisos los revisa BannersController.
+ * Imágenes en imagenes/banners/ con nombre aleatorio (SubidaImagen). El orden es por página.
  */
 class BannerService implements InterfaceBanners
 {
-    const CAMPOS_TEXTO = ['antetitulo', 'titulo', 'texto', 'boton_texto', 'boton_url', 'fecha_inicio', 'fecha_fin'];
+    const CAMPOS_TEXTO = ['ubicacion', 'antetitulo', 'titulo', 'texto', 'boton_texto', 'boton_url', 'fecha_inicio', 'fecha_fin'];
 
-    public function listar($params)
+    public function listar($params, $ubicacion = 'inicio')
     {
         $search = new BannersSearch();
+        $dePagina = Banners::find()->where(['ubicacion' => $ubicacion]);
+        $encabezado = empty(Banners::UBICACIONES[$ubicacion]['carrusel']) ? $this->encabezado($ubicacion) : null;
         return [
             'searchModel' => $search,
-            'dataProvider' => $search->search($params),
+            'dataProvider' => $search->search($params, $ubicacion),
             // Para no mostrar ↑ en el primero ni ↓ en el último
-            'extremos' => [(int) Banners::find()->min('orden'), (int) Banners::find()->max('orden')],
+            'extremos' => [(int) (clone $dePagina)->min('orden'), (int) (clone $dePagina)->max('orden')],
+            'conteos' => Banners::find()->select(['COUNT(*)'])->groupBy('ubicacion')->indexBy('ubicacion')->column(),
+            'enUso' => $encabezado ? (int) $encabezado->idbanner : null,
         ];
     }
 
-    public function paraWeb()
+    public function paraWeb($ubicacion = 'inicio')
     {
-        return Banners::vigentes()->all();
+        return Banners::vigentes($ubicacion)->all();
+    }
+
+    public function encabezado($ubicacion): ?Banners
+    {
+        return Banners::vigentes($ubicacion)->one();
     }
 
     public function buscar($id): Banners
@@ -49,6 +58,16 @@ class BannerService implements InterfaceBanners
         $antes = $model->getAttributes();
         $datos = $post['Banners'] ?? [];
         $model->setAttributes(array_intersect_key($datos, array_flip(self::CAMPOS_TEXTO)), false);
+        // Solo se guardan los textos que usa la ubicación (ej. una página interna: solo el título)
+        if (isset(Banners::UBICACIONES[$model->ubicacion])) {
+            foreach (Banners::COLUMNAS_OPCIONALES as $campo => $columnas) {
+                if (!$model->usa($campo)) {
+                    foreach ($columnas as $columna) {
+                        $model->$columna = null;
+                    }
+                }
+            }
+        }
 
         // Archivos: se validan antes de guardar nada
         $archivos = [];
@@ -61,11 +80,11 @@ class BannerService implements InterfaceBanners
         $quitar = (array) ($datos['quitar'] ?? []);
         $valido = $model->validate();
         if (!isset($archivos['imagen']) && ($nuevo || !empty($quitar['imagen']))) {
-            $model->addError('imagen', $nuevo ? 'Subí la imagen del banner.' : 'Subí otra imagen: la de computadora es obligatoria.');
+            $model->addError('imagen', $nuevo ? 'Suba la imagen del banner.' : 'Suba otra imagen: la de computadora es obligatoria.');
             $valido = false;
         }
         if (!$valido) {
-            return ['exito' => false, 'mensaje' => 'Revisá los campos marcados.'];
+            return ['exito' => false, 'mensaje' => 'Revise los campos marcados.'];
         }
 
         // Subir primero; si alguna falla no se guarda nada
@@ -77,7 +96,7 @@ class BannerService implements InterfaceBanners
                 foreach ($subidas as $archivo) {
                     SubidaImagen::borrar(Banners::carpeta(), $archivo);
                 }
-                return ['exito' => false, 'mensaje' => 'Revisá los campos marcados.'];
+                return ['exito' => false, 'mensaje' => 'Revise los campos marcados.'];
             }
             $subidas[$campo] = $r['archivo'];
         }
@@ -99,9 +118,12 @@ class BannerService implements InterfaceBanners
             }
         }
 
+        // Nuevo, o pasó a otra página: va al final de la lista de esa página
+        if ($nuevo || $antes['ubicacion'] !== $model->ubicacion) {
+            $model->orden = (int) Banners::find()->where(['ubicacion' => $model->ubicacion])->max('orden') + 1;
+        }
         if ($nuevo) {
             $model->estado = '1';
-            $model->orden = (int) Banners::find()->max('orden') + 1;
             $model->idusuario_registro = Yii::$app->user->id;
             $model->fecha_registro = date('Y-m-d H:i:s');
         } else {
@@ -113,12 +135,16 @@ class BannerService implements InterfaceBanners
         }
 
         if ($nuevo) {
-            BannerHistorial::registrar($model->idbanner, 'Creación', 'Banner creado: ' . $model->nombre());
+            BannerHistorial::registrar($model->idbanner, 'Creación', 'Banner creado: ' . $model->nombre() . "\nPágina: " . $model->ubicacionNombre());
         } else {
             $cambios = [];
             foreach (self::CAMPOS_TEXTO as $campo) {
                 $a = (string) $antes[$campo];
                 $d = (string) $model->$campo;
+                if ($campo === 'ubicacion') {
+                    $a = Banners::UBICACIONES[$a]['nombre'] ?? $a;
+                    $d = $model->ubicacionNombre();
+                }
                 if ($a !== $d) {
                     $cambios[] = $model->getAttributeLabel($campo) . ': ' . ($a === '' ? '(vacío)' : $a) . ' → ' . ($d === '' ? '(vacío)' : $d);
                 }
@@ -146,7 +172,8 @@ class BannerService implements InterfaceBanners
         $model = $this->buscar($id);
         $subir = (int) $direccion < 0;
         $vecino = Banners::find()
-            ->where([$subir ? '<' : '>', 'orden', $model->orden])
+            ->where(['ubicacion' => $model->ubicacion])
+            ->andWhere([$subir ? '<' : '>', 'orden', $model->orden])
             ->orderBy(['orden' => $subir ? SORT_DESC : SORT_ASC])
             ->one();
         if ($vecino === null) {

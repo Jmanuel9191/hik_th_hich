@@ -47,7 +47,7 @@ $imagenes = array_intersect_key($campos, array_flip(PaginaItem::IMAGENES));
                 <div class="box-body">
                     <?php foreach (array_diff_key($campos, $imagenes) as $campo => $etiqueta): ?>
                         <?php if ($campo === 'codigo'): ?>
-                            <?= $form->field($model, 'codigo')->dropDownList(MapaPaises::PAISES, ['prompt' => 'Elegí el país…']) ?>
+                            <?= $form->field($model, 'codigo')->dropDownList(MapaPaises::PAISES, ['prompt' => 'Elija el país…']) ?>
                         <?php elseif ($campo === 'cifra'): ?>
                             <?= $form->field($model, 'cifra')->textInput(['maxlength' => 60]) ?>
                         <?php elseif ($campo === 'titulo'): ?>

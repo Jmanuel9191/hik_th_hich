@@ -45,8 +45,7 @@ class EquipoService implements InterfaceEquipo
         $model->setAttributes(array_intersect_key($datos, array_flip(self::CAMPOS)), false);
         if (array_key_exists('biografia', $datos)) {
             $bio = HtmlEditor::limpiar($datos['biografia']);
-            $texto = preg_replace('/[\s\x{00A0}]+/u', '', html_entity_decode(strip_tags($bio), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-            $model->biografia = $texto === '' ? null : $bio; // un editor "vacío" deja <p>&nbsp;</p>
+            $model->biografia = Equipo::textoPlano($bio) === '' ? null : $bio; // un editor "vacío" deja <p>&nbsp;</p>
         }
 
         $foto = UploadedFile::getInstance($model, 'foto');
@@ -54,7 +53,7 @@ class EquipoService implements InterfaceEquipo
             $foto = null;
         }
         if (!$model->validate()) {
-            return ['exito' => false, 'mensaje' => 'Revisá los campos marcados.'];
+            return ['exito' => false, 'mensaje' => 'Revise los campos marcados.'];
         }
 
         $cambioFoto = null;
@@ -63,7 +62,7 @@ class EquipoService implements InterfaceEquipo
             $r = SubidaImagen::guardar($foto, Equipo::carpeta(), 5);
             if (!$r['ok']) {
                 $model->addError('foto', $r['error']);
-                return ['exito' => false, 'mensaje' => 'Revisá los campos marcados.'];
+                return ['exito' => false, 'mensaje' => 'Revise los campos marcados.'];
             }
             $borrar = $model->foto;
             $cambioFoto = $model->foto ? 'reemplazada' : 'subida';
@@ -186,7 +185,7 @@ class EquipoService implements InterfaceEquipo
             'X / Twitter' => fn($m) => $m->twitter,
             'Destacado' => fn($m) => $m->destacado === '1' ? 'Sí' : 'No',
             'Visible en la web' => fn($m) => $m->estado === '1' ? 'Sí' : 'No',
-            'Biografía' => fn($m) => trim(html_entity_decode(strip_tags((string) $m->biografia), ENT_QUOTES | ENT_HTML5, 'UTF-8')),
+            'Resumen' => fn($m) => Equipo::textoPlano($m->biografia),
             'Fecha de registro' => fn($m) => $m->fecha_registro ? date('d/m/Y', strtotime($m->fecha_registro)) : '',
         ];
         $filtros = [];
@@ -204,4 +203,8 @@ class EquipoService implements InterfaceEquipo
         return ['titulo' => 'Equipo', 'columnas' => $columnas, 'modelos' => $modelos, 'filtros' => $filtros];
     }
 
+    public function paraWeb(): array
+    {
+        return Equipo::activos()->all();
+    }
 }

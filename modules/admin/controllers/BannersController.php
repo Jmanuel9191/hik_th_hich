@@ -12,7 +12,8 @@ use yii\web\Controller;
 use yii\web\Response;
 
 /**
- * Banners de la portada. Permisos banners_* (Superadmin y Editor de contenido por defecto).
+ * Banners de la web, con una pestaña por página (Banners::UBICACIONES).
+ * Permisos banners_* (Superadmin y Editor de contenido por defecto).
  * Estado, orden y eliminar responden JSON (huk-listado.js).
  */
 class BannersController extends Controller
@@ -41,10 +42,11 @@ class BannersController extends Controller
         ];
     }
 
-    public function actionIndex()
+    public function actionIndex($tab = 'inicio')
     {
         $this->permisos->verificarPermiso('banners_listar');
-        return $this->render('index', $this->banners->listar(Yii::$app->request->queryParams) + $this->puede());
+        $tab = $this->ubicacion($tab);
+        return $this->render('index', $this->banners->listar(Yii::$app->request->queryParams, $tab) + ['tab' => $tab] + $this->puede());
     }
 
     public function actionView($id)
@@ -56,10 +58,10 @@ class BannersController extends Controller
         ] + $this->puede());
     }
 
-    public function actionCreate()
+    public function actionCreate($ubicacion = 'inicio')
     {
         $this->permisos->verificarPermiso('banners_crear');
-        return $this->formulario(new Banners(), 'create');
+        return $this->formulario(new Banners(['ubicacion' => $this->ubicacion($ubicacion)]), 'create');
     }
 
     public function actionUpdate($id)
@@ -95,10 +97,16 @@ class BannersController extends Controller
             $r = $this->banners->guardar($model, Yii::$app->request->post());
             Yii::$app->session->setFlash('flash', ['type' => $r['exito'] ? 'success' : 'error', 'message' => $r['mensaje']]);
             if ($r['exito']) {
-                return $this->redirect(['index']);
+                return $this->redirect(['index', 'tab' => $model->ubicacion]);
             }
         }
         return $this->render($vista, ['model' => $model]);
+    }
+
+    /** Página válida de la lista; si no, Inicio. */
+    private function ubicacion($ubicacion)
+    {
+        return isset(Banners::UBICACIONES[$ubicacion]) ? $ubicacion : 'inicio';
     }
 
     private function puede()

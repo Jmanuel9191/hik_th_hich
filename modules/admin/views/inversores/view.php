@@ -10,8 +10,10 @@
  * @var app\models\NdaVersion|null $vigente
  * @var yii\data\ActiveDataProvider|null $historial
  * @var array $ecosistemas id => nombre
+ * @var bool $tieneFoto subió foto de perfil (Mi cuenta)
+ * @var int[] $pedidas áreas que pidió desde Mi cuenta, sin decidir
  * @var array|null $inversiones pagos por proyecto (null = sin permiso)
- * @var array $puede ['editar','aprobar','estado','registrarPago' => bool]
+ * @var array $puede ['editar','aprobar','estado','desbloquear','registrarPago' => bool]
  */
 
 use app\models\Inversor;
@@ -32,10 +34,12 @@ $aceptoVigente = $vigente === null || in_array($vigente->idversion, array_map(fn
 $reenviable = ($model->origen === 'web' && $estado === 'sin_verificar') || ($model->origen === 'admin' && !$model->email_verificado);
 $marcadas = array_map('intval', array_column($estado === 'aprobado' ? $model->areas : $model->intereses, 'idecosistema'));
 $intereses = array_map('intval', array_column($model->intereses, 'idecosistema'));
+$bloqueadoIntentos = $u->bloqueado_hasta && strtotime($u->bloqueado_hasta) > time();
 ?>
 
 <section class="content-header">
-    <h1><i class="fa fa-handshake-o"></i> <?= Html::encode($this->title) ?></h1>
+    <h1><?php if ($tieneFoto): ?><img class="huk-inv-foto" src="<?= Url::to(['foto', 'id' => $model->idusuario, 'v' => substr(md5((string) $u->foto_perfil), 0, 8)]) ?>" alt="" width="44" height="44"><?php else: ?><i class="fa fa-handshake-o"></i><?php endif; ?>
+        <?= Html::encode($this->title) ?></h1>
     <p class="huk-inicio-sub">
         <span class="label <?= $model->estadoClase() ?>"><?= Html::encode($model->estadoNombre()) ?></span>
         <?php if (!$activa): ?><span class="label label-danger">Cuenta bloqueada</span><?php endif; ?>
@@ -180,7 +184,7 @@ $intereses = array_map('intval', array_column($model->intereses, 'idecosistema')
                 <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-history"></i> Historial</h3></div>
                 <div class="box-body">
                     <?php if ($historial === null): ?>
-                        <p class="text-muted">No tenés permiso para ver el historial.</p>
+                        <p class="text-muted">No tiene permiso para ver el historial.</p>
                     <?php else: ?>
                         <?php Pjax::begin(['id' => 'inversor-historial', 'timeout' => 5000]); ?>
                         <?= GridView::widget([
@@ -219,6 +223,10 @@ $intereses = array_map('intval', array_column($model->intereses, 'idecosistema')
                         <?php endif; ?>
                         <?= Html::beginForm([$estado === 'aprobado' ? 'areas' : 'aprobar', 'id' => $model->idusuario], 'post') ?>
                         <p><strong><?= $estado === 'aprobado' ? 'Áreas que puede ver' : 'Aprobar con estas áreas' ?></strong></p>
+                        <?php if ($estado === 'aprobado' && ($pedidas = array_diff($pedidas, $marcadas))): ?>
+                            <p class="huk-aviso-pedido"><i class="fa fa-bell"></i> Pidió acceso a <?= count($pedidas) === 1 ? 'un área nueva' : count($pedidas) . ' áreas nuevas' ?>
+                                (marcadas con «pidió»). Tilde las que aprueba y guarde: las que queden sin tildar se le informan como no aprobadas.</p>
+                        <?php endif; ?>
                         <?php foreach ($ecosistemas as $id => $nombre): ?>
                             <div class="checkbox huk-check-area">
                                 <label>
@@ -268,8 +276,19 @@ $intereses = array_map('intval', array_column($model->intereses, 'idecosistema')
                             ['label' => 'Términos aceptados', 'value' => $model->terminos_fecha ? $fecha($model->terminos_fecha) . ' (IP ' . $model->terminos_ip . ')' : '—'],
                             ['label' => 'Aprobado', 'value' => $fecha($model->fecha_aprobacion)],
                             ['label' => 'Último acceso', 'value' => $u->ultimo_acceso ? $fecha($u->ultimo_acceso) . ' (IP ' . $u->ultimo_acceso_ip . ')' : 'Nunca entró'],
+                            ['label' => 'Intentos fallidos', 'format' => 'raw', 'value' => $bloqueadoIntentos
+                                ? '<span class="label label-warning">Bloqueado hasta las ' . date('H:i', strtotime($u->bloqueado_hasta)) . '</span>'
+                                : ((int) $u->intentos_fallidos ? (int) $u->intentos_fallidos . ' de ' . \app\components\AuthService::MAX_INTENTOS : 'Ninguno')],
                         ],
                     ]) ?>
+                    <?php if ($puede['desbloquear'] && ($bloqueadoIntentos || (int) $u->intentos_fallidos)): ?>
+                        <?= Html::button('<i class="fa fa-unlock-alt"></i> ' . ($bloqueadoIntentos ? 'Desbloquear ingreso' : 'Reiniciar intentos fallidos'), [
+                            'class' => 'btn btn-block ' . ($bloqueadoIntentos ? 'btn-warning' : 'btn-default'),
+                            'data-inversor-post' => Url::to(['desbloquear', 'id' => $model->idusuario]),
+                            'data-titulo' => $bloqueadoIntentos ? '¿Desbloquear el ingreso?' : '¿Reiniciar los intentos fallidos?',
+                            'data-texto' => $bloqueadoIntentos ? 'Podrá volver a ingresar ahora mismo. Se le avisa por correo.' : 'Vuelve a tener ' . \app\components\AuthService::MAX_INTENTOS . ' intentos.',
+                        ]) ?>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

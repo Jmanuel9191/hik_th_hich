@@ -30,4 +30,7 @@ interface InterfaceEquipo
 
     /** @return array ['titulo', 'columnas', 'modelos', 'filtros'] para Exportador (con los filtros del listado). */
     public function exportar($params);
+
+    /** Para la web (Nosotros → Liderazgo): activos, primero los destacados y después en el orden de la lista. @return Equipo[] */
+    public function paraWeb(): array;
 }

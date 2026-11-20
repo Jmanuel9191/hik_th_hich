@@ -21,7 +21,7 @@ class PaginasService implements InterfacePaginas
 {
     public function pagina($pagina): array
     {
-        if (!isset(PaginaSeccion::PAGINAS[$pagina])) {
+        if (!isset(PaginaSeccion::PAGINAS[$pagina]['pestanas'])) { // las de "enlace" (Liderazgo) no tienen bloques
             throw new NotFoundHttpException('Página no encontrada.');
         }
         return PaginaSeccion::PAGINAS[$pagina];
@@ -29,19 +29,66 @@ class PaginasService implements InterfacePaginas
 
     public function tarjetasInicio(): array
     {
-        $seccion = PaginaSeccion::findOne(['pagina' => 'nosotros', 'clave' => 'historia']);
+        $seccion = PaginaSeccion::findOne(['pagina' => 'quienes', 'clave' => 'historia']);
         return $seccion ? $seccion->getItemsActivos()->all() : [];
     }
 
     public function quienesInicio(): array
     {
-        $bloques = PaginaSeccion::find()->where(['pagina' => 'nosotros', 'clave' => ['historia', 'destacados', 'cifras'], 'estado' => '1'])
+        $bloques = PaginaSeccion::find()->where(['pagina' => 'quienes', 'clave' => ['historia', 'destacados', 'cifras'], 'estado' => '1'])
             ->indexBy('clave')->all();
         return [
             'historia' => $bloques['historia'] ?? null,
             'destacados' => isset($bloques['destacados']) ? $bloques['destacados']->getItemsActivos()->all() : [],
             'cifras' => isset($bloques['cifras']) ? $bloques['cifras']->getItemsActivos()->all() : [],
         ];
+    }
+
+    public function nosotrosWeb(): array
+    {
+        $b = PaginaSeccion::dePagina(['quienes', 'pvm']); // bloques visibles, con sus ítems activos
+        $items = static fn ($clave) => isset($b[$clave]) ? $b[$clave]->itemsActivos : [];
+        $datos = [
+            'quienes' => ['historia' => $b['historia'] ?? null, 'destacados' => $items('destacados'), 'cifras' => $items('cifras')],
+            'tarjetas' => $items('historia'),
+            'bloques' => $items('bloques'),
+        ];
+        foreach (['proposito', 'vision', 'mision', 'valores', 'principios', 'ceo'] as $clave) {
+            $datos[$clave] = $b[$clave] ?? null;
+        }
+        return $datos;
+    }
+
+    public function estrategiaWeb(): array
+    {
+        $b = PaginaSeccion::dePagina('ejes');
+        return [
+            'ejes' => $b['ejes'] ?? null, 'modelo' => $b['modelo'] ?? null, 'propuesta' => $b['propuesta_valor'] ?? null,
+            'expansion' => $b['expansion'] ?? null, 'fases' => $b['fases'] ?? null,
+        ];
+    }
+
+    public function gobiernoWeb(): array
+    {
+        $b = PaginaSeccion::dePagina('gobierno');
+        return ['gobierno' => $b['gobierno'] ?? null, 'impacto' => $b['impacto'] ?? null, 'socios' => $b['socios'] ?? null, 'razones' => $b['razones'] ?? null];
+    }
+
+    public function paisesExpansion(): array
+    {
+        $seccion = PaginaSeccion::findOne(['pagina' => 'ejes', 'clave' => 'expansion']);
+        $paises = [];
+        foreach ($seccion ? $seccion->itemsActivos : [] as $item) {
+            if ($item->codigo) {
+                $paises[$item->codigo] = (string) $item->titulo;
+            }
+        }
+        return $paises;
+    }
+
+    public function pieWeb(): ?PaginaSeccion
+    {
+        return PaginaSeccion::findOne(['pagina' => 'general', 'clave' => 'pie', 'estado' => '1']);
     }
 
     public function bloques($pagina, $pestana): array
@@ -54,7 +101,7 @@ class PaginasService implements InterfacePaginas
         $bloques = [];
         foreach (array_keys($config['bloques']) as $clave) {
             if (!isset($filas[$clave])) {
-                throw new ServerErrorHttpException('Falta el bloque "' . $clave . '" en la base de datos. Corré la migración de páginas.');
+                throw new ServerErrorHttpException('Falta el bloque "' . $clave . '" en la base de datos. Ejecute la migración de páginas.');
             }
             $bloques[$clave] = $filas[$clave];
         }
@@ -87,39 +134,49 @@ class PaginasService implements InterfacePaginas
             }
         }
 
-        $imagen = null;
-        if ($seccion->usa('imagen')) {
-            $imagen = UploadedFile::getInstance($seccion, 'imagen');
-            if ($imagen !== null && $imagen->error === UPLOAD_ERR_NO_FILE) {
-                $imagen = null;
+        // Imágenes del bloque (foto, firma…): solo las que usa este bloque
+        $subidas = [];
+        foreach (PaginaSeccion::IMAGENES as $campo) {
+            $f = $seccion->usa($campo) ? UploadedFile::getInstance($seccion, $campo) : null;
+            if ($f !== null && $f->error !== UPLOAD_ERR_NO_FILE) {
+                $subidas[$campo] = $f;
             }
         }
         if (!$seccion->validate()) {
-            return ['exito' => false, 'mensaje' => 'Revisá los campos marcados.'];
+            return ['exito' => false, 'mensaje' => 'Revise los campos marcados.'];
         }
 
-        $borrar = null;
-        $cambioImagen = null;
-        if ($imagen !== null) {
-            $r = SubidaImagen::guardar($imagen, PaginaSeccion::carpeta(), 5);
-            if (!$r['ok']) {
-                $seccion->addError('imagen', $r['error']);
-                return ['exito' => false, 'mensaje' => 'Revisá los campos marcados.'];
+        $borrar = [];
+        $cambiosImagen = [];
+        $nuevas = [];
+        foreach (PaginaSeccion::IMAGENES as $campo) {
+            if (isset($subidas[$campo])) {
+                $r = SubidaImagen::guardar($subidas[$campo], PaginaSeccion::carpeta(), 5);
+                if (!$r['ok']) {
+                    foreach ($nuevas as $archivo) {
+                        SubidaImagen::borrar(PaginaSeccion::carpeta(), $archivo); // no dejar huérfanas
+                    }
+                    $seccion->addError($campo, $r['error']);
+                    return ['exito' => false, 'mensaje' => 'Revise los campos marcados.'];
+                }
+                $nuevas[] = $r['archivo'];
+                if ($seccion->$campo) {
+                    $borrar[] = $seccion->$campo;
+                }
+                $cambiosImagen[$campo] = $seccion->$campo ? 'reemplazada' : 'subida';
+                $seccion->$campo = $r['archivo'];
+            } elseif ($seccion->usa($campo) && !empty($datos['quitar'][$campo]) && $seccion->$campo) {
+                $borrar[] = $seccion->$campo;
+                $cambiosImagen[$campo] = 'quitada';
+                $seccion->$campo = null;
             }
-            $borrar = $seccion->imagen;
-            $cambioImagen = $seccion->imagen ? 'reemplazada' : 'subida';
-            $seccion->imagen = $r['archivo'];
-        } elseif ($seccion->usa('imagen') && !empty($datos['quitar']['imagen']) && $seccion->imagen) {
-            $borrar = $seccion->imagen;
-            $cambioImagen = 'quitada';
-            $seccion->imagen = null;
         }
 
         $seccion->idusuario_actualizacion = Yii::$app->user->id;
         $seccion->fecha_actualizacion = date('Y-m-d H:i:s');
         $seccion->save(false);
-        if ($borrar) {
-            SubidaImagen::borrar(PaginaSeccion::carpeta(), $borrar);
+        foreach ($borrar as $archivo) {
+            SubidaImagen::borrar(PaginaSeccion::carpeta(), $archivo);
         }
 
         $cambios = [];
@@ -128,8 +185,8 @@ class PaginasService implements InterfacePaginas
                 $this->diff($cambios, $seccion->getAttributeLabel($campo), $antes[$campo], $seccion->$campo, $campo === 'texto');
             }
         }
-        if ($cambioImagen) {
-            $cambios[] = $seccion->getAttributeLabel('imagen') . ': ' . $cambioImagen;
+        foreach ($cambiosImagen as $campo => $cambio) {
+            $cambios[] = $seccion->getAttributeLabel($campo) . ': ' . $cambio;
         }
         if ($cambios) {
             PaginaHistorial::registrar($seccion->pagina, 'Edición', $this->nombre($seccion) . "\n" . implode("\n", $cambios));
@@ -194,7 +251,7 @@ class PaginasService implements InterfacePaginas
             }
         }
         if (!$item->validate()) {
-            return ['exito' => false, 'mensaje' => 'Revisá los campos marcados.'];
+            return ['exito' => false, 'mensaje' => 'Revise los campos marcados.'];
         }
 
         $guardadas = [];
@@ -207,7 +264,7 @@ class PaginasService implements InterfacePaginas
                     SubidaImagen::borrar(PaginaSeccion::carpeta(), $archivo); // no dejar huérfanas
                 }
                 $item->addError($campo, $r['error']);
-                return ['exito' => false, 'mensaje' => 'Revisá los campos marcados.'];
+                return ['exito' => false, 'mensaje' => 'Revise los campos marcados.'];
             }
             $guardadas[] = $r['archivo'];
             if ($item->$campo) {

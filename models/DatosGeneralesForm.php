@@ -73,14 +73,14 @@ class DatosGeneralesForm extends Model
             [['telefonos_otros'], function ($attr) use ($telefono) {
                 foreach (preg_split('/\R/', $this->$attr) as $linea) {
                     if (trim($linea) !== '' && !preg_match($telefono, trim($linea))) {
-                        $this->addError($attr, 'Revisá "' . trim($linea) . '": solo números, espacios, +, ( ) y guiones (uno por renglón).');
+                        $this->addError($attr, 'Revise "' . trim($linea) . '": solo números, espacios, +, ( ) y guiones (uno por renglón).');
                         return;
                     }
                 }
             }],
             [self::REDES, 'string', 'max' => 255],
             [self::REDES, 'url', 'validSchemes' => ['https', 'http'], 'defaultScheme' => 'https',
-                'message' => 'Pegá el enlace completo del perfil. Ej.: https://www.facebook.com/hukglobal'],
+                'message' => 'Pegue el enlace completo del perfil. Ej.: https://www.facebook.com/hukglobal'],
             [['mapa'], 'validarMapa'],
         ];
     }
@@ -94,8 +94,8 @@ class DatosGeneralesForm extends Model
         $enlace = self::extraerMapa($this->$attr);
         if ($enlace === null) {
             $this->addError($attr, preg_match('#goo\.gl|maps\.app|/maps/place|/maps/@#i', $this->$attr)
-                ? 'Ese es el enlace de "Compartir": Google no deja mostrarlo dentro de la página. Usá Compartir → Insertar un mapa → Copiar HTML.'
-                : 'No es un mapa de Google válido. En Google Maps: Compartir → Insertar un mapa → Copiar HTML, y pegalo acá.');
+                ? 'Ese es el enlace de "Compartir": Google no deja mostrarlo dentro de la página. Use Compartir → Insertar un mapa → Copiar HTML.'
+                : 'No es un mapa de Google válido. En Google Maps: Compartir → Insertar un mapa → Copiar HTML, y péguelo aquí.');
             return;
         }
         if (strlen($enlace) > 1000) {

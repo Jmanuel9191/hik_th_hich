@@ -9,59 +9,60 @@
 
 use app\assets_b\AppAsset;
 use app\assets_b\GTranslateAsset;
-use app\models\Configuracion;
+use app\components\InterfaceSitio;
+use app\models\PaginaSeccion;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
 AppAsset::register($this);
 
-// Datos generales del sitio (tabla configuracion).
-$cfg = Configuracion::find()->asArray()->one() ?? [];
-$c = static fn (string $k): string => trim((string) ($cfg[$k] ?? ''));
+// Datos del header y el footer: los arma SitioService (configuración, pie, ecosistemas, imágenes).
+$sitio = Yii::$container->get(InterfaceSitio::class)->layout();
+$cfg = $sitio['config'];
+$c = static fn (string $k): string => $cfg[$k] ?? '';
 
-$empresa = $c('titulo_pagina') ?: 'HUK-THE-ICHI GLOBAL GROUP';
+$empresa = $sitio['empresa'];
+$nombreEmpresa = $sitio['nombreEmpresa']; // solo para el © del pie
 
-// Texto y lemas del pie: Panel → Páginas → Nosotros → Pie de página (si el bloque está oculto, no se muestran).
-$pie = \app\models\PaginaSeccion::findOne(['pagina' => 'nosotros', 'clave' => 'pie', 'estado' => '1']);
+// Texto y lemas del pie: Panel → Páginas → Pie de página (si el bloque está oculto, viene null).
+$pie = $sitio['pie'];
 
-// Logo y favicon: si el archivo no existe, no se pide (evita el 404).
-$web = Yii::getAlias('@webroot');
-$logoUrl = is_file($web . '/assets_b/img/logo.png') ? Url::to('@web/assets_b/img/logo.png') : null;
-$logoUrlf = is_file($web . '/assets_b/img/logo-footer.png') ? Url::to('@web/assets_b/img/logo-footer.png') : null;
-$faviconUrl = is_file($web . '/assets_b/img/favicon.png') ? Url::to('@web/assets_b/img/favicon.png') : null;
-$fenixUrl = is_file($web . '/assets_b/img/fenix.gif') ? Url::to('@web/assets_b/img/fenix.gif') : null;
+// Logo, favicon y fénix: null si el archivo no existe (así no se pide y no da 404).
+$logoUrl = $sitio['imagenes']['logo'];
+$logoUrlf = $sitio['imagenes']['logoPie'];
+$faviconUrl = $sitio['imagenes']['favicon'];
+$fenixUrl = $sitio['imagenes']['fenix'];
 
 // Ciudad y país: barra superior del header y footer. Editalo acá.
 $ubicacion = 'Santa Cruz, Bolivia';
 
 // Menú principal: editá rutas y textos acá.
-$ruta = Yii::$app->controller->id . '/' . Yii::$app->controller->action->id;
+$ruta = '/' . Yii::$app->controller->route; // absoluta: así el menú funciona igual dentro de /cuenta
 // En el panel del inversor no se carga el traductor (datos confidenciales).
 $esPanel = Yii::$app->controller->module->id === 'cuenta';
 if (!$esPanel) {
     GTranslateAsset::register($this); // traductor: solo en el sitio público
 }
 // Ecosistemas activos del panel (por número): submenú del header y columna del footer.
-$ecosistemas = \app\models\Ecosistema::paraWeb()->orderBy(['numero' => SORT_ASC])->all();
-$linksEcosistemas = array_map(static fn ($e) => ['label' => $e->nombre, 'url' => ['site/ecosistema', 'slug' => $e->slug]], $ecosistemas);
+$linksEcosistemas = array_map(static fn ($e) => ['label' => $e->nombre, 'url' => ['/ecosistemas/ver', 'slug' => $e->slug]], $sitio['ecosistemas']);
+
+// Subpáginas de Nosotros (NosotrosController): mismo orden y nombres que PaginaSeccion::NOSOTROS_WEB.
+$linksNosotros = [];
+foreach (PaginaSeccion::NOSOTROS_WEB as $accion => [$nombre]) {
+    $linksNosotros[] = ['label' => $nombre, 'url' => ['/nosotros/' . $accion]];
+}
 
 $menu = [
-    ['label' => 'Inicio',      'url' => ['site/index']],
-    ['label' => 'Nosotros',    'url' => ['site/nosotros']],
-    ['label' => 'Ecosistemas', 'url' => ['site/ecosistemas'], 'items' => $linksEcosistemas, 'enFooter' => false],
-    ['label' => 'Proyectos',   'url' => ['site/proyectos']],
-    ['label' => 'Expansión',   'url' => ['site/expansion']],
-    ['label' => 'Contacto',    'url' => ['site/contacto']],
+    ['label' => 'Inicio',      'url' => ['/site/index']],
+    ['label' => 'Nosotros',    'url' => ['/nosotros/index'], 'items' => $linksNosotros],
+    ['label' => 'Ecosistemas', 'url' => ['/ecosistemas/index'], 'items' => $linksEcosistemas, 'enFooter' => false],
+    ['label' => 'Proyectos',   'url' => ['/proyectos/index']],
+    ['label' => 'Blog',        'url' => ['/noticias/index']],
+    ['label' => 'Contacto',    'url' => ['/site/contacto']],
 ];
 
-// Redes: solo se muestran las que tienen URL cargada.
-$redes = array_filter([
-    'fa-facebook-f'  => $c('facebook'),
-    'fa-instagram'   => $c('instagram'),
-    'fa-linkedin-in' => $c('LinkedIn'),
-    'fa-x-twitter'   => $c('twitter'),
-    'fa-tiktok'     => $c('tiktok'),
-]);
+// Redes: solo las que tienen URL cargada (las filtra el servicio).
+$redes = $sitio['redes'];
 $red = static function (string $icono, string $url, string $clase): string {
     return Html::a(
         Html::tag('i', '', ['class' => "fa-brands {$icono}", 'aria-hidden' => 'true']),
@@ -78,8 +79,9 @@ $red = static function (string $icono, string $url, string $clase): string {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title ? $this->title . ' · ' . $empresa : $empresa) ?></title>
-    <?php if ($c('meta_descripcion')): ?>
-        <meta name="description" content="<?= Html::encode($c('meta_descripcion')) ?>">
+    <?php $descripcion = $this->params['descripcion'] ?? $c('meta_descripcion'); // una página puede poner la suya (ej. una noticia) ?>
+    <?php if ($descripcion): ?>
+        <meta name="description" content="<?= Html::encode($descripcion) ?>">
     <?php endif; ?>
     <?php if ($faviconUrl): ?>
         <link rel="icon" type="image/png" href="<?= $faviconUrl ?>">
@@ -162,7 +164,7 @@ $red = static function (string $icono, string $url, string $clase): string {
         <?php endif; ?>
 
         <div class="huk-ft-bot" data-reveal data-reveal-delay="300">
-        <span class="huk-ft-bot-lema">&copy; <?= date('Y') ?>  <?= Html::encode($empresa) ?></span>
+        <span class="huk-ft-bot-lema">&copy; <?= date('Y') ?>  <?= Html::encode($nombreEmpresa) ?></span>
             <?php /* Licencia gratuita de HTML Codex: este crédito NO se puede quitar
                      salvo que se compre la licencia de remoción. */ ?>
             <span>Desarrollado por <a href="#" rel="noopener" target="_blank">Zebra Brand Consulting</a></span>

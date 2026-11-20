@@ -23,12 +23,12 @@ class SubidaImagen
     public static function guardar(UploadedFile $f, $carpeta, $maxMb = 5, $permitirSvg = false)
     {
         if ($f->error !== UPLOAD_ERR_OK) {
-            return ['ok' => false, 'error' => 'No se pudo subir "' . $f->name . '". Intentá de nuevo.'];
+            return ['ok' => false, 'error' => 'No se pudo subir "' . $f->name . '". Intente de nuevo.'];
         }
         $ext = strtolower($f->extension);
         $permitidas = $permitirSvg ? array_merge(self::EXT_FOTO, ['svg']) : self::EXT_FOTO;
         if (!in_array($ext, $permitidas, true)) {
-            return ['ok' => false, 'error' => '"' . $f->name . '": formato no permitido. Usá ' . strtoupper(implode(', ', $permitidas)) . '.'];
+            return ['ok' => false, 'error' => '"' . $f->name . '": formato no permitido. Use ' . strtoupper(implode(', ', $permitidas)) . '.'];
         }
         if ($f->size > $maxMb * 1024 * 1024) {
             return ['ok' => false, 'error' => '"' . $f->name . '" pesa más de ' . $maxMb . ' MB.'];
@@ -38,7 +38,7 @@ class SubidaImagen
             $svg = (string) file_get_contents($f->tempName);
             if (!preg_match('/<svg[\s>]/i', $svg)
                 || preg_match('/<script|<foreignObject|<iframe|<embed|<object|javascript:|\son[a-z]+\s*=/i', $svg)) {
-                return ['ok' => false, 'error' => '"' . $f->name . '": el SVG no es válido o trae código. Exportalo de nuevo como SVG simple.'];
+                return ['ok' => false, 'error' => '"' . $f->name . '": el SVG no es válido o trae código. Expórtelo de nuevo como SVG simple.'];
             }
         } else {
             $info = @getimagesize($f->tempName);

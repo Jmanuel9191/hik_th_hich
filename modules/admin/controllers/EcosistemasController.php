@@ -3,6 +3,7 @@
 namespace app\modules\admin\controllers;
 
 use app\components\InterfaceEcosistemas;
+use app\components\InterfacePaginas;
 use app\components\InterfacePermisosService;
 use app\models\Ecosistema;
 use Yii;
@@ -19,11 +20,13 @@ class EcosistemasController extends Controller
 {
     private $ecosistemas;
     private $permisos;
+    private InterfacePaginas $paginas; // países de la visión de expansión para el formulario
 
-    public function __construct($id, $module, InterfaceEcosistemas $ecosistemas, InterfacePermisosService $permisos, $config = [])
+    public function __construct($id, $module, InterfaceEcosistemas $ecosistemas, InterfacePermisosService $permisos, InterfacePaginas $paginas, $config = [])
     {
         $this->ecosistemas = $ecosistemas;
         $this->permisos = $permisos;
+        $this->paginas = $paginas;
         parent::__construct($id, $module, $config);
     }
 
@@ -84,7 +87,7 @@ class EcosistemasController extends Controller
                 return $this->redirect(['update', 'id' => $model->idecosistema]);
             }
         }
-        return $this->render('create', ['model' => $model]);
+        return $this->render('create', ['model' => $model, 'paises' => $this->paginas->paisesExpansion()]);
     }
 
     public function actionUpdate($id)
@@ -97,7 +100,7 @@ class EcosistemasController extends Controller
                 return $this->redirect(['view', 'id' => $model->idecosistema]);
             }
         }
-        return $this->render('update', ['model' => $model]);
+        return $this->render('update', ['model' => $model, 'paises' => $this->paginas->paisesExpansion()]);
     }
 
     public function actionEstado($id)

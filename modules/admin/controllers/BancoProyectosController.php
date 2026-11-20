@@ -3,7 +3,9 @@
 namespace app\modules\admin\controllers;
 
 use app\components\InterfaceAvances;
+use app\components\InterfaceInteresInversion;
 use app\components\InterfaceInversiones;
+use app\components\InterfacePaginaProyecto;
 use app\components\InterfacePermisosService;
 use app\components\InterfaceProyecto;
 use app\components\SubidaArchivo;
@@ -19,23 +21,29 @@ use yii\web\Response;
  * Banco de proyectos (admin). URL: /admin/banco-proyectos (el controlador "proyectos" es del sistema anterior).
  * Permisos proyectos_* y alcance por área: ProyectoService. Las acciones de botón responden JSON.
  * Las imágenes, videos y documentos se sirven desde acá (están en privado/, sin URL pública).
+ * Pestaña "Página web": el editor de secciones y bloques (PaginasProyectoController hace las acciones).
+ * El Editor de contenido (proyectos_pagina sin proyectos_ver) solo ve esa pestaña: nada de montos ni inversores.
  */
 class BancoProyectosController extends Controller
 {
-    const PESTANAS = ['ficha' => 'Ficha', 'fotos' => 'Fotos', 'videos' => 'Videos', 'documentos' => 'Documentos', 'avances' => 'Avances', 'inversiones' => 'Inversiones', 'historial' => 'Historial'];
+    const PESTANAS = ['ficha' => 'Ficha', 'pagina' => 'Página web', 'fotos' => 'Fotos', 'videos' => 'Videos', 'documentos' => 'Documentos', 'avances' => 'Avances', 'interesados' => 'Interesados', 'inversiones' => 'Inversiones', 'historial' => 'Historial'];
 
     private $proyectos;
     private $avances;
     private $permisos;
     private $inversiones;
+    private $interes;
+    private $pagina;
 
     public function __construct($id, $module, InterfaceProyecto $proyectos, InterfaceAvances $avances, InterfacePermisosService $permisos,
-        InterfaceInversiones $inversiones, $config = [])
+        InterfaceInversiones $inversiones, InterfacePaginaProyecto $pagina, InterfaceInteresInversion $interes, $config = [])
     {
+        $this->interes = $interes;
         $this->proyectos = $proyectos;
         $this->avances = $avances;
         $this->permisos = $permisos;
         $this->inversiones = $inversiones;
+        $this->pagina = $pagina;
         parent::__construct($id, $module, $config);
     }
 
@@ -54,7 +62,7 @@ class BancoProyectosController extends Controller
                     'video-agregar' => ['POST'], 'video-mover' => ['POST'], 'video-eliminar' => ['POST'],
                     'documento-agregar' => ['POST'], 'documento-visible' => ['POST'], 'documento-eliminar' => ['POST'],
                     'avance-estado' => ['POST'], 'avance-eliminar' => ['POST'], 'avance-archivo-agregar' => ['POST'], 'avance-archivo-eliminar' => ['POST'],
-                    'avance-archivo-leyenda' => ['POST'],
+                    'avance-archivo-leyenda' => ['POST'], 'interes-seguimiento' => ['POST'],
                 ],
             ],
         ];
@@ -65,6 +73,7 @@ class BancoProyectosController extends Controller
         return $this->render('index', $this->proyectos->listar(Yii::$app->request->queryParams) + [
             'puedeCrear' => $this->permisos->tienePermiso('proyectos_crear'),
             'puedeExportar' => $this->permisos->tienePermiso('proyectos_exportar'),
+            'verMontos' => $this->permisos->tienePermiso('proyectos_ver'),
         ]);
     }
 
@@ -81,27 +90,40 @@ class BancoProyectosController extends Controller
 
     public function actionView($id, $tab = 'ficha')
     {
-        $p = $this->proyectos->buscar($id);
-        $pestanas = self::PESTANAS;
-        if (!$this->permisos->tienePermiso('proyectos_historial')) {
-            unset($pestanas['historial']);
+        $soloPagina = !$this->permisos->tienePermiso('proyectos_ver');
+        if ($soloPagina) { // Editor de contenido: solo la página web
+            $p = $this->pagina->proyecto($id);
+            $pestanas = ['pagina' => self::PESTANAS['pagina']];
+        } else {
+            $p = $this->proyectos->buscar($id);
+            $pestanas = self::PESTANAS;
+            if (!$this->permisos->tienePermiso('proyectos_historial')) {
+                unset($pestanas['historial']);
+            }
+            if (!$this->permisos->tienePermiso('inversiones_listar')) {
+                unset($pestanas['inversiones']);
+            }
+            if (!$this->permisos->tienePermiso('interesados_ver')) {
+                unset($pestanas['interesados']);
+            }
         }
-        if (!$this->permisos->tienePermiso('inversiones_listar')) {
-            unset($pestanas['inversiones']);
-        }
-        $tab = isset($pestanas[$tab]) ? $tab : 'ficha';
+        $tab = isset($pestanas[$tab]) ? $tab : array_key_first($pestanas);
         return $this->render('view', [
             'model' => $p,
             'tab' => $tab,
             'pestanas' => $pestanas,
-            'puedeEditar' => $this->proyectos->puedeEditar($p),
+            'puedeEditar' => !$soloPagina && $this->proyectos->puedeEditar($p),
             'puedeEliminar' => $this->proyectos->puedeEliminar($p),
             'transiciones' => $this->proyectos->transiciones($p),
             'historial' => $tab === 'historial' ? $this->proyectos->historial($p->idproyecto) : null,
             'descargas' => $tab === 'documentos' ? $this->proyectos->descargasPorDocumento($p->idproyecto) : [],
             'avances' => $tab === 'avances' ? $this->avances->listar($p) : [],
             'inversiones' => $tab === 'inversiones' ? $this->inversiones->resumenProyecto($p, Yii::$app->request->queryParams) : null,
+            'interesados' => $tab === 'interesados' ? $this->interes->deProyecto($p) : [],
+            'gestionarInteres' => $tab === 'interesados' && $this->interes->puedeGestionar(),
+            'registrarPago' => $this->permisos->tienePermiso('inversiones_registrar'),
             'limiteServidor' => SubidaArchivo::limiteServidor(),
+            'editor' => $tab === 'pagina' ? $this->pagina->editor('proyecto', (int) $p->idproyecto, true) : null,
         ]);
     }
 
@@ -191,6 +213,14 @@ class BancoProyectosController extends Controller
     public function actionAvanceEditar($id)
     {
         return $this->formularioAvance($this->avances->buscar($id, true));
+    }
+
+    /** Interesados ("Quiero invertir"): cambiar el estado y/o anotar el seguimiento. */
+    public function actionInteresSeguimiento($id)
+    {
+        $r = $this->interes->seguimiento((int) $id, Yii::$app->request->post());
+        Yii::$app->session->setFlash('flash', ['type' => $r['exito'] ? 'success' : 'error', 'message' => $r['mensaje']]);
+        return $this->redirect(['view', 'id' => $r['idproyecto'], 'tab' => 'interesados', '#' => 'interes-' . (int) $id]);
     }
 
     public function actionAvanceEstado($id)

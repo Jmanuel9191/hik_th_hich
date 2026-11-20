@@ -75,7 +75,7 @@ class m261117_220000_roles_huk extends Migration
 
     public function down()
     {
-        echo "m261117_220000_roles_huk borra datos y no se puede revertir. Restaurá el respaldo de la BD.\n";
+        echo "m261117_220000_roles_huk borra datos y no se puede revertir. Restaure el respaldo de la BD.\n";
         return false;
     }
 }

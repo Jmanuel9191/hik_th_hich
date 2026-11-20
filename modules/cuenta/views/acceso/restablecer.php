@@ -22,8 +22,8 @@ $clave = fn($id) => ['template' => '{label}<div class="huk-clave">{input}<button
     <div class="container">
         <div class="huk-cuenta-cab">
             <span class="huk-cuenta-eyebrow">Área privada</span>
-            <h1><?= $activar ? 'Activá tu cuenta' : 'Nueva contraseña' ?></h1>
-            <p>Hola, <?= Html::encode($nombre) ?>. <?= $activar ? 'Creá la contraseña con la que vas a ingresar.' : 'Elegí tu contraseña nueva.' ?></p>
+            <h1><?= $activar ? 'Active su cuenta' : 'Nueva contraseña' ?></h1>
+            <p>Hola, <?= Html::encode($nombre) ?>. <?= $activar ? 'Cree la contraseña con la que ingresará.' : 'Elija su contraseña nueva.' ?></p>
         </div>
         <div class="huk-tarjeta-form is-angosta">
             <?php $form = ActiveForm::begin(['id' => 'restablecer-form', 'options' => ['class' => 'huk-form'], 'fieldConfig' => [

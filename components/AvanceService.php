@@ -34,7 +34,7 @@ class AvanceService implements InterfaceAvances
     {
         $p = $this->proyectos->buscar($idproyecto, 'proyectos_editar');
         if (!$this->proyectos->puedeEditar($p)) {
-            throw new ForbiddenHttpException('No podés editar este proyecto.');
+            throw new ForbiddenHttpException('No puede editar este proyecto.');
         }
         return $p;
     }
@@ -83,7 +83,7 @@ class AvanceService implements InterfaceAvances
             $a->porcentaje = null;
         }
         if (!$a->validate()) {
-            return ['exito' => false, 'mensaje' => 'Revisá los campos marcados.'];
+            return ['exito' => false, 'mensaje' => 'Revise los campos marcados.'];
         }
         if (($a->porcentaje === null || $a->porcentaje === '') && $a->etapa) {
             $a->porcentaje = Proyecto::PORCENTAJE_ETAPA[$a->etapa]; // si no lo ajustó, el de la etapa
@@ -125,7 +125,7 @@ class AvanceService implements InterfaceAvances
         }
         ProyectoHistorial::registrar($a->idproyecto, 'Avances', implode("\n", $detalle));
         $this->recalcular($a->proyecto);
-        return ['exito' => true, 'mensaje' => $nuevo ? 'Avance agregado. Si querés, sumale fotos, videos o documentos.' : 'Cambios guardados.'];
+        return ['exito' => true, 'mensaje' => $nuevo ? 'Avance agregado. Si desea, súmele fotos, videos o documentos.' : 'Cambios guardados.'];
     }
 
     public function cambiarEstado($idavance)
@@ -164,7 +164,7 @@ class AvanceService implements InterfaceAvances
             $f = null;
         }
         if ($f === null && $url === '') {
-            return ['exito' => false, 'mensaje' => 'Elegí un archivo o pegá un enlace de YouTube o Vimeo.'];
+            return ['exito' => false, 'mensaje' => 'Elija un archivo o pegue un enlace de YouTube o Vimeo.'];
         }
 
         $nuevo = new ProyectoAvanceArchivo(['idavance' => $a->idavance, 'idusuario' => Yii::$app->user->id, 'fecha_registro' => date('Y-m-d H:i:s')]);
@@ -244,7 +244,7 @@ class AvanceService implements InterfaceAvances
     {
         $max = ProyectoAvance::MAXIMOS[$tipo];
         $n = ProyectoAvanceArchivo::find()->where(['idavance' => $a->idavance, 'tipo' => $tipo])->count();
-        return $n >= $max ? 'Este avance ya tiene ' . $max . ' ' . mb_strtolower(ProyectoAvanceArchivo::TIPOS[$tipo]) . '(s), el máximo. Creá otro avance o borrá uno.' : null;
+        return $n >= $max ? 'Este avance ya tiene ' . $max . ' ' . mb_strtolower(ProyectoAvanceArchivo::TIPOS[$tipo]) . '(s), el máximo. Cree otro avance o borre uno.' : null;
     }
 
     public function eliminarArchivo($idarchivo)

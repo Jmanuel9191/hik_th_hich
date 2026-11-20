@@ -29,7 +29,7 @@
   }
 
   /* 2. Contadores: <b data-count="25" data-suffix="+">25+</b>
-     Escribí el valor final dentro: sin JS (o para buscadores) se ve igual. */
+     Escriba el valor final dentro: sin JS (o para buscadores) se ve igual. */
   var counters = document.querySelectorAll("[data-count]");
   function runCounter(el) {
     var target = parseFloat(el.getAttribute("data-count"));
@@ -194,8 +194,8 @@
   document.addEventListener("click", function (e) {
     var b = e.target.closest("[data-copiar]");
     if (!b) return;
-    var original = b.getAttribute("data-copiar-texto") || b.textContent;
-    b.setAttribute("data-copiar-texto", original);
+    if (!b._hukOriginal) b._hukOriginal = b.innerHTML; // guarda el contenido (texto o ícono) para volver a ponerlo
+    var original = b._hukOriginal;
     copiarTexto(b.getAttribute("data-copiar")).then(function () {
       b.textContent = b.getAttribute("data-copiar-ok") || "¡Copiado!";
       b.classList.add("is-ok");
@@ -203,7 +203,7 @@
       b.textContent = b.getAttribute("data-copiar");
     });
     clearTimeout(b._hukCopiar);
-    b._hukCopiar = setTimeout(function () { b.textContent = original; b.classList.remove("is-ok"); }, 2000);
+    b._hukCopiar = setTimeout(function () { b.innerHTML = original; b.classList.remove("is-ok"); }, 2000);
   });
 
   /* 9. Punto dorado que sigue al mouse (solo con mouse y sin "movimiento reducido") */
@@ -231,15 +231,16 @@
     document.documentElement.addEventListener("mouseleave", function () { punto.classList.remove("is-on"); });
   }
 
-  /* 10. Carrusel del banner del Inicio: <section data-banner> con [data-banner-slide], puntitos [data-banner-ir]
-     y flechas [data-banner-anterior] / [data-banner-siguiente].
-     Cambia solo cada 7 s (se pausa con el mouse encima, con el foco adentro o con la pestaña oculta).
-     En celular se puede deslizar con el dedo. Con "movimiento reducido" no cambia solo. */
+  /* 10. Carrusel de uno en uno: <section data-banner> con [data-banner-slide], puntitos [data-banner-ir]
+     y flechas [data-banner-anterior] / [data-banner-siguiente]. Lo usan el banner del Inicio y los
+     proyectos destacados de cada ecosistema.
+     Cambia solo cada 5 s (se pausa con el mouse encima, con el foco adentro o con la pestaña oculta).
+     En celular se puede deslizar con el dedo; con el foco adentro, con ← →. Con "movimiento reducido" no cambia solo. */
   document.querySelectorAll("[data-banner]").forEach(function (banner) {
     var slides = banner.querySelectorAll("[data-banner-slide]");
     var puntos = banner.querySelectorAll("[data-banner-ir]");
     if (slides.length < 2) return;
-    var actual = 0, timer = null, pausa = false, ESPERA = 7000;
+    var actual = 0, timer = null, pausa = false, ESPERA = 5000;
 
     function ir(n) {
       n = (n + slides.length) % slides.length;
@@ -270,6 +271,10 @@
     banner.addEventListener("focusin", function () { pausa = true; clearTimeout(timer); });
     banner.addEventListener("focusout", function () { pausa = false; programar(); });
     document.addEventListener("visibilitychange", programar);
+    banner.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") { e.preventDefault(); ir(actual - 1); }
+      if (e.key === "ArrowRight") { e.preventDefault(); ir(actual + 1); }
+    });
 
     var x0 = null;
     banner.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
@@ -285,7 +290,7 @@
 
   /* 11. Carrusel de tarjetas del Inicio: <section data-tarjetas> con [data-tarjetas-pista] y [data-tarjeta].
      Cuántas se ven lo dice el CSS (--tarjetas-por-vista: 3 / 2 / 1). Si entran todas: sin flechas y quieto.
-     Si no: flechas y avanza solo cada 4 s (al llegar al final vuelve al principio). Pausa con el mouse
+     Si no: flechas y avanza solo cada 5 s (al llegar al final vuelve al principio). Pausa con el mouse
      encima o con el foco adentro; en celular se desliza con el dedo. */
   document.querySelectorAll("[data-tarjetas]").forEach(function (sec) {
     var pista = sec.querySelector("[data-tarjetas-pista]");
@@ -293,7 +298,7 @@
     var ant = sec.querySelector("[data-tarjetas-anterior]");
     var sig = sec.querySelector("[data-tarjetas-siguiente]");
     if (!pista || !celdas.length) return;
-    var actual = 0, timer = null, pausa = false, ESPERA = 4000;
+    var actual = 0, timer = null, pausa = false, ESPERA = 5000;
 
     function porVista() { return parseInt(getComputedStyle(sec).getPropertyValue("--tarjetas-por-vista"), 10) || 1; }
     function maximo() { return Math.max(0, celdas.length - porVista()); }
@@ -342,7 +347,7 @@
   });
 
   /* 12. Parallax de costado: <span data-parallax="0.12"> se corre en horizontal según dónde está su bloque
-     al hacer scroll (bajás → se corre a la derecha; subís → vuelve a la izquierda). El número es la intensidad.
+     al hacer scroll (baja → se corre a la derecha; sube → vuelve a la izquierda). El número es la intensidad.
      Con "movimiento reducido" queda quieto. */
   var paralax = document.querySelectorAll("[data-parallax]");
   if (paralax.length && !reduceMotion) {
@@ -376,6 +381,148 @@
     window.addEventListener("load", ubicarLineas);
     if (bannerArriba && "ResizeObserver" in window) new ResizeObserver(ubicarLineas).observe(bannerArriba);
   }
+
+  /* 14. Visión de expansión (Nosotros → Ejes estratégicos): <section data-expansion> con países [data-expansion-pais].
+         Al pasar el mouse (o el foco) por un país de la lista se pone dorado y se resalta en el mapa;
+         al pasar por un país del mapa se marca en la lista. Al salir, vuelve todo como estaba. */
+  document.querySelectorAll("[data-expansion]").forEach(function (bloque) {
+    var paises = bloque.querySelectorAll("[data-expansion-pais]");
+    var paths = bloque.querySelectorAll(".huk-mapa-pais");
+    function marcar(codigo) {
+      paises.forEach(function (el) { el.classList.toggle("is-activo", el.getAttribute("data-expansion-pais") === codigo); });
+      paths.forEach(function (path) { path.classList.toggle("is-seleccionado", path.getAttribute("data-pais") === codigo); });
+    }
+    paises.forEach(function (el) {
+      var codigo = el.getAttribute("data-expansion-pais");
+      el.addEventListener("mouseenter", function () { marcar(codigo); });
+      el.addEventListener("focus", function () { marcar(codigo); });
+      el.addEventListener("mouseleave", function () { marcar(null); });
+      el.addEventListener("blur", function () { marcar(null); });
+    });
+    paths.forEach(function (path) {
+      if (!path.classList.contains("is-activo")) return; // solo los países de la lista
+      path.addEventListener("mouseenter", function () { marcar(path.getAttribute("data-pais")); });
+      path.addEventListener("mouseleave", function () { marcar(null); });
+    });
+  });
+
+  /* 15. Galería de fotos de una noticia: <div data-galeria> con [data-galeria-foto], flechas, miniaturas [data-galeria-ir]
+         y contador [data-galeria-contador]. También con las flechas del teclado y deslizando el dedo. */
+  document.querySelectorAll("[data-galeria]").forEach(function (g) {
+    var fotos = g.querySelectorAll("[data-galeria-foto]");
+    var miniaturas = g.querySelectorAll("[data-galeria-ir]");
+    var contador = g.querySelector("[data-galeria-contador]");
+    var actual = 0;
+    if (fotos.length < 2) return;
+    function ir(n) {
+      actual = (n + fotos.length) % fotos.length;
+      fotos.forEach(function (f, i) { f.classList.toggle("is-activa", i === actual); });
+      miniaturas.forEach(function (m, i) {
+        m.classList.toggle("is-activa", i === actual);
+        if (i === actual && m.scrollIntoView) m.parentNode.scrollTo({ left: m.offsetLeft - m.parentNode.clientWidth / 2 + m.clientWidth / 2, behavior: "smooth" });
+      });
+      if (contador) contador.textContent = (actual + 1) + " / " + fotos.length;
+    }
+    var ant = g.querySelector("[data-galeria-anterior]");
+    var sig = g.querySelector("[data-galeria-siguiente]");
+    if (ant) ant.addEventListener("click", function () { ir(actual - 1); });
+    if (sig) sig.addEventListener("click", function () { ir(actual + 1); });
+    miniaturas.forEach(function (m) {
+      m.addEventListener("click", function () { ir(parseInt(m.getAttribute("data-galeria-ir"), 10)); });
+    });
+    g.setAttribute("tabindex", "0");
+    g.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") ir(actual - 1);
+      if (e.key === "ArrowRight") ir(actual + 1);
+    });
+    var x0 = null;
+    g.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    g.addEventListener("touchend", function (e) {
+      if (x0 === null) return;
+      var dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 40) ir(actual + (dx < 0 ? 1 : -1));
+      x0 = null;
+    });
+  });
+
+  /* 16. Pasar de página con las flechas del teclado: <a data-tecla-anterior> y <a data-tecla-siguiente>
+         (ej. ecosistema anterior / siguiente). No actúa si se está escribiendo o hay una galería con el foco. */
+  var teclaAnterior = document.querySelector("[data-tecla-anterior]");
+  var teclaSiguiente = document.querySelector("[data-tecla-siguiente]");
+  if (teclaAnterior || teclaSiguiente) {
+    document.addEventListener("keydown", function (e) {
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      var t = e.target;
+      if (t.closest && (t.closest("input, textarea, select, [contenteditable], [data-galeria], [data-banner]"))) return;
+      var destino = e.key === "ArrowLeft" ? teclaAnterior : (e.key === "ArrowRight" ? teclaSiguiente : null);
+      if (destino) window.location.href = destino.href;
+    });
+  }
+
+  /* 12. Proyectos destacados de a 2 (views/site/widgets/proyecto_carrusel.php): pista con scroll-snap.
+     Se ven 2 (1 en celular). Si hay más: avanza de a UNO solo cada 5 s y al final vuelve al principio;
+     flechas, puntitos (uno por posición), dedo y ← → del teclado. Pausa con el mouse encima o el foco adentro.
+     Con "reducir movimiento" no avanza solo. */
+  document.querySelectorAll("[data-proy-pista]").forEach(function (pista) {
+    var control = pista.parentNode.querySelector("[data-proy-control]");
+    if (!control) return;
+    var puntos = control.querySelector("[data-proy-puntos]");
+    var ant = control.querySelector("[data-proy-anterior]");
+    var sig = control.querySelector("[data-proy-siguiente]");
+    var items = pista.children, porVista = 1, posiciones = 1, timer = null, pausa = false, ESPERA = 5000, t;
+    var paso = function () { return items.length > 1 ? items[1].offsetLeft - items[0].offsetLeft : pista.clientWidth; };
+    var actual = function () {
+      if (pista.scrollLeft + pista.clientWidth >= pista.scrollWidth - 2) return posiciones - 1;
+      return Math.round(pista.scrollLeft / Math.max(paso(), 1));
+    };
+    var ir = function (n) {
+      n = n > posiciones - 1 ? 0 : (n < 0 ? posiciones - 1 : n); // da la vuelta
+      pista.scrollTo({ left: items[n].offsetLeft - items[0].offsetLeft, behavior: reduceMotion ? "auto" : "smooth" });
+      programar();
+    };
+    var programar = function () {
+      clearTimeout(timer);
+      if (posiciones > 1 && !reduceMotion && !pausa && !document.hidden) timer = setTimeout(function () { ir(actual() + 1); }, ESPERA);
+    };
+    var marcar = function () {
+      var a = actual();
+      Array.prototype.forEach.call(puntos.children, function (b, i) {
+        b.classList.toggle("is-activo", i === a);
+        if (i === a) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
+      });
+    };
+    var armar = function () {
+      porVista = Math.max(1, Math.round(pista.clientWidth / Math.max(paso(), 1)));
+      posiciones = Math.max(1, items.length - porVista + 1);
+      control.hidden = posiciones < 2;
+      puntos.innerHTML = "";
+      for (var i = 0; i < posiciones; i++) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "huk-banner-punto";
+        b.setAttribute("aria-label", "Ir al proyecto " + (i + 1));
+        b.addEventListener("click", ir.bind(null, i));
+        puntos.appendChild(b);
+      }
+      marcar();
+      programar();
+    };
+    ant.addEventListener("click", function () { ir(actual() - 1); });
+    sig.addEventListener("click", function () { ir(actual() + 1); });
+    pista.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") { e.preventDefault(); ir(actual() - 1); }
+      else if (e.key === "ArrowRight") { e.preventDefault(); ir(actual() + 1); }
+    });
+    var zona = pista.parentNode;
+    zona.addEventListener("mouseenter", function () { pausa = true; clearTimeout(timer); });
+    zona.addEventListener("mouseleave", function () { pausa = false; programar(); });
+    zona.addEventListener("focusin", function () { pausa = true; clearTimeout(timer); });
+    zona.addEventListener("focusout", function () { pausa = false; programar(); });
+    document.addEventListener("visibilitychange", programar);
+    pista.addEventListener("scroll", function () { clearTimeout(t); t = setTimeout(marcar, 80); }, { passive: true });
+    window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(armar, 150); });
+    armar();
+  });
 })();
 
 /* ==========================================================================
@@ -430,4 +577,6 @@
     else if (e.key === "Escape" || e.key === "Tab") { cerrar(e.key === "Escape"); }
   });
   document.addEventListener("click", function (e) { if (!sw.contains(e.target)) cerrar(false); });
+
+
 })();

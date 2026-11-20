@@ -14,4 +14,10 @@ interface InterfaceConfiguracion
 
     /** Historial de cambios (más nuevo primero). */
     public function historial();
+
+    /**
+     * Datos para la web pública (header, footer, meta). No falla si falta la fila.
+     * @return array ['datos' => columna => texto recortado, 'redes' => ícono => URL (solo las cargadas)]
+     */
+    public function paraWeb(): array;
 }

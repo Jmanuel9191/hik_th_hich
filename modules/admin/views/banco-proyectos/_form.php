@@ -51,17 +51,17 @@ if ($model->pais && !isset($paises[$model->pais])) {
                 ]) ?>
                 <?= $form->field($model, 'titulo')->textInput(['maxlength' => 160]) ?>
                 <div class="row">
-                    <div class="col-sm-6"><?= $form->field($model, 'idecosistema')->dropDownList($ecosistemas, ['prompt' => 'Elegí el ecosistema…']) ?></div>
+                    <div class="col-sm-6"><?= $form->field($model, 'idecosistema')->dropDownList($ecosistemas, ['prompt' => 'Elija el ecosistema…']) ?></div>
                     <div class="col-sm-6"><?= $form->field($model, 'idgerente')->dropDownList($gerentes, ['prompt' => 'Sin asignar'])
                         ->hint('Le llegan los avisos de este proyecto. Tiene que tener el ecosistema asignado.') ?></div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-4"><?= $form->field($model, 'pais')->dropDownList($paises, ['prompt' => 'Elegí el país…']) ?></div>
+                    <div class="col-sm-4"><?= $form->field($model, 'pais')->dropDownList($paises, ['prompt' => 'Elija el país…']) ?></div>
                     <div class="col-sm-4"><?= $form->field($model, 'ciudad')->textInput(['maxlength' => 80]) ?></div>
                     <div class="col-sm-4"><?= $form->field($model, 'ubicacion')->textInput(['maxlength' => 200, 'placeholder' => 'Ej.: Km 12 carretera al norte']) ?></div>
                 </div>
                 <div data-solo-tipo="financiamiento">
-                    <?= $form->field($model, 'etapa')->dropDownList(Proyecto::ETAPAS, ['prompt' => 'Elegí la etapa…']) ?>
+                    <?= $form->field($model, 'etapa')->dropDownList(Proyecto::ETAPAS, ['prompt' => 'Elija la etapa…']) ?>
                 </div>
                 <div data-solo-tipo="inversion">
                     <?= $form->field($model, 'etapasInteres')->checkboxList(Proyecto::ETAPAS, ['class' => 'huk-proyecto-checks']) ?>
@@ -75,7 +75,7 @@ if ($model->pais && !isset($paises[$model->pais])) {
                 <?= $form->field($model, 'resumen')->textarea(['rows' => 3, 'maxlength' => 500])
                     ->hint('Lo que se lee en la tarjeta del listado. Máx. 500 caracteres.') ?>
                 <?= $form->field($model, 'descripcion')->textarea($editor(380))
-                    ->hint('Todo lo que el inversor necesita saber del proyecto. Obligatoria para publicar.') ?>
+                    ->hint('Ficha interna (la ve solo el equipo de HUK). Lo que ve el inversor se arma en la pestaña «Página web».') ?>
             </div>
         </div>
 
@@ -83,7 +83,7 @@ if ($model->pais && !isset($paises[$model->pais])) {
             <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-line-chart"></i> Números</h3></div>
             <div class="box-body">
                 <div class="row">
-                    <div class="col-sm-4"><?= $form->field($model, 'idmoneda')->dropDownList(Moneda::lista($model->idmoneda), ['prompt' => 'Elegí…']) ?></div>
+                    <div class="col-sm-4"><?= $form->field($model, 'idmoneda')->dropDownList(Moneda::lista($model->idmoneda), ['prompt' => 'Elija…']) ?></div>
                     <div class="col-sm-8" data-solo-tipo="financiamiento"><?= $form->field($model, 'monto_total')->textInput(['inputmode' => 'decimal', 'placeholder' => '2500000'])
                         ->hint('Lo que cuesta el proyecto completo (opcional).') ?></div>
                 </div>
@@ -92,14 +92,14 @@ if ($model->pais && !isset($paises[$model->pais])) {
                     <div class="col-sm-4"><?= $form->field($model, 'inversion_minima')->textInput(['inputmode' => 'decimal', 'placeholder' => '10000'])->label(null, $etiqueta('inversion_minima')) ?></div>
                     <div class="col-sm-4"><?= $form->field($model, 'inversion_maxima')->textInput(['inputmode' => 'decimal'])->label(null, $etiqueta('inversion_maxima')) ?></div>
                 </div>
-                <p class="huk-ayuda huk-ayuda-numeros"><i class="fa fa-info-circle"></i> Escribí solo el número, sin puntos de miles: <code>1500000</code> o <code>1500000.50</code>.</p>
+                <p class="huk-ayuda huk-ayuda-numeros"><i class="fa fa-info-circle"></i> Escriba solo el número, sin puntos de miles: <code>1500000</code> o <code>1500000.50</code>.</p>
                 <div class="row">
                     <div class="col-sm-4"><?= $form->field($model, 'roi')->textInput(['inputmode' => 'decimal', 'placeholder' => '18'])->label(null, $etiqueta('roi')) ?></div>
                     <div class="col-sm-4"><?= $form->field($model, 'plazo_meses')->textInput(['inputmode' => 'numeric', 'placeholder' => '36'])->label(null, $etiqueta('plazo_meses')) ?></div>
-                    <div class="col-sm-4" data-solo-tipo="financiamiento"><?= $form->field($model, 'frecuencia_retorno')->dropDownList(Proyecto::FRECUENCIAS, ['prompt' => 'Elegí…']) ?></div>
+                    <div class="col-sm-4" data-solo-tipo="financiamiento"><?= $form->field($model, 'frecuencia_retorno')->dropDownList(Proyecto::FRECUENCIAS, ['prompt' => 'Elija…']) ?></div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-4"><?= $form->field($model, 'tipo_participacion')->dropDownList(Proyecto::PARTICIPACIONES, ['prompt' => 'Elegí…']) ?></div>
+                    <div class="col-sm-4"><?= $form->field($model, 'tipo_participacion')->dropDownList(Proyecto::PARTICIPACIONES, ['prompt' => 'Elija…']) ?></div>
                     <div class="col-sm-4"><?= $form->field($model, 'fecha_apertura')->input('date') ?></div>
                     <div class="col-sm-4"><?= $form->field($model, 'fecha_cierre')->input('date') ?></div>
                 </div>
@@ -107,7 +107,7 @@ if ($model->pais && !isset($paises[$model->pais])) {
         </div>
 
         <div class="box box-primary">
-            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-shield"></i> Riesgos, garantías e impacto (opcional)</h3></div>
+            <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-shield"></i> Riesgos, garantías e impacto (opcional · ficha interna)</h3></div>
             <div class="box-body">
                 <?= $form->field($model, 'riesgos')->textarea($editor(260)) ?>
                 <?= $form->field($model, 'garantias')->textarea(['rows' => 3]) ?>

@@ -4,43 +4,9 @@ namespace app\components;
 interface InterfaceCorreos
 {
     public function enviarCorreodeBienvenida($model);
-    public function enviarCorreodeEditar($model);
     public function enviarCorreoDeBloqueo($model, $motivo);
     public function enviarCorreoDeInactividad($model, $motivo);
     public function enviarCorreoDedesBloqueo($model, $motivo);
-
-    public function enviarCorreodeCreacionproyecto($model, $correoCliente);
-    public function enviarCorreoActualizacionProyectoGestor($model, $correoGestor, $cambios);
-    public function enviarCorreoAsignacionProyectoGestor($model, $correoGestor);
-
-    public function enviarCorreodeEdicionproyecto($model, $correoCliente, $cambios);
-    public function enviarCorreoDeProyectoBloqueo($model, $correoCliente, $motivo);
-    public function enviarCorreoDeProyectoDesBloqueo($model, $correoCliente, $motivo);
-
-
-
-    public function enviarCorreodeAsignacionproyecto($model, $correoConsultor);
-    public function enviarCorreoAGestorSobreAsignacion($model, $correoGestor);
-    public function enviarCorreoModificacionAsignacionGestor($model, $correoGestor);
-    public function enviarCorreoNuevoRecursoGestor($model, $correoGestor);
-    public function enviarCorreoEditarRecursoGestor($model, $correoGestor);
-    public function enviarCorreoEliminarRecursoGestor($model, $correoGestor);
-    public function enviarCorreoAvisoAceptaciondetarea($correoGestor, array $datos);
-    public function enviarCorreoAvisoEliminacionAsignacionConsultor($correo, $idtarea, $descripcion);
-    public function enviarCorreoAvisoEliminacionAsignacionGestor($correo, $idtarea, $descripcion);
-
-    public function enviarCorreosNotificacion($usuario, $recurso, $esComentario, $esArchivo);
-
-    public function enviarCorreoCambioConsultorAsignacion($model, $correoNuevoConsultor);
-    public function enviarCorreoNuevoRecurso($model, $correoCliente);
-    public function enviarCorreoEdicionRecurso($model, $correoCliente);
-    public function enviarCorreoEliminacionRecurso($model, $correoCliente);
-
-
-
-    public function enviarCorreoDesasignacionConsultor($model, $correoAnterior);
-    public function enviarCorreoModificacionAsignacion($model, $correoConsultor);
-    public function enviarCorreoModificacionAsignacionCliente($model, $correoCliente);
 
 
     public function enviarCorreoRecuperacion($id, $enlace);
@@ -49,29 +15,24 @@ interface InterfaceCorreos
     public function enviarCorreoVerificacionInversor($usuario, $enlace);
     public function enviarCorreoActivacionInversor($usuario, $enlace);
     public function enviarCorreoRecuperacionInversor($usuario, $enlace);
-    public function enviarCorreoNuevaSolicitudInversor(array $emails, $usuario, $enlacePanel);
-    public function enviarCorreoInversorAprobado($usuario, array $areas);
-    public function enviarCorreoInversorRechazado($usuario, $motivo);
+    /** Formulario de contacto de la web → a la empresa, con "responder a" la persona. @param array $datos nombre, empresa, telefono, email, mensaje */
+    public function enviarCorreoContacto(array $datos, string $destino);
+    public function enviarCorreoNuevaSolicitudInversor(array $emails, $usuario, $enlacePanel, array $resumen = []);
+    public function enviarCorreoInversorAprobado($usuario, array $areas, array $noIncluidas = []);
+    public function enviarCorreoInversorRechazado($usuario, $motivo, array $areasPedidas = []);
+    public function enviarCorreoAreasActualizadas($usuario, array $ahora, array $nuevas, array $quitadas, array $noAprobadas = []);
+    public function enviarCorreoGerenteNuevoInversor($gerente, $inversor, array $areas, $enlacePanel);
     public function enviarCorreoCuentaInversor($usuario, $bloqueada, $motivo);
     public function enviarCorreoDesbloqueoPorIntentos($usuario);
     public function enviarCorreoDeBloqueoporintentos($id);
-    public function enviarCorreoRechazoRecurso($recurso, $comentario, $destinatarios);
-    public function enviarCorreoAprobacionRecurso($recurso, $comentario, $destinatarios);
-
-    public function enviarCorreoFinalizacionTarea($asignacion, $correo);
-    public function enviarCorreoReversionTarea($asignacion, $destinatarios);
-    public function enviarCorreoFinalizacionProyecto($proyecto, $correo);
-
-
-    public function enviarCorreodeCreacioncampania($model, $correoCliente);
-    public function enviarCorreodeAsignacionGestorcampania($model, $correoGestor);
-    public function enviarCorreodeEdicioncampania($model, $correoCliente, $cambios);
-    public function enviarCorreoActualizacionCampaniaGestor($model, $correoGestor, $cambios);
-    public function enviarCorreoDeCampaniaBloqueo($model, $correoCliente, $motivo);
-    public function enviarCorreoDeCampaniaDesBloqueo($model, $correoCliente, $motivo);
-    public function enviarCorreoSolicitudFin($asignacion, $correo);
-
-    public function enviarCorreoFinalizacionCampania($campania, $correo);
+    /** Un inversor aprobado pide más áreas desde Mi cuenta → al correo del sistema, Superadmin y distribuidores. */
+    public function enviarCorreoPedidoAreas(array $emails, $usuario, array $areas, $enlacePanel);
+    /** "Quiero invertir": confirmación al inversor (quién y en cuánto tiempo lo contactan). */
+    public function enviarCorreoInteresInversor($usuario, $proyecto, $interes, string $quienContacta);
+    /** "Quiero invertir": aviso al equipo (gerente del proyecto, gerentes del área, Superadmin, correo del sistema). */
+    public function enviarCorreoInteresEquipo(array $emails, $usuario, $proyecto, array $resumen, $enlacePanel, bool $nuevo = true);
+    /** Aviso al inversor: cambió su contraseña desde Mi cuenta. */
+    public function enviarCorreoContrasenaCambiadaInversor($usuario);
 
 
 }

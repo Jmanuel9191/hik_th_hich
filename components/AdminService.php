@@ -2,7 +2,6 @@
 
 namespace app\components;
 
-use app\models\HistorialProyectosSearch;
 use app\models\Ecosistema;
 use app\models\HistorialUsuarios;
 use app\models\HistorialUsuariosSearch;
@@ -100,7 +99,7 @@ class AdminService implements InterfaceAdmin
             $model->bloqueado_hasta = null;
 
             if (!Rol::entraAlPanel($model->idrol)) {
-                $model->addError('idrol', 'Elegí un tipo de usuario válido.');
+                $model->addError('idrol', 'Elija un tipo de usuario válido.');
                 return ['exito' => false, 'model' => $model];
             }
 
@@ -152,9 +151,9 @@ class AdminService implements InterfaceAdmin
         }
 
         if (!Rol::entraAlPanel($model->idrol)) {
-            $model->addError('idrol', 'Elegí un tipo de usuario válido.');
+            $model->addError('idrol', 'Elija un tipo de usuario válido.');
         } elseif ((int) $id === (int) Yii::$app->user->id && (int) $model->idrol !== (int) $anterior['idrol']) {
-            $model->addError('idrol', 'No podés cambiar tu propio tipo de usuario.');
+            $model->addError('idrol', 'No puede cambiar su propio tipo de usuario.');
         }
 
         // No se validan los campos protegidos (ej. contrasena ya viene como hash).
@@ -239,10 +238,10 @@ class AdminService implements InterfaceAdmin
     {
         $motivo = trim((string) $motivo);
         if ($motivo === '') {
-            return ['exito' => false, 'mensaje' => 'Tenés que escribir el motivo.'];
+            return ['exito' => false, 'mensaje' => 'Debe escribir el motivo.'];
         }
         if ((int) $id === (int) Yii::$app->user->id) {
-            return ['exito' => false, 'mensaje' => 'No podés bloquear tu propia cuenta.'];
+            return ['exito' => false, 'mensaje' => 'No puede bloquear su propia cuenta.'];
         }
 
         $model = Usuarios::findOne($id);
@@ -276,7 +275,7 @@ class AdminService implements InterfaceAdmin
     public function eliminarUsuario($id)
     {
         if ((int) $id === (int) Yii::$app->user->id) {
-            return ['exito' => false, 'mensaje' => 'No podés eliminar tu propia cuenta.'];
+            return ['exito' => false, 'mensaje' => 'No puede eliminar su propia cuenta.'];
         }
         $model = Usuarios::findOne($id);
         if ($model === null || !Rol::entraAlPanel($model->idrol)) {
@@ -284,7 +283,7 @@ class AdminService implements InterfaceAdmin
         }
         // Si ya usó el panel, se bloquea (así se conserva quién hizo qué).
         if ($model->ultimo_acceso !== null) {
-            return ['exito' => false, 'mensaje' => 'Este usuario ya ingresó al panel: no se elimina, bloquealo.'];
+            return ['exito' => false, 'mensaje' => 'Este usuario ya ingresó al panel: no se elimina, bloquéelo.'];
         }
         $model->delete();
         Yii::info('Usuario #' . $id . ' (' . $model->usuario . ') eliminado por #' . Yii::$app->user->id, 'usuarios');
@@ -384,7 +383,7 @@ class AdminService implements InterfaceAdmin
             } else {
                 $accion = 'Reactivado desde estado inactivo';
                 $descripcion = 'El usuario fue reactivado. Motivo: ' . $motivo;
-                $this->correoService->enviarCorreoDedesBloqueo($model, $motivo); // Podés crear uno específico si querés
+                $this->correoService->enviarCorreoDedesBloqueo($model, $motivo); // Puede crear uno específico si desea
             }
 
             // Registrar en historial
@@ -418,7 +417,7 @@ class AdminService implements InterfaceAdmin
 
         // Filtra por ID de tarea si se proporciona
         if ($idusuario !== null) {
-            $queryParams['HistorialUsuariosSearch']['idusuario_afectado'] = $idusuario; // Asegúrate de que coincida con el nombre del campo en tu modelo
+            $queryParams['HistorialUsuariosSearch']['idusuario_afectado'] = $idusuario; // Asegúrate de que coincida con el nombre del campo en su modelo
         }
 
         $dataProvider = $searchModel->search($queryParams);

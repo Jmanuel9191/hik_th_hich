@@ -89,7 +89,7 @@ $mostrar = $vista ?? $vigente;
                     'data-editor-alto' => 460,
                     'data-tinymce-base' => Url::to('@web/assets_b/lib/tinymce'),
                     'rows' => 14,
-                ])->hint('Arranca con el texto de la versión vigente: cambiá lo que haga falta.') ?>
+                ])->hint('Arranca con el texto de la versión vigente: cambie lo que haga falta.') ?>
                 <?= $form->field($borrador, 'nota')->textInput(['maxlength' => 300, 'placeholder' => 'Ej.: Se amplió la vigencia a 3 años']) ?>
             </div>
             <div class="box-footer text-center">

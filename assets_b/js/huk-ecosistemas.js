@@ -5,6 +5,8 @@
    3. Activar / Desactivar: <a data-eco-estado="URL" data-accion="activar|desactivar" data-nombre="...">
    3b. Eliminar: <a data-eco-eliminar="URL" data-nombre="...">
    4. Galería: al terminar de subir, recarga para mostrar las fotos con su botón de borrar.
+   5. Etiquetas del banner: [data-etiqueta-agregar] suma un campo (copia de <template data-etiqueta-modelo>),
+      [data-etiqueta-quitar] lo saca. Tope: data-max del contenedor [data-etiquetas].
    ========================================================================== */
 (function ($) {
   "use strict";
@@ -31,7 +33,7 @@
           Swal.fire({ icon: r && r.exito ? "success" : "error", titleText: (r && r.mensaje) || "No se pudo cambiar el estado." })
             .then(function () { window.location.reload(); });
         })
-        .fail(function () { Swal.fire({ icon: "error", titleText: "Error de conexión. Intentá de nuevo." }); });
+        .fail(function () { Swal.fire({ icon: "error", titleText: "Error de conexión. Intente de nuevo." }); });
     });
   });
 
@@ -42,7 +44,7 @@
     Swal.fire({
       icon: "warning",
       titleText: "¿Eliminar " + $b.data("nombre") + "?",
-      text: "Se borran el ecosistema, sus imágenes y su galería, y se quita a los gerentes que lo tenían. No se puede deshacer. Si solo querés ocultarlo, usá Desactivar.",
+      text: "Se borran el ecosistema, sus imágenes y su galería, y se quita a los gerentes que lo tenían. No se puede deshacer. Si solo desea ocultarlo, use Desactivar.",
       showCancelButton: true,
       confirmButtonText: "Eliminar",
       cancelButtonText: "Cancelar",
@@ -56,7 +58,7 @@
           Swal.fire({ icon: r && r.exito ? "success" : "error", titleText: (r && r.mensaje) || "No se pudo eliminar." })
             .then(function () { if (r && r.exito) window.location.reload(); });
         })
-        .fail(function () { Swal.fire({ icon: "error", titleText: "Error de conexión. Intentá de nuevo." }); });
+        .fail(function () { Swal.fire({ icon: "error", titleText: "Error de conexión. Intente de nuevo." }); });
     });
   });
 
@@ -64,4 +66,29 @@
   $(document).on("filebatchuploadcomplete", "#galeria-imagenes", function () {
     window.location.reload();
   });
+  /* 5. Etiquetas del banner */
+  function botonAgregar($lista) {
+    var max = parseInt($lista.data("max"), 10) || 12;
+    $("[data-etiqueta-agregar]").prop("disabled", $lista.children(".huk-etiqueta").length >= max);
+  }
+  $(document).on("click", "[data-etiqueta-agregar]", function () {
+    var $lista = $("[data-etiquetas]");
+    var modelo = document.querySelector("template[data-etiqueta-modelo]");
+    if (!$lista.length || !modelo) return;
+    var $nueva = $(modelo.content.cloneNode(true)).children().first();
+    $lista.append($nueva);
+    $nueva.find("input").trigger("focus");
+    botonAgregar($lista);
+  });
+  $(document).on("click", "[data-etiqueta-quitar]", function () {
+    $(this).closest(".huk-etiqueta").remove();
+    botonAgregar($("[data-etiquetas]"));
+  });
+  $(document).on("keydown", "[data-etiquetas] input", function (e) {
+    if (e.key === "Enter") { // Enter suma otra en vez de enviar el formulario
+      e.preventDefault();
+      $("[data-etiqueta-agregar]").trigger("click");
+    }
+  });
+  $(function () { if ($("[data-etiquetas]").length) botonAgregar($("[data-etiquetas]")); });
 })(jQuery);

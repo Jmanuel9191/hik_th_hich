@@ -1,84 +1,31 @@
-/* ==========================================================================
-   HUK · Banners
-   1. Orden:   <button data-banner-mover="URL">          → POST y recarga la tabla
-   2. Estado:  <a data-banner-estado="URL" data-accion="activar|desactivar" data-nombre="...">
-   3. Borrar:  <a data-banner-eliminar="URL" data-nombre="...">
-   Las tres responden JSON {exito, mensaje}.
-   ========================================================================== */
+/*
+ * Formulario de banners: al cambiar la "Página" muestra solo los textos que usa esa página.
+ * data-campos (en el select) = {"inicio": ["antetitulo","titulo","texto","boton"], "prefooter": [...], ...}
+ * Cada grupo de campos lleva data-campo="antetitulo|texto|boton"; la ayuda de cada página, data-ayuda-de="clave".
+ */
 (function ($) {
-  "use strict";
+    "use strict";
 
-  function csrf() {
-    var d = {};
-    d[$('meta[name="csrf-param"]').attr("content")] = $('meta[name="csrf-token"]').attr("content");
-    return d;
-  }
-
-  function recargar() {
-    if ($("#banners-grid").length && $.pjax) {
-      $.pjax.reload({ container: "#banners-grid", timeout: 5000 });
-    } else {
-      window.location.reload();
+    function aplicar($select) {
+        var mapa = $select.data("campos") || {};
+        var pagina = String($select.val());
+        var campos = mapa[pagina] || [];
+        var $form = $select.closest("form");
+        $form.find("[data-campo]").each(function () {
+            $(this).prop("hidden", campos.indexOf($(this).data("campo")) === -1);
+        });
+        $form.find("[data-ayuda-de]").each(function () {
+            $(this).prop("hidden", String($(this).data("ayuda-de")) !== pagina);
+        });
     }
-  }
 
-  function enviar(url, alTerminar) {
-    return $.post(url, csrf())
-      .done(function (r) {
-        if (r && r.exito) {
-          alTerminar(r);
-        } else {
-          Swal.fire({ icon: "error", titleText: (r && r.mensaje) || "No se pudo completar." });
-        }
-      })
-      .fail(function () { Swal.fire({ icon: "error", titleText: "Error de conexión. Intentá de nuevo." }); });
-  }
-
-  /* 1. Orden */
-  $(document).on("click", "[data-banner-mover]", function (e) {
-    e.preventDefault();
-    var $b = $(this).prop("disabled", true);
-    enviar($b.data("banner-mover"), recargar).always(function () { $b.prop("disabled", false); });
-  });
-
-  /* 2. Estado */
-  $(document).on("click", "[data-banner-estado]", function (e) {
-    e.preventDefault();
-    var $b = $(this);
-    var activar = $b.data("accion") === "activar";
-    Swal.fire({
-      icon: "question",
-      titleText: (activar ? "¿Activar " : "¿Desactivar ") + $b.data("nombre") + "?",
-      text: activar ? "Se va a mostrar en la portada (si está dentro de sus fechas)." : "Deja de mostrarse en la portada. No se borra nada.",
-      showCancelButton: true,
-      confirmButtonText: activar ? "Activar" : "Desactivar",
-      cancelButtonText: "Cancelar",
-      confirmButtonColor: activar ? "#bd944f" : "#b07a12"
-    }).then(function (res) {
-      if (!res.isConfirmed) return;
-      enviar($b.data("banner-estado"), function (r) {
-        Swal.fire({ icon: "success", titleText: r.mensaje }).then(function () { window.location.reload(); });
-      });
+    $(document).on("change", "[data-banner-ubicacion]", function () {
+        aplicar($(this));
     });
-  });
 
-  /* 3. Eliminar */
-  $(document).on("click", "[data-banner-eliminar]", function (e) {
-    e.preventDefault();
-    var $b = $(this);
-    Swal.fire({
-      icon: "warning",
-      titleText: "¿Eliminar " + $b.data("nombre") + "?",
-      text: "Se borran el banner y sus imágenes. No se puede deshacer. Si solo querés ocultarlo, usá Desactivar.",
-      showCancelButton: true,
-      confirmButtonText: "Eliminar",
-      cancelButtonText: "Cancelar",
-      confirmButtonColor: "#a33a2c"
-    }).then(function (res) {
-      if (!res.isConfirmed) return;
-      enviar($b.data("banner-eliminar"), function (r) {
-        Swal.fire({ icon: "success", titleText: r.mensaje }).then(recargar);
-      });
+    $(function () {
+        $("[data-banner-ubicacion]").each(function () {
+            aplicar($(this));
+        });
     });
-  });
 })(jQuery);

@@ -25,11 +25,11 @@ class SubidaArchivo
             return ['ok' => false, 'error' => '"' . $f->name . '" es más grande de lo que acepta el servidor (' . self::limiteServidorTexto() . ').'];
         }
         if ($f->error !== UPLOAD_ERR_OK) {
-            return ['ok' => false, 'error' => 'No se pudo subir "' . $f->name . '". Intentá de nuevo.'];
+            return ['ok' => false, 'error' => 'No se pudo subir "' . $f->name . '". Intente de nuevo.'];
         }
         $ext = strtolower($f->extension);
         if (!isset($formatos[$ext])) {
-            return ['ok' => false, 'error' => '"' . $f->name . '": formato no permitido. Usá ' . strtoupper(implode(', ', array_keys($formatos))) . '.'];
+            return ['ok' => false, 'error' => '"' . $f->name . '": formato no permitido. Use ' . strtoupper(implode(', ', array_keys($formatos))) . '.'];
         }
         if ($f->size > $maxMb * 1024 * 1024) {
             return ['ok' => false, 'error' => '"' . $f->name . '" pesa más de ' . $maxMb . ' MB.'];
