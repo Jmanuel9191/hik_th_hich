@@ -38,11 +38,9 @@ $ubicacion = 'Santa Cruz, Bolivia';
 
 // Menú principal: editá rutas y textos acá.
 $ruta = '/' . Yii::$app->controller->route; // absoluta: así el menú funciona igual dentro de /cuenta
-// En el panel del inversor no se carga el traductor (datos confidenciales).
-$esPanel = Yii::$app->controller->module->id === 'cuenta';
-if (!$esPanel) {
-    GTranslateAsset::register($this); // traductor: solo en el sitio público
-}
+// Traductor en todo el sitio, también en /cuenta (ingreso, registro, Mi cuenta y sus mensajes).
+// Los datos personales de Mi cuenta llevan translate="no" (clase notranslate): no se mandan al traductor.
+GTranslateAsset::register($this);
 // Ecosistemas activos del panel (por número): submenú del header y columna del footer.
 $linksEcosistemas = array_map(static fn ($e) => ['label' => $e->nombre, 'url' => ['/ecosistemas/ver', 'slug' => $e->slug]], $sitio['ecosistemas']);
 
@@ -94,7 +92,7 @@ $red = static function (string $icono, string $url, string $clase): string {
 
 <?= $this->render('_header', [
     'c' => $c, 'empresa' => $empresa, 'ubicacion' => $ubicacion, 'logoUrl' => $logoUrl, 'menu' => $menu,
-    'ruta' => $ruta, 'redes' => $redes, 'red' => $red, 'esPanel' => $esPanel,
+    'ruta' => $ruta, 'redes' => $redes, 'red' => $red,
 ]) ?>
 
 <main id="contenido">

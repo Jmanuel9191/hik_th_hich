@@ -16,7 +16,7 @@ use yii\helpers\Html;
 
 $u = $inversor->usuario;
 $fijo = fn($rotulo, $valor) => '<div class="huk-dato"><span class="huk-dato-rotulo"><i class="fa-solid fa-lock" aria-hidden="true"></i> '
-    . Html::encode($rotulo) . '</span><span class="huk-dato-valor">' . Html::encode($valor !== null && $valor !== '' ? $valor : '—') . '</span></div>';
+    . Html::encode($rotulo) . '</span><span class="huk-dato-valor notranslate" translate="no">' . Html::encode($valor !== null && $valor !== '' ? $valor : '—') . '</span></div>';
 $empresa = $formDatos->scenario === \app\models\PerfilInversorForm::SCENARIO_EMPRESA;
 ?>
 

@@ -9,7 +9,7 @@ use yii\web\View;
 
 /**
  * Traductor GTranslate (motor oculto del selector de idiomas con banderas).
- * Solo se registra en el sitio público (ver views/layouts/main.php), nunca en /cuenta.
+ * Se registra en todo el sitio, también en /cuenta (ver views/layouts/main.php). Lo marcado con translate="no" no se traduce.
  * Orden: primero la configuración, después el script de GTranslate.
  */
 class GTranslateAsset extends AssetBundle

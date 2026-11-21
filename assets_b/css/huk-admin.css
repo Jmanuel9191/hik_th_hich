@@ -816,6 +816,11 @@ thead .huk-pe-tabla-x{position:absolute;top:0;right:4px;font-size:14px;color:#8f
 .huk-interes-monto{text-align:right;background:#141210;color:#fff;border-radius:6px;padding:6px 14px}
 .huk-interes-monto span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#bbb7ad}
 .huk-interes-monto strong{font-size:17px;color:#e6c27a}
+.huk-interes-montos{display:flex;gap:8px;flex-wrap:wrap}
+.huk-interes-monto.is-pagado{background:#2f7d4f}
+.huk-interes-monto.is-pagado strong{color:#fff}
+.huk-interes-monto.is-vacio{background:#ecebe8}
+.huk-interes-monto.is-vacio span,.huk-interes-monto.is-vacio strong{color:#8a857a}
 .huk-interes-datos{margin-bottom:10px}
 .huk-interes-datos th{width:120px;color:#6b665c;font-weight:600}
 .huk-interes-form{background:#faf8f3;border:1px solid #ece6d8;border-radius:6px;padding:10px 12px;margin-bottom:10px}
@@ -824,3 +829,55 @@ thead .huk-pe-tabla-x{position:absolute;top:0;right:4px;font-size:14px;color:#8f
 .huk-interes-historial li span{display:block;font-size:11.5px;color:#8a857a}
 .huk-interes-historial li.is-estado{border-left-color:var(--adm-gold-dark)}
 .huk-interes-historial li.is-inversor{border-left-color:#34557a}
+
+/* Zona para subir archivos (app\widgets\ZonaArchivo · huk-zona.js): mismo look que CampoImagen */
+.huk-zona{margin-bottom:4px}
+.huk-zona-caja{position:relative;border:2px dashed rgba(var(--adm-gold-rgb),.55);border-radius:10px;background:#fcfbf8;min-height:150px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px 14px;text-align:center;transition:border-color .2s,background .2s}
+.huk-zona-caja>input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;padding:0;border:0}
+.huk-zona-caja:hover,.huk-zona-caja:focus-within{border-color:var(--adm-gold)}
+.huk-zona-caja:focus-within{box-shadow:0 0 0 3px rgba(var(--adm-gold-rgb),.2)}
+.huk-zona.is-arrastrando .huk-zona-caja{border-color:var(--adm-gold);background:#f7f1e4}
+.huk-zona-texto{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--adm-muted);font-family:var(--adm-font);pointer-events:none}
+.huk-zona-texto i{font-size:26px;color:var(--adm-gold);margin-bottom:4px}
+.huk-zona-texto strong{font-size:16px;font-weight:500;color:var(--adm-muted)}
+.huk-zona-texto span{font-size:15px}
+.huk-zona-texto small{font-size:12px;margin-top:4px}
+.huk-zona-elegidos{display:flex;flex-direction:column;gap:6px;width:100%;max-width:460px;margin-top:12px;pointer-events:none}
+.huk-zona-elegidos:empty{display:none}
+.huk-zona-archivo{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--adm-line);border-radius:8px;padding:6px 10px;text-align:left}
+.huk-zona-archivo img{width:44px;height:44px;object-fit:cover;border-radius:6px;flex:0 0 auto}
+.huk-zona-archivo i{font-size:26px;color:var(--adm-gold-dark);width:44px;text-align:center;flex:0 0 auto}
+.huk-zona-archivo span{min-width:0;display:flex;flex-direction:column}
+.huk-zona-archivo strong{font-size:13px;font-weight:600;color:var(--adm-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.huk-zona-archivo small{font-size:11.5px;color:var(--adm-muted)}
+.huk-zona.tiene-archivo[data-lista="1"] .huk-zona-texto{flex-direction:row;gap:6px}
+.huk-zona.tiene-archivo[data-lista="1"] .huk-zona-texto i,.huk-zona.tiene-archivo[data-lista="1"] .huk-zona-texto small,
+.huk-zona.tiene-archivo[data-lista="1"] .huk-zona-texto span{display:none}
+.huk-zona.tiene-archivo[data-lista="1"] .huk-zona-texto strong::after{content:" · o arrastre otro"}
+.huk-zona.tiene-archivo[data-lista="1"] .huk-zona-caja{min-height:0}
+.huk-zona-botones{display:flex;gap:8px;margin-top:8px}
+.huk-zona-botones .btn{flex:1 1 0}
+.huk-zona .huk-zona-quitar{display:none;color:var(--adm-danger)}
+.huk-zona .huk-zona-quitar:hover{border-color:var(--adm-danger);color:var(--adm-danger);background:#fbeeec}
+.huk-zona.tiene-archivo .huk-zona-quitar{display:block}
+.huk-zona.is-compacta .huk-zona-caja{min-height:96px;padding:14px 10px}
+.huk-zona.is-compacta .huk-zona-texto i{font-size:20px}
+.huk-zona.is-compacta .huk-zona-texto strong{font-size:14px}
+.huk-zona.is-compacta .huk-zona-texto span{font-size:13px}
+.huk-zona.is-compacta .huk-zona-botones .btn{padding:4px 8px;font-size:12.5px}
+.huk-zona.is-deshabilitado{opacity:.55}
+.huk-zona.is-deshabilitado .huk-zona-caja>input[type=file]{cursor:not-allowed}
+.has-error .huk-zona-caja{border-color:var(--adm-danger)}
+
+/* Ficha del inversor → Inversiones (un bloque por proyecto) */
+.huk-inv-proyecto{border:1px solid #e6e0d2;border-left:4px solid var(--adm-gold-dark);border-radius:6px;padding:12px 14px;margin-bottom:14px;background:#fff}
+.huk-inv-proyecto-cab{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.huk-inv-proyecto-codigo{display:block;font-size:12px;font-weight:700;letter-spacing:.04em}
+.huk-inv-proyecto-cab strong{font-size:15px}
+.huk-inv-proyecto-cifras{display:flex;gap:6px;flex-wrap:wrap}
+.huk-inv-proyecto-cifras>div{background:#141210;color:#fff;border-radius:6px;padding:5px 12px;text-align:right;min-width:96px}
+.huk-inv-proyecto-cifras span{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#bbb7ad}
+.huk-inv-proyecto-cifras strong{font-size:14.5px;color:#e6c27a}
+.huk-inv-proyecto .huk-tabla-pagos{margin-bottom:8px}
+.huk-inv-sin-pagos{margin:4px 0 8px}

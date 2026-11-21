@@ -46,7 +46,7 @@ $clave = fn($id) => ['template' => '{label}<div class="huk-clave">{input}<button
         <div class="huk-dato"><span class="huk-dato-rotulo">Fecha y hora</span>
             <span class="huk-dato-valor"><?= $u->ultimo_acceso ? Yii::$app->formatter->asDatetime($u->ultimo_acceso, 'php:d/m/Y H:i') : '—' ?></span></div>
         <div class="huk-dato"><span class="huk-dato-rotulo">Desde la conexión</span>
-            <span class="huk-dato-valor"><?= Html::encode($u->ultimo_acceso_ip ?: '—') ?></span></div>
+            <span class="huk-dato-valor notranslate" translate="no"><?= Html::encode($u->ultimo_acceso_ip ?: '—') ?></span></div>
     </div>
     <p class="huk-perfil-nota"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Si no reconoce este ingreso, cambie su contraseña y escríbanos.</p>
 </div>

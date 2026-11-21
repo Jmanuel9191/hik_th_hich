@@ -40,10 +40,15 @@ interface InterfaceInversiones
     /** Inversores aprobados y activos: id => "Nombre (áreas)". */
     public function inversoresAprobados(): array;
 
+    /** Interesados ("Quiero invertir") de cada proyecto que se puede pagar, para ponerlos primero al registrar un pago:
+     *  idproyecto => [idusuario => ['texto' => 'USD 5.000 estimado', 'monto' => '5000', 'idmoneda' => 1]] */
+    public function interesadosParaPagar(): array;
+
     /** Ronda de un proyecto: ['recaudado', 'porcentaje', 'porInversor' => [...], 'totales', 'dataProvider'] */
     public function resumenProyecto(Proyecto $p, $params);
 
-    /** Inversiones de un inversor por proyecto: [['proyecto' => Proyecto, 'totales' => [...], 'pagos' => n], ...] */
+    /** Inversiones de un inversor por proyecto (también los que solo tocó "Quiero invertir"):
+     *  [['proyecto', 'totales', 'equivalente', 'anulados', 'interes' => InteresInversion|null, 'pagos' => ArrayDataProvider], ...] */
     public function resumenInversor($idusuario): array;
 
     /** @return array ['titulo', 'columnas', 'modelos', 'filtros'] para Exportador */

@@ -3,13 +3,15 @@
 /**
  * Pestaña Interesados del proyecto: los "Quiero invertir" de la web, con su estado y el seguimiento del equipo.
  * Estados: Recibido → En contacto → En negociación → Concretado / Cerrado sin inversión.
- * Concretado + permiso de inversiones → "Registrar pago" con el proyecto y el inversor ya elegidos.
+ * "Registrar pago" (si no está cerrado sin inversión) con el proyecto, el inversor y el monto estimado ya cargados;
+ * al registrarlo pasa solo a Concretado. Al lado del monto estimado, lo que ya pagó.
  *
  * @var yii\web\View $this
  * @var app\models\Proyecto $model
  * @var app\models\InteresInversion[] $interesados
  * @var bool $gestionarInteres
  * @var bool $registrarPago
+ * @var array $pagados idusuario => "USD 5.000" (pagos vigentes en este proyecto)
  */
 
 use app\models\InteresInversion;
@@ -48,7 +50,11 @@ $iconos = ['whatsapp' => 'fa fa-whatsapp', 'llamada' => 'fa fa-phone', 'correo' 
                         <span class="label <?= $i->estadoClasePanel() ?>"><?= Html::encode($i->estadoNombre()) ?></span>
                         <div class="huk-eco-resumen">Envió su interés el <?= $fecha($i->fecha_registro) ?><?= $i->fecha_actualizacion !== $i->fecha_registro ? ' · actualizado el ' . $fecha($i->fecha_actualizacion) : '' ?></div>
                     </div>
-                    <div class="huk-interes-monto"><span>Monto estimado</span><strong><?= Html::encode($i->montoTexto()) ?></strong></div>
+                    <div class="huk-interes-montos">
+                        <div class="huk-interes-monto"><span>Monto estimado</span><strong><?= Html::encode($i->montoTexto()) ?></strong></div>
+                        <div class="huk-interes-monto is-pagado<?= isset($pagados[$u->idusuario]) ? '' : ' is-vacio' ?>"><span>Ya pagó</span>
+                            <strong><?= Html::encode($pagados[$u->idusuario] ?? '—') ?></strong></div>
+                    </div>
                 </div>
 
                 <div class="row">
@@ -63,9 +69,9 @@ $iconos = ['whatsapp' => 'fa fa-whatsapp', 'llamada' => 'fa fa-phone', 'correo' 
                             </td></tr>
                             <?php if ($i->comentario): ?><tr><th>Comentario</th><td><?= nl2br(Html::encode($i->comentario)) ?></td></tr><?php endif; ?>
                         </table>
-                        <?php if ($i->estado === 'concretado' && $registrarPago): ?>
-                            <?= Html::a('<i class="fa fa-plus"></i> Registrar pago', ['/admin/inversiones/create', 'idproyecto' => $model->idproyecto, 'idinversor' => $u->idusuario],
-                                ['class' => 'btn btn-success btn-sm']) ?>
+                        <?php if ($i->estado !== 'descartado' && $registrarPago): ?>
+                            <?= Html::a('<i class="fa fa-plus"></i> Registrar pago', ['/admin/inversiones/create', 'idproyecto' => $model->idproyecto, 'idinversor' => $u->idusuario, 'volver' => 'interesados'],
+                                ['class' => 'btn btn-success btn-sm', 'title' => 'Con el monto estimado ya cargado. Al registrarlo pasa a Concretado.']) ?>
                         <?php endif; ?>
                     </div>
                     <div class="col-md-6">

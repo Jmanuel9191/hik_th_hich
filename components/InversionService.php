@@ -2,6 +2,8 @@
 
 namespace app\components;
 
+use app\models\InteresInversion;
+use app\models\InteresInversionNota;
 use app\models\Inversor;
 use app\models\InversorHistorial;
 use app\models\InversionPago;
@@ -92,6 +94,14 @@ class InversionService implements InterfaceInversiones
         if ($idinversor && isset($this->inversoresAprobados()[(int) $idinversor])) {
             $pago->idusuario = (int) $idinversor;
         }
+        // Viene de un interesado: el monto y la moneda que estimó arrancan cargados (se corrigen si cambió).
+        if ($pago->idproyecto && $pago->idusuario) {
+            $i = InteresInversion::findOne(['idproyecto' => $pago->idproyecto, 'idusuario' => $pago->idusuario]);
+            if ($i && $i->monto !== null && $i->estado !== 'descartado') {
+                $pago->monto = 0 + $i->monto;
+                $pago->idmoneda = $i->idmoneda ?: $pago->idmoneda;
+            }
+        }
         return $pago;
     }
 
@@ -145,6 +155,7 @@ class InversionService implements InterfaceInversiones
             $texto = $this->descripcion($pago);
             ProyectoHistorial::registrar($p->idproyecto, 'Inversión', 'Pago registrado de ' . $inv->nombreVisible() . ': ' . $texto);
             InversorHistorial::registrar($inv->idusuario, 'Inversión', 'Pago registrado en ' . $p->codigo . ' · ' . $p->titulo . ': ' . $texto);
+            $this->concretarInteres($p, (int) $inv->idusuario, $pago);
             $tx->commit();
         } catch (\Throwable $e) {
             $tx->rollBack();
@@ -257,6 +268,35 @@ class InversionService implements InterfaceInversiones
         return $q->column();
     }
 
+    /** Si el inversor había enviado "Quiero invertir" en este proyecto: pasa a Concretado y queda anotado el pago. */
+    private function concretarInteres(Proyecto $p, int $idusuario, InversionPago $pago): void
+    {
+        $i = InteresInversion::findOne(['idproyecto' => $p->idproyecto, 'idusuario' => $idusuario]);
+        if ($i === null) {
+            return;
+        }
+        $texto = 'Se registró un pago de ' . $pago->montoTexto() . '.';
+        if ($i->estado !== 'concretado') {
+            $texto .= ' Estado: ' . $i->estadoNombre() . ' → ' . InteresInversion::ESTADOS['concretado'][0] . '.';
+            $i->updateAttributes(['estado' => 'concretado', 'fecha_actualizacion' => date('Y-m-d H:i:s')]);
+        }
+        InteresInversionNota::registrar($i->idinteres, 'estado', $texto, (int) Yii::$app->user->id);
+    }
+
+    public function interesadosParaPagar(): array
+    {
+        $ids = array_keys($this->proyectosParaPagar());
+        $res = [];
+        foreach (InteresInversion::find()->with('moneda')->where(['idproyecto' => $ids ?: [0]])->andWhere(['<>', 'estado', 'descartado'])->all() as $i) {
+            $res[$i->idproyecto][$i->idusuario] = [
+                'texto' => $i->monto === null ? 'a conversar' : $i->montoTexto() . ' estimado',
+                'monto' => $i->monto === null ? null : (string) (0 + $i->monto),
+                'idmoneda' => $i->idmoneda,
+            ];
+        }
+        return $res;
+    }
+
     public function inversoresAprobados(): array
     {
         $lista = [];
@@ -308,7 +348,9 @@ class InversionService implements InterfaceInversiones
     public function resumenInversor($idusuario): array
     {
         $ids = InversionPago::find()->select('idproyecto')->distinct()->where(['idusuario' => (int) $idusuario])->column();
-        $q = Proyecto::find()->with('moneda')->where(['idproyecto' => $ids])->orderBy(['codigo' => SORT_ASC]);
+        $intereses = InteresInversion::find()->where(['idusuario' => (int) $idusuario])->indexBy('idproyecto')->all();
+        $ids = array_unique(array_merge($ids, array_keys($intereses)));   // también los que solo tocó "Quiero invertir"
+        $q = Proyecto::find()->with(['moneda', 'ecosistema'])->where(['idproyecto' => $ids ?: [0]])->orderBy(['codigo' => SORT_ASC]);
         if (($alc = $this->alcance()) !== null) {
             $q->andWhere(['idecosistema' => $alc ?: [0]]);
         }
@@ -320,6 +362,12 @@ class InversionService implements InterfaceInversiones
                 'totales' => InversionPago::totalesPorMoneda($cond),
                 'equivalente' => (float) InversionPago::find()->where($cond + ['estado' => 'vigente'])->sum('monto_equivalente'),
                 'anulados' => (int) InversionPago::find()->where($cond + ['estado' => 'anulado'])->count(),
+                'interes' => $intereses[$p->idproyecto] ?? null,
+                'pagos' => new \yii\data\ArrayDataProvider([
+                    'allModels' => InversionPago::find()->with(['proyecto', 'moneda', 'monedaProyecto', 'registradoPor', 'anuladoPor'])->where($cond)
+                        ->orderBy(['fecha_pago' => SORT_DESC, 'idpago' => SORT_DESC])->all(),
+                    'pagination' => false,
+                ]),
             ];
         }
         return $res;

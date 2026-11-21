@@ -54,8 +54,8 @@ class InversionesController extends Controller
             $r = $this->inversiones->registrar($pago, Yii::$app->request->post());
             if ($r['exito']) {
                 Yii::$app->session->setFlash('flash', ['type' => 'success', 'message' => $r['mensaje']]);
-                if ($volver === 'proyecto') {
-                    return $this->redirect(['banco-proyectos/view', 'id' => $pago->idproyecto, 'tab' => 'inversiones']);
+                if ($volver === 'proyecto' || $volver === 'interesados') {
+                    return $this->redirect(['banco-proyectos/view', 'id' => $pago->idproyecto, 'tab' => $volver === 'interesados' ? 'interesados' : 'inversiones']);
                 }
                 if ($volver === 'inversor') {
                     return $this->redirect(['inversores/view', 'id' => $pago->idusuario]);
@@ -68,7 +68,8 @@ class InversionesController extends Controller
             'proyectos' => $this->inversiones->proyectosParaPagar(),
             'datosProyectos' => $this->inversiones->datosProyectos(),
             'inversores' => $this->inversiones->inversoresAprobados(),
-            'volver' => in_array($volver, ['proyecto', 'inversor'], true) ? $volver : null,
+            'interesados' => $this->inversiones->interesadosParaPagar(), // van primero en la lista, marcados con ★
+            'volver' => in_array($volver, ['proyecto', 'inversor', 'interesados'], true) ? $volver : null,
         ]);
     }
 

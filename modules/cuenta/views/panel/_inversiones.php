@@ -53,7 +53,7 @@ $fecha = fn($f) => Yii::$app->formatter->asDate($f, 'php:d/m/Y');
             </div>
             <div class="huk-inversion-total">
                 <span>Total invertido</span>
-                <strong><?= Html::encode($i['totales']) ?></strong>
+                <strong class="notranslate" translate="no"><?= Html::encode($i['totales']) ?></strong>
                 <small><?= count($i['pagos']) ?> <?= count($i['pagos']) === 1 ? 'pago' : 'pagos' ?></small>
             </div>
         </header>
@@ -64,10 +64,10 @@ $fecha = fn($f) => Yii::$app->formatter->asDate($f, 'php:d/m/Y');
                 <?php foreach ($i['pagos'] as $pago): ?>
                     <tr>
                         <td data-rotulo="Fecha"><?= $fecha($pago->fecha_pago) ?></td>
-                        <td data-rotulo="Monto"><span><strong><?= Html::encode($pago->montoTexto()) ?></strong>
+                        <td data-rotulo="Monto" class="notranslate" translate="no"><span><strong><?= Html::encode($pago->montoTexto()) ?></strong>
                             <?php if ((int) $pago->idmoneda !== (int) $pago->idmoneda_proyecto): ?><small class="d-block">≈ <?= Html::encode($pago->equivalenteTexto()) ?></small><?php endif; ?></span></td>
                         <td data-rotulo="Forma de pago"><?= Html::encode($pago->tipoPagoTexto()) ?></td>
-                        <td data-rotulo="Referencia"><?= Html::encode($pago->referencia ?: '—') ?></td>
+                        <td data-rotulo="Referencia" class="notranslate" translate="no"><?= Html::encode($pago->referencia ?: '—') ?></td>
                         <td data-rotulo="Comprobante" class="text-end">
                             <?= $pago->comprobante_archivo
                                 ? Html::a('<i class="fa-solid fa-file-invoice" aria-hidden="true"></i> Ver', ['/cuenta/panel/comprobante', 'id' => $pago->idpago],

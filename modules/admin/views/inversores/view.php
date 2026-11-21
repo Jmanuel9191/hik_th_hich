@@ -12,7 +12,7 @@
  * @var array $ecosistemas id => nombre
  * @var bool $tieneFoto subió foto de perfil (Mi cuenta)
  * @var int[] $pedidas áreas que pidió desde Mi cuenta, sin decidir
- * @var array|null $inversiones pagos por proyecto (null = sin permiso)
+ * @var array|null $inversiones por proyecto: pagos con comprobantes y su «Quiero invertir» (null = sin permiso)
  * @var array $puede ['editar','aprobar','estado','desbloquear','registrarPago' => bool]
  */
 
@@ -22,6 +22,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\DetailView;
 use yii\widgets\Pjax;
+use app\widgets\ZonaArchivo;
 
 \app\assets_b\InversoresAdminAsset::register($this);
 
@@ -125,6 +126,11 @@ $bloqueadoIntentos = $u->bloqueado_hasta && strtotime($u->bloqueado_hasta) > tim
                 </div>
             </div>
 
+            <?php if ($inversiones !== null): ?>
+                <?= $this->render('_inversiones', ['model' => $model, 'inversiones' => $inversiones, 'puede' => $puede,
+                    'puedeRegistrar' => $puede['registrarPago'] && $estado === 'aprobado' && $activa]) ?>
+            <?php endif; ?>
+
             <div class="box box-primary">
                 <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-file-text-o"></i> Acuerdo de confidencialidad</h3></div>
                 <div class="box-body">
@@ -151,35 +157,6 @@ $bloqueadoIntentos = $u->bloqueado_hasta && strtotime($u->bloqueado_hasta) > tim
                 </div>
             </div>
 
-            <?php if ($inversiones !== null): ?>
-            <div class="box box-primary">
-                <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-money"></i> Inversiones</h3></div>
-                <div class="box-body table-responsive">
-                    <?php if (!$inversiones): ?>
-                        <p class="text-muted">Todavía no tiene pagos registrados.</p>
-                    <?php else: ?>
-                        <table class="table table-striped">
-                            <thead><tr><th>Proyecto</th><th>Pagó</th><th>Equivale a</th><th>De la ronda</th></tr></thead>
-                            <tbody>
-                            <?php foreach ($inversiones as $fila): $p = $fila['proyecto']; ?>
-                                <tr>
-                                    <td><?= Html::a(Html::encode($p->codigo), ['banco-proyectos/view', 'id' => $p->idproyecto, 'tab' => 'inversiones']) ?>
-                                        <div class="huk-eco-resumen"><?= Html::encode($p->titulo) ?></div></td>
-                                    <td><?= Html::encode(\app\models\InversionPago::totalesTexto($fila['totales'])) ?>
-                                        <?php if ($fila['anulados']): ?><div class="huk-eco-resumen"><?= $fila['anulados'] ?> anulado<?= $fila['anulados'] > 1 ? 's' : '' ?></div><?php endif; ?></td>
-                                    <td><?= Html::encode(\app\models\InversionPago::dinero($fila['equivalente'], $p->moneda)) ?></td>
-                                    <td><?= (float) $p->monto_objetivo ? Yii::$app->formatter->asDecimal($fila['equivalente'] * 100 / (float) $p->monto_objetivo, 1) . ' %' : '—' ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    <?php endif; ?>
-                    <?php if ($puede['registrarPago'] && $estado === 'aprobado' && $activa): ?>
-                        <?= Html::a('<i class="fa fa-plus"></i> Registrar pago', ['inversiones/create', 'idinversor' => $model->idusuario, 'volver' => 'inversor'], ['class' => 'btn btn-success btn-sm']) ?>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <?php endif; ?>
             <div class="box box-primary">
                 <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-history"></i> Historial</h3></div>
                 <div class="box-body">
@@ -257,7 +234,8 @@ $bloqueadoIntentos = $u->bloqueado_hasta && strtotime($u->bloqueado_hasta) > tim
                     <?php endif; ?>
                     <?php if ($puede['editar']): ?>
                         <?= Html::beginForm(['documento-subir', 'id' => $model->idusuario], 'post', ['enctype' => 'multipart/form-data', 'class' => 'huk-subir-documento']) ?>
-                        <?= Html::fileInput('documento', null, ['class' => 'form-control input-sm', 'accept' => '.jpg,.jpeg,.png,.webp,.pdf', 'required' => true]) ?>
+                        <?= ZonaArchivo::envolver(Html::fileInput('documento', null, ['accept' => '.jpg,.jpeg,.png,.webp,.pdf', 'required' => true]),
+                            'JPG, PNG, WEBP o PDF · hasta ' . \app\models\Inversor::MAX_DOCUMENTO_MB . ' MB', ['compacta' => true]) ?>
                         <?= Html::submitButton('<i class="fa fa-upload"></i> ' . ($model->documento_archivo ? 'Reemplazar' : 'Subir'), ['class' => 'btn btn-default btn-sm']) ?>
                         <?= Html::endForm() ?>
                     <?php endif; ?>

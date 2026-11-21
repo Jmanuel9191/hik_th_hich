@@ -17,6 +17,7 @@ use app\models\ProyectoAvance;
 use app\models\ProyectoAvanceArchivo;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use app\widgets\ZonaArchivo;
 
 $maxBytes = min(Proyecto::MAX_VIDEO_MB * 1048576, $limiteServidor ?: PHP_INT_MAX);
 $conObra = $model->tipo === 'financiamiento';
@@ -141,8 +142,9 @@ $leyenda = function (ProyectoAvanceArchivo $x) use ($puedeEditar) {
                                     'data-max-texto' => round($maxBytes / 1048576) . ' MB',
                                     'data-max-leyenda' => ProyectoAvanceArchivo::MAX_LEYENDA,
                                 ]) ?>
-                                <?= Html::fileInput('archivos[]', null, ['class' => 'form-control', 'multiple' => true, 'data-subida-archivos' => true,
-                                    'accept' => '.jpg,.jpeg,.png,.webp,.mp4,.mov,.m4v,.webm,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx']) ?>
+                                <?= ZonaArchivo::envolver(Html::fileInput('archivos[]', null, ['multiple' => true, 'data-subida-archivos' => true,
+                                    'accept' => '.jpg,.jpeg,.png,.webp,.mp4,.mov,.m4v,.webm,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx']),
+                                    'Fotos, videos y documentos (PDF, Word, Excel, PowerPoint)', ['multiple' => true, 'lista' => false]) ?>
                                 <p class="help-block">Puede elegir varios a la vez. Cada uno puede llevar su descripción.
                                     Máximo por avance: <?= ProyectoAvance::MAXIMOS['foto'] ?> fotos, <?= ProyectoAvance::MAXIMOS['video'] ?> videos
                                     (<?= Proyecto::MAX_VIDEO_MB ?> MB c/u) y <?= ProyectoAvance::MAXIMOS['documento'] ?> documentos.</p>

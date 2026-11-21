@@ -120,6 +120,7 @@ class BancoProyectosController extends Controller
             'avances' => $tab === 'avances' ? $this->avances->listar($p) : [],
             'inversiones' => $tab === 'inversiones' ? $this->inversiones->resumenProyecto($p, Yii::$app->request->queryParams) : null,
             'interesados' => $tab === 'interesados' ? $this->interes->deProyecto($p) : [],
+            'pagados' => $tab === 'interesados' ? $this->interes->pagados($p) : [],
             'gestionarInteres' => $tab === 'interesados' && $this->interes->puedeGestionar(),
             'registrarPago' => $this->permisos->tienePermiso('inversiones_registrar'),
             'limiteServidor' => SubidaArchivo::limiteServidor(),

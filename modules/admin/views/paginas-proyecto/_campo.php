@@ -19,6 +19,7 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
+use app\widgets\ZonaArchivo;
 
 $id = 'pe-' . preg_replace('/[^a-z0-9_]+/i', '-', $ruta);
 $etiqueta = Html::encode($c['etiqueta'] ?? $nombre) . (!empty($c['requerido']) ? ' <span class="text-danger">*</span>' : '');
@@ -84,7 +85,8 @@ $comunes = ['id' => $id, 'class' => 'form-control', 'placeholder' => $c['placeho
                 </div>
                 <div>
                     <?= Html::hiddenInput($prefijo, $valor, ['data-pe-imagen-valor' => '1']) ?>
-                    <?= Html::fileInput('archivos[' . $ruta . ']', null, ['id' => $id, 'accept' => 'image/jpeg,image/png,image/webp', 'data-pe-imagen-archivo' => '1']) ?>
+                    <?= ZonaArchivo::envolver(Html::fileInput('archivos[' . $ruta . ']', null, ['id' => $id, 'accept' => 'image/jpeg,image/png,image/webp', 'data-pe-imagen-archivo' => '1']),
+                        '', ['compacta' => true, 'lista' => false, 'botones' => false, 'titulo' => 'Arrastre la foto aquí']) ?>
                     <button type="button" class="btn btn-link btn-xs" data-pe-imagen-quitar<?= $valor ? '' : ' hidden' ?>><i class="fa fa-times"></i> Quitar foto</button>
                     <?= $ayuda ?: '<p class="help-block">JPG, PNG o WEBP, hasta 8 MB.</p>' ?>
                 </div>

@@ -33,6 +33,9 @@ interface InterfaceInteresInversion
 
     public function puedeGestionar(): bool;
 
+    /** Lo que ya pagó cada interesado en el proyecto (pagos vigentes): idusuario => "USD 5.000". */
+    public function pagados(Proyecto $p): array;
+
     /** Cambia el estado y/o agrega una nota (permiso interesados_gestionar, gerente solo de sus áreas). @return array ['exito', 'mensaje', 'idproyecto'] */
     public function seguimiento(int $idinteres, array $post): array;
 }

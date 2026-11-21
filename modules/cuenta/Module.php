@@ -6,7 +6,7 @@ use Yii;
 
 /**
  * Cuenta del inversor en la web (/cuenta): registro, confirmación de correo, ingreso, recuperar contraseña,
- * estado de la solicitud y acuerdo de confidencialidad. Usa el layout público (sin traductor: ver layouts/main.php).
+ * estado de la solicitud y acuerdo de confidencialidad. Usa el layout público (con traductor; los datos personales llevan translate="no").
  * Sesión propia (como el panel admin): solo entran usuarios con rol Inversor.
  */
 class Module extends \yii\base\Module

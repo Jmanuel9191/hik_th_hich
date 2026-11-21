@@ -16,6 +16,7 @@ use app\models\ProyectoVideo;
 use app\components\VideoFormato;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use app\widgets\ZonaArchivo;
 
 $videos = $model->videos;
 $subidos = count(array_filter($videos, fn($v) => $v->tipo === 'archivo'));
@@ -79,8 +80,9 @@ $nuevo = new ProyectoVideo();
                     </div>
                     <div class="form-group">
                         <label class="control-label" for="video-archivo">Archivo de video</label>
-                        <?= Html::activeFileInput($nuevo, 'archivo', ['id' => 'video-archivo', 'class' => 'form-control', 'accept' => VideoFormato::accept(),
-                            'data-subida-archivo' => true, 'disabled' => $subidos >= Proyecto::MAX_VIDEOS_ARCHIVO]) ?>
+                        <?= ZonaArchivo::envolver(Html::activeFileInput($nuevo, 'archivo', ['id' => 'video-archivo', 'accept' => VideoFormato::accept(),
+                            'data-subida-archivo' => true, 'disabled' => $subidos >= Proyecto::MAX_VIDEOS_ARCHIVO]),
+                            'Video · hasta ' . Proyecto::MAX_VIDEO_MB . ' MB', ['titulo' => 'Arrastre el video aquí']) ?>
                         <p class="help-block">
                             <?= Html::encode(VideoFormato::textoFormatos()) ?> · hasta <?= Proyecto::MAX_VIDEO_MB ?> MB
                             <?php if (VideoFormato::ffmpeg()): ?>· los que no se ven en el navegador (AVI, MKV, cámaras…) se convierten solos a MP4<?php endif; ?>

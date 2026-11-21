@@ -17,7 +17,6 @@
  * @var string   $ruta     ruta actual, absoluta (ej. /site/index)
  * @var array    $redes    ['fa-facebook-f' => 'https://...']
  * @var callable $red      dibuja un ícono de red social
- * @var bool     $esPanel
  */
 
 use yii\helpers\Html;
@@ -114,8 +113,7 @@ $flagUrl = static fn (string $archivo): string => Url::to('@web/assets_b/img/fla
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
-            <?php if (!$esPanel): ?>
-                <!-- Selector de idioma con banderas (agregado). Usa GTranslate por detrás. -->
+            <!-- Selector de idioma con banderas (agregado). Usa GTranslate por detrás. -->
                 <div class="huk-lang-switch notranslate" data-lang-switch>
                     <button type="button" class="huk-lang-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Elegir idioma">
                         <img src="<?= $flagUrl($idiomas['es'][1]) ?>" alt="" width="20" height="15" data-lang-flag>
@@ -132,7 +130,6 @@ $flagUrl = static fn (string $archivo): string => Url::to('@web/assets_b/img/fla
                     </ul>
                 </div>
                 <div class="huk-lang gtranslate_wrapper"></div>
-            <?php endif; ?>
         </div>
     </div>
 </div>

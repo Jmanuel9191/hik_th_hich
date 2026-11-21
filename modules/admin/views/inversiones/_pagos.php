@@ -7,6 +7,7 @@
  * @var yii\web\View $this
  * @var yii\data\ActiveDataProvider $dataProvider
  * @var bool $conProyecto  muestra la columna Proyecto
+ * @var bool $conInversor  muestra la columna Inversor (no en la ficha del inversor)
  * @var bool $puedeAnular
  * @var bool $puedeRegistrar
  */
@@ -17,13 +18,14 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 $fecha = fn($v) => date('d/m/Y', strtotime($v));
+$conInversor = $conInversor ?? true;
 ?>
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
     'tableOptions' => ['class' => 'table table-striped table-hover huk-tabla-pagos'],
     'rowOptions' => fn(InversionPago $m) => $m->esAnulado() ? ['class' => 'huk-pago-anulado'] : [],
     'emptyText' => 'Todavía no hay pagos registrados.',
-    'layout' => "{summary}\n<div class=\"table-responsive\">{items}</div>\n{pager}",
+    'layout' => $conInversor ? "{summary}\n<div class=\"table-responsive\">{items}</div>\n{pager}" : '<div class="table-responsive">{items}</div>',
     'columns' => [
         [
             'label' => 'Fecha',
@@ -40,6 +42,7 @@ $fecha = fn($v) => date('d/m/Y', strtotime($v));
         [
             'label' => 'Inversor',
             'format' => 'raw',
+            'visible' => $conInversor,
             'value' => fn(InversionPago $m) => Html::a(Html::encode($m->fichaInversor ? $m->fichaInversor->nombreVisible() : $m->inversor->nombrecompleto),
                 ['inversores/view', 'id' => $m->idusuario], ['data-pjax' => '0']),
         ],
@@ -79,7 +82,7 @@ $fecha = fn($v) => date('d/m/Y', strtotime($v));
             'value' => fn(InversionPago $m) => Html::encode($m->registradoPor->nombrecompleto ?? '—')
                 . Html::tag('div', date('d/m/Y H:i', strtotime($m->fecha_registro)), ['class' => 'huk-eco-resumen'])
                 . ($m->esAnulado() ? Html::tag('div', '<span class="label label-danger">Anulado</span> ' . Html::encode($m->motivo_anulacion)
-                    . ' · ' . Html::encode($m->anuladoPor->nombrecompleto ?? '') . ' ' . date('d/m/Y H:i', strtotime($m->fecha_anulacion)), ['class' => 'huk-pago-motivo']) : ''),
+                    . ' · ' . Html::encode($m->anuladoPor->nombrecompleto ?? '') . ($m->fecha_anulacion ? ' ' . date('d/m/Y H:i', strtotime($m->fecha_anulacion)) : ''), ['class' => 'huk-pago-motivo']) : ''),
         ],
         [
             'label' => '',

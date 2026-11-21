@@ -84,6 +84,7 @@ class InversoresController extends Controller
             'inversiones' => $this->permisos->tienePermiso('inversiones_listar') ? $this->inversiones->resumenInversor($inv->idusuario) : null,
             'puede' => [
                 'registrarPago' => $this->permisos->tienePermiso('inversiones_registrar'),
+                'anularPago' => $this->permisos->tienePermiso('inversiones_anular'),
                 'editar' => $this->permisos->tienePermiso('inversores_editar'),
                 'aprobar' => $this->permisos->tienePermiso('inversores_aprobar'),
                 'estado' => $this->permisos->tienePermiso('inversores_estado'),

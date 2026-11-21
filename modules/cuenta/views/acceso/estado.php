@@ -23,7 +23,7 @@ $rechazado = $estado === 'rechazado';
             <div class="huk-mensaje-icono"><i class="fa-solid <?= $rechazado ? 'fa-circle-xmark' : 'fa-hourglass-half' ?>" aria-hidden="true"></i></div>
             <span class="huk-estado-etiqueta"><?= $rechazado ? 'Solicitud no aprobada' : 'En revisión' ?></span>
             <h1><?= $rechazado ? 'Su solicitud fue rechazada' : 'Su solicitud está siendo procesada' ?></h1>
-            <p>Hola, <strong><?= Html::encode($nombre) ?></strong>.
+            <p>Hola, <strong class="notranslate" translate="no"><?= Html::encode($nombre) ?></strong>.
                 <?= $rechazado
                     ? 'Revisamos su solicitud y por ahora no pudimos aprobarla, por eso no puede ingresar a la plataforma.'
                     : 'Nuestro equipo está verificando sus datos. Podrá ingresar en cuanto su solicitud sea aprobada: le avisaremos por correo.' ?></p>

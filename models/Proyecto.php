@@ -371,7 +371,7 @@ class Proyecto extends ActiveRecord
         return array_values(array_intersect_key(self::ETAPAS, array_flip($this->etapasInteres)));
     }
 
-    /** "US$ 1.500.000" (o "—"). */
+    /** "USD 1.500.000" (o null): siempre con el código de la moneda, igual en todo el sistema. */
     public function monto($campo)
     {
         if ($this->$campo === null || $this->$campo === '') {
@@ -379,7 +379,7 @@ class Proyecto extends ActiveRecord
         }
         $n = (float) $this->$campo;
         $texto = number_format($n, fmod($n, 1.0) ? 2 : 0, ',', '.');
-        return trim(($this->moneda->simbolo ?? '') . ' ' . $texto);
+        return trim(($this->moneda->codigo ?? '') . ' ' . $texto);
     }
 
     /**

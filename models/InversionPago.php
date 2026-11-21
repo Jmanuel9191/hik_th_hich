@@ -185,12 +185,12 @@ class InversionPago extends ActiveRecord
         return Yii::getAlias('@app/' . self::CARPETA . '/' . (int) $idproyecto);
     }
 
-    /** "USD 5.000" / "Bs 1.250,50" */
+    /** "USD 5.000" / "BOB 1.250,50": siempre con el código de la moneda, igual en todo el sistema. */
     public static function dinero($monto, $moneda)
     {
         $m = (float) $monto;
         $dec = floor($m) == $m ? 0 : 2;
-        return trim(($moneda->simbolo ?? $moneda->codigo ?? '') . ' ' . number_format($m, $dec, ',', '.'));
+        return trim(($moneda->codigo ?? '') . ' ' . number_format($m, $dec, ',', '.'));
     }
 
     public function montoTexto()
@@ -220,7 +220,7 @@ class InversionPago extends ActiveRecord
         return array_map(fn($f) => ['moneda' => $monedas[$f['idmoneda']] ?? null, 'total' => (float) $f['total'], 'pagos' => (int) $f['pagos']], $filas);
     }
 
-    /** "Bs 7.000 + USD 5.000" */
+    /** "BOB 7.000 + USD 5.000" */
     public static function totalesTexto(array $totales)
     {
         return $totales ? implode(' + ', array_map(fn($t) => self::dinero($t['total'], $t['moneda']), $totales)) : '—';

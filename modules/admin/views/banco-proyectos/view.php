@@ -19,6 +19,7 @@
  * @var array|null $editor datos del editor de la página web (pestaña pagina)
  * @var app\models\InteresInversion[] $interesados  "Quiero invertir" (pestaña Interesados)
  * @var bool $gestionarInteres
+ * @var array $pagados idusuario => lo que ya pagó (Interesados)
  * @var bool $registrarPago
  */
 
@@ -90,6 +91,7 @@ $cantidad = [
         'avances' => $avances,
         'inversiones' => $inversiones,
         'interesados' => $interesados,
+        'pagados' => $pagados,
         'gestionarInteres' => $gestionarInteres,
         'registrarPago' => $registrarPago,
         'limiteServidor' => $limiteServidor,

@@ -14,6 +14,7 @@ use app\models\Inversor;
 use app\models\SolicitudInversorForm;
 use kartik\form\ActiveForm;
 use yii\helpers\Html;
+use app\widgets\ZonaArchivo;
 
 \app\assets_b\InversoresAdminAsset::register($this);
 
@@ -48,8 +49,9 @@ $nuevo = !$model->idusuario;
                     <div class="col-sm-7"><?= $form->field($model, 'documento_numero')->textInput(['maxlength' => 40]) ?></div>
                 </div>
                 <?php if ($nuevo): ?>
-                    <?= $form->field($model, 'documento')->fileInput(['accept' => '.jpg,.jpeg,.png,.webp,.pdf'])
-                        ->hint('Opcional desde el panel (en la web es obligatorio). JPG, PNG, WEBP o PDF, hasta ' . Inversor::MAX_DOCUMENTO_MB . ' MB.') ?>
+                    <?= $form->field($model, 'documento', ['template' => ZonaArchivo::plantilla('JPG, PNG, WEBP o PDF · hasta ' . Inversor::MAX_DOCUMENTO_MB . ' MB')])
+                        ->fileInput(['accept' => '.jpg,.jpeg,.png,.webp,.pdf'])
+                        ->hint('Opcional desde el panel (en la web es obligatorio).') ?>
                 <?php endif; ?>
                 <div class="row">
                     <div class="col-sm-6"><?= $form->field($model, 'pais')->textInput(['maxlength' => 50, 'list' => 'lista-paises']) ?></div>

@@ -36,7 +36,7 @@ $fecha = fn($f) => $f ? Yii::$app->formatter->asDate($f, 'php:d/m/Y') : '—';
             <?= Html::endForm() ?>
         <?php endif; ?>
 
-        <h1 class="huk-perfil-nombre"><?= Html::encode($u->nombrecompleto) ?></h1>
+        <h1 class="huk-perfil-nombre notranslate" translate="no"><?= Html::encode($u->nombrecompleto) ?></h1>
         <p class="huk-perfil-tipo">
             <?= Html::encode(Inversor::TIPOS[$inversor->tipo] ?? $inversor->tipo) ?>
             <?php if ($inversor->tipo === 'empresa' && $inversor->razon_social): ?> · <?= Html::encode($inversor->razon_social) ?><?php endif; ?>
@@ -46,7 +46,7 @@ $fecha = fn($f) => $f ? Yii::$app->formatter->asDate($f, 'php:d/m/Y') : '—';
             <?= $inversor->estado_solicitud === 'aprobado' ? 'Inversor aprobado' : Html::encode($inversor->estadoNombre()) ?>
         </span>
 
-        <ul class="huk-perfil-datos">
+        <ul class="huk-perfil-datos notranslate" translate="no">
             <li><i class="fa-solid fa-envelope" aria-hidden="true"></i><span><?= Html::encode($u->email) ?></span></li>
             <li><i class="fa-solid fa-mobile-screen" aria-hidden="true"></i><span><?= Html::encode($u->movil ?: $u->telefono ?: '—') ?></span></li>
             <li><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span><?= Html::encode(trim($u->ciudad . ', ' . $u->pais, ', ') ?: '—') ?></span></li>

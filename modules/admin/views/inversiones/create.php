@@ -8,7 +8,8 @@
  * @var array $proyectos id => texto
  * @var array $datosProyectos id => ['moneda', 'codigo']
  * @var array $inversores id => texto
- * @var string|null $volver proyecto | inversor
+ * @var array $interesados idproyecto => [idusuario => ['texto', 'monto', 'idmoneda']] ("Quiero invertir": van primero, con ★)
+ * @var string|null $volver proyecto | inversor | interesados
  */
 
 use app\models\InversionPago;
@@ -16,6 +17,8 @@ use app\models\Moneda;
 use kartik\form\ActiveForm;
 use kartik\select2\Select2;
 use yii\helpers\Html;
+use yii\helpers\Json;
+use app\widgets\ZonaArchivo;
 
 \app\assets_b\InversionesAdminAsset::register($this);
 
@@ -24,7 +27,18 @@ $opcionesProyecto = [];
 foreach ($datosProyectos as $id => $d) {
     $opcionesProyecto[$id] = ['data-moneda' => $d['moneda'], 'data-codigo' => $d['codigo']];
 }
-$cancelar = $volver === 'proyecto' && $model->idproyecto ? ['banco-proyectos/view', 'id' => $model->idproyecto, 'tab' => 'inversiones']
+// Con el proyecto ya elegido, sus interesados arriba (el JS los reordena si cambia el proyecto).
+$interesadosProyecto = $interesados[$model->idproyecto] ?? [];
+if ($interesadosProyecto) {
+    $primero = [];
+    foreach ($interesadosProyecto as $id => $d) {
+        if (isset($inversores[$id])) {
+            $primero[$id] = '★ ' . $inversores[$id] . ' · Interesado: ' . $d['texto'];
+        }
+    }
+    $inversores = $primero + array_diff_key($inversores, $primero);
+}
+$cancelar = in_array($volver, ['proyecto', 'interesados'], true) && $model->idproyecto ? ['banco-proyectos/view', 'id' => $model->idproyecto, 'tab' => $volver === 'interesados' ? 'interesados' : 'inversiones']
     : ($volver === 'inversor' && $model->idusuario ? ['inversores/view', 'id' => $model->idusuario] : ['index']);
 ?>
 
@@ -53,8 +67,9 @@ $cancelar = $volver === 'proyecto' && $model->idproyecto ? ['banco-proyectos/vie
                     ])->hint('Solo proyectos publicados o con la inversión completa.') ?>
                     <?= $form->field($model, 'idusuario')->widget(Select2::class, [
                         'data' => $inversores,
-                        'options' => ['placeholder' => 'Elija el inversor…'],
-                    ])->hint('Inversores aprobados. Entre paréntesis, las áreas que tiene habilitadas: el proyecto tiene que ser de una de ellas.') ?>
+                        'options' => ['placeholder' => 'Elija el inversor…', 'data-pago-inversor' => true, 'data-interesados' => Json::encode($interesados)],
+                    ])->hint('Todos los inversores aprobados. Primero, con ★, los que tocaron «Quiero invertir» en este proyecto (y su monto estimado). '
+                        . 'Entre paréntesis, las áreas que tiene habilitadas: el proyecto tiene que ser de una de ellas.') ?>
                 </div>
             </div>
             <div class="box box-primary">
@@ -85,8 +100,9 @@ $cancelar = $volver === 'proyecto' && $model->idproyecto ? ['banco-proyectos/vie
             <div class="box box-primary">
                 <div class="box-header with-border"><h3 class="box-title"><i class="fa fa-paperclip"></i> Comprobante y nota</h3></div>
                 <div class="box-body">
-                    <?= $form->field($model, 'comprobante')->fileInput(['accept' => '.jpg,.jpeg,.png,.webp,.pdf'])
-                        ->hint('Foto o PDF del comprobante, hasta ' . InversionPago::MAX_COMPROBANTE_MB . ' MB. Si no lo tiene ahora, puede subirlo después desde la lista.') ?>
+                    <?= $form->field($model, 'comprobante', ['template' => ZonaArchivo::plantilla('Foto o PDF · hasta ' . InversionPago::MAX_COMPROBANTE_MB . ' MB')])
+                        ->fileInput(['accept' => '.jpg,.jpeg,.png,.webp,.pdf'])
+                        ->hint('Si no lo tiene ahora, puede subirlo después desde la lista.') ?>
                     <?= $form->field($model, 'nota')->textarea(['rows' => 4, 'maxlength' => 500]) ?>
                 </div>
             </div>

@@ -4,6 +4,8 @@
       Proyecto: <select data-pago-proyecto> con <option data-moneda data-codigo>. Moneda: <select data-pago-moneda>.
    2. Tipo de pago: marca la opción elegida y cambia la ayuda de "Referencia" (data-ayuda).
    3. Subir / reemplazar comprobante desde la lista: <button data-pago-comprobante="URL">.
+   4. Inversor: los que tocaron «Quiero invertir» en el proyecto elegido van primero, con ★ y su monto estimado;
+      al elegir uno, si el monto está vacío se carga el estimado (y su moneda). Datos: <select data-pago-inversor data-interesados>.
    ========================================================================== */
 (function ($) {
   "use strict";
@@ -69,4 +71,34 @@
     });
     $in.trigger("click");
   });
+
+  /* 4 */
+  var $inv = $("[data-pago-inversor]");
+  if ($inv.length) {
+    var mapa = $inv.data("interesados") || {};
+    var base = {};
+    $inv.find("option").each(function () {
+      if (this.value) base[this.value] = $(this).text().replace(/^★ /, "").replace(/ · Interesado: .*$/, "");
+    });
+    var reordenar = function (idp) {
+      var inter = mapa[idp] || {}, actual = String($inv.val() || "");
+      var ids = Object.keys(base).sort(function (a, b) { return base[a].localeCompare(base[b], "es"); });
+      var lista = ids.filter(function (id) { return inter[id]; }).concat(ids.filter(function (id) { return !inter[id]; }));
+      $inv.find("option").filter(function () { return this.value !== ""; }).remove();
+      lista.forEach(function (id) {
+        var texto = inter[id] ? "★ " + base[id] + " · Interesado: " + inter[id].texto : base[id];
+        $inv.append(new Option(texto, id, false, id === actual));
+      });
+      $inv.trigger("change.select2");
+    };
+    $(document).on("change", "[data-pago-proyecto]", function () { reordenar(String($(this).val() || "")); });
+    $inv.on("change", function () {
+      var d = (mapa[String($("[data-pago-proyecto]").val() || "")] || {})[String($(this).val() || "")];
+      var $m = $("#inversionpago-monto");
+      if (d && d.monto && !$m.val()) {
+        $m.val(d.monto);
+        if (d.idmoneda) { $("[data-pago-moneda]").val(String(d.idmoneda)); equivalente(); }
+      }
+    });
+  }
 })(jQuery);

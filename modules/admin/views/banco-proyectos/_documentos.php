@@ -16,6 +16,7 @@ use app\models\Proyecto;
 use app\models\ProyectoDocumento;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use app\widgets\ZonaArchivo;
 
 $maxBytes = min(Proyecto::MAX_DOCUMENTO_MB * 1048576, $limiteServidor ?: PHP_INT_MAX);
 $nuevo = new ProyectoDocumento(['visible_inversor' => '1']);
@@ -98,9 +99,9 @@ $documentos = $model->documentos;
                     </div>
                     <div class="form-group">
                         <label class="control-label" for="documento-archivo">Archivo</label>
-                        <?= Html::activeFileInput($nuevo, 'archivo', ['id' => 'documento-archivo', 'class' => 'form-control', 'required' => true,
-                            'accept' => '.' . implode(',.', array_keys(ProyectoDocumento::FORMATOS)), 'data-subida-archivo' => true]) ?>
-                        <p class="help-block">PDF, Word, Excel, PowerPoint o imagen · hasta <?= round($maxBytes / 1048576) ?> MB.</p>
+                        <?= ZonaArchivo::envolver(Html::activeFileInput($nuevo, 'archivo', ['id' => 'documento-archivo', 'required' => true,
+                            'accept' => '.' . implode(',.', array_keys(ProyectoDocumento::FORMATOS)), 'data-subida-archivo' => true]),
+                            'PDF, Word, Excel, PowerPoint o imagen · hasta ' . round($maxBytes / 1048576) . ' MB') ?>
                     </div>
                     <div class="checkbox">
                         <label><?= Html::activeCheckbox($nuevo, 'visible_inversor', ['label' => null, 'uncheck' => '0']) ?> Lo pueden ver los inversores</label>

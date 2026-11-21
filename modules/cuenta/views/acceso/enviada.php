@@ -16,7 +16,7 @@ use yii\helpers\Html;
 \app\assets_b\CuentaAsset::register($this);
 
 $pasos = [
-    ['fa-envelope-circle-check', 'Confirme su correo', 'Le enviamos un enlace a <strong>' . Html::encode($email) . '</strong>. Ábralo para confirmar que es suyo (si no lo ve, revise la carpeta de spam).', 'is-actual'],
+    ['fa-envelope-circle-check', 'Confirme su correo', 'Le enviamos un enlace a <strong class="notranslate" translate="no">' . Html::encode($email) . '</strong>. Ábralo para confirmar que es suyo (si no lo ve, revise la carpeta de spam).', 'is-actual'],
     ['fa-user-check', 'Verificamos sus datos', 'Nuestro equipo revisa su solicitud y su documento. Es posible que nos comuniquemos con usted para conocer mejor su perfil.', ''],
     ['fa-bell', 'Le avisaremos por correo', 'Cuando su solicitud esté aprobada le llegará un correo con las áreas habilitadas y ya podrá ingresar.', ''],
 ];
@@ -31,7 +31,7 @@ $pasos = [
         <div class="huk-tarjeta-form is-media huk-enviada" data-reveal>
             <div class="huk-enviada-check" aria-hidden="true"><i class="fa-solid fa-check"></i></div>
             <h1>¡Solicitud enviada correctamente!</h1>
-            <p class="huk-enviada-lead">Gracias, <strong><?= Html::encode($nombre) ?></strong>. Recibimos sus datos.
+            <p class="huk-enviada-lead">Gracias, <strong class="notranslate" translate="no"><?= Html::encode($nombre) ?></strong>. Recibimos sus datos.
                 Esté atento a su correo: le avisaremos cuando su solicitud sea aprobada.</p>
 
             <ol class="huk-enviada-pasos">

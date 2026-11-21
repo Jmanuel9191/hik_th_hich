@@ -69,7 +69,7 @@ $fechaHora = fn($f) => Yii::$app->formatter->asDatetime($f, 'php:d/m/Y \a \l\a\s
     <div class="huk-perfil-bloque huk-perfil-estado-bloque">
         <div class="huk-mensaje-icono"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i></div>
         <div><h2>Su solicitud está en revisión.</h2>
-            <p>Nuestro equipo se comunicará con usted al <?= Html::encode($u->movil ?: $u->telefono) ?> o a <?= Html::encode($u->email) ?>.
+            <p>Nuestro equipo se comunicará con usted al <span class="notranslate" translate="no"><?= Html::encode($u->movil ?: $u->telefono) ?></span> o a <span class="notranslate" translate="no"><?= Html::encode($u->email) ?></span>.
                 Cuando esté aprobada le avisaremos por correo.</p></div>
     </div>
 <?php endif; ?>
@@ -84,7 +84,7 @@ $fechaHora = fn($f) => Yii::$app->formatter->asDatetime($f, 'php:d/m/Y \a \l\a\s
             <div>
                 <strong>Acuerdo de confidencialidad</strong>
                 <?php if ($nda): ?>
-                    <span>Versión <?= (int) ($nda->version->numero ?? 0) ?> · firmado como «<?= Html::encode($nda->firma) ?>»</span>
+                    <span>Versión <?= (int) ($nda->version->numero ?? 0) ?> · firmado como «<span class="notranslate" translate="no"><?= Html::encode($nda->firma) ?></span>»</span>
                     <span><?= $fechaHora($nda->fecha) ?></span>
                     <?php if ($nda->version): ?>
                         <button type="button" class="huk-perfil-leer" data-bs-toggle="modal" data-bs-target="#modal-nda">Leer el acuerdo</button>

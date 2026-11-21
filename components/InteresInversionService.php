@@ -3,6 +3,7 @@
 namespace app\components;
 
 use app\models\Configuracion;
+use app\models\InversionPago;
 use app\models\InteresInversion;
 use app\models\InteresInversionNota;
 use app\models\Inversor;
@@ -116,6 +117,19 @@ class InteresInversionService implements InterfaceInteresInversion
         $orden = "FIELD(estado, 'nuevo', 'contacto', 'negociacion', 'concretado', 'descartado')";
         return InteresInversion::find()->with(['usuario', 'inversor', 'moneda', 'notas.usuario'])->where(['idproyecto' => $p->idproyecto])
             ->orderBy(new \yii\db\Expression($orden . ', fecha_actualizacion DESC'))->all();
+    }
+
+    public function pagados(Proyecto $p): array
+    {
+        $ids = InteresInversion::find()->select('idusuario')->where(['idproyecto' => $p->idproyecto])->column();
+        $res = [];
+        foreach ($ids as $id) {
+            $totales = InversionPago::totalesPorMoneda(['idproyecto' => $p->idproyecto, 'idusuario' => (int) $id]);
+            if ($totales) {
+                $res[(int) $id] = InversionPago::totalesTexto($totales);
+            }
+        }
+        return $res;
     }
 
     public function puedeGestionar(): bool

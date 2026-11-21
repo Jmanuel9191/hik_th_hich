@@ -15,6 +15,7 @@ use app\models\BannerProyectoForm;
 use app\models\Proyecto;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use app\widgets\ZonaArchivo;
 
 $p = $proyecto;
 $f = $banner;
@@ -59,7 +60,8 @@ $filaCifra = function ($i, array $c) use ($n) {
                                     <?= $p->$campo ? Html::img($p->urlImagen($campo), ['alt' => '']) : '<i class="fa fa-picture-o"></i>' ?>
                                 </div>
                                 <div>
-                                    <?= Html::fileInput('imagen[' . $campo . ']', null, ['accept' => 'image/jpeg,image/png,image/webp', 'data-pe-imagen-archivo' => '1']) ?>
+                                    <?= ZonaArchivo::envolver(Html::fileInput('imagen[' . $campo . ']', null, ['accept' => 'image/jpeg,image/png,image/webp', 'data-pe-imagen-archivo' => '1']),
+                                        'JPG, PNG o WEBP', ['compacta' => true, 'lista' => false, 'botones' => false, 'titulo' => 'Arrastre la foto aquí']) ?>
                                     <p class="help-block"><?= $campo === 'imagen_banner' ? 'El fondo del banner de la página.' : 'La foto de la tarjeta (listado y carrusel del ecosistema).' ?></p>
                                 </div>
                             </div>
